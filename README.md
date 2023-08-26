@@ -1,2 +1,2 @@
 # config
-Kickstart configuration files
+Kickstart installation files for Linux (Ubuntu), macOS and Windows
