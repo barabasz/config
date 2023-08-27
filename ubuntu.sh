@@ -1,8 +1,14 @@
-#!/bin/zsh
+#!/bin/bash
 
 # Update, upgrade & cleanup
 sudo apt update && sudo apt -y upgrade
 sudo apt autoremove
+
+# Certs & security
+sudo apt install -y openssh-server gnupg2 ca-certificates acl
+
+# Basic tools
+sudo apt install -y net-tools lsb-release apt-transport-https software-properties-common
 
 # Git & GitHub
 sudo apt -y install git gh
@@ -41,12 +47,6 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/too
 git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
 git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
 git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
-
-# Certs & security
-sudo apt install -y openssh-server gnupg2 ca-certificates acl
-
-# Basic tools
-sudo apt install -y curl net-tools lsb-release apt-transport-https software-properties-common
 
 # mc (Midnight Commander)
 sudo apt install -y mc
