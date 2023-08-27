@@ -1,18 +1,21 @@
 #!/bin/bash
 
+export NEEDRESTART_MODE=a
+
 # Update, upgrade & cleanup
-sudo apt update && sudo apt -y upgrade
+sudo NEEDRESTART_MODE=a apt update && sudo apt -y upgrade
 sudo apt autoremove
 
 # Certs & security
-sudo apt install -y openssh-server gnupg2 ca-certificates acl
+sudo NEEDRESTART_MODE=a apt install -y openssh-server gnupg2 ca-certificates acl
 
 # Basic tools
-sudo apt install -y net-tools lsb-release apt-transport-https software-properties-common
+sudo NEEDRESTART_MODE=a apt install -y net-tools lsb-release apt-transport-https software-properties-common
 
 # Git & GitHub
-sudo apt -y install git gh
+sudo NEEDRESTART_MODE=a apt -y install git gh
 gh auth login
+mkdir -p ~/GitHub && cd $_
 
 # Clone bin
 if [ ! -d "~/GitHub/bin" ]; then
@@ -27,12 +30,16 @@ fi
 ln -sf ~/GitHub/bintest/linux ~/bintest
 
 # Clone config
-mkdir -p ~/GitHub && cd $_
 if [ ! -d "~/GitHub/config" ]; then
     gh repo clone barabasz/config
 fi
 
-# Locale
+# Disable login info
+sudo chmod -x /etc/update-motd.d/10-help-text
+sudo chmod -x /etc/update-motd.d/50-motd-news
+sudo chmod -x /etc/update-motd.d/91-contract-ua-esm-status
+
+# Set locale
 sudo apt install language-pack-pl-base language-pack-pl
 sudo locale-gen pl_PL && sudo locale-gen pl_PL.UTF-8
 sudo cp -f ~/GitHub/config/default/locale /etc/default/locale
