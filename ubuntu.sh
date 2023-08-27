@@ -32,9 +32,9 @@ sudo locale-gen pl_PL && sudo locale-gen pl_PL.UTF-8
 sudo cp -f ~/GitHub/config/default/locale /etc/default/locale
 
 # zsh & omz
-ln -sf ~/GitHub/config/zsh/.zshrc ~/.zshrc
-ln -sf ~/GitHub/config/zsh/.zprofile ~/.zprofile
-ln -sf ~/GitHub/config/zsh/.p10k.zsh ~/.p10k.zsh
+ln -sf ~/GitHub/config/zsh/.zshrc ~/
+ln -sf ~/GitHub/config/zsh/.zprofile ~/
+ln -sf ~/GitHub/config/zsh/.p10k.zsh ~/
 sudo apt install zsh
 chsh -s $(which zsh)
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
