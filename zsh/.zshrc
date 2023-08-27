@@ -10,7 +10,7 @@ fi
 [ -f ~/.bash_profile ] && source ~/.bash_profile
 [ -f ~/.iterm2_shell_integration.zsh ] && source ~/.iterm2_shell_integration.zsh
 
-export PATH=$HOME/bin:/usr/local/bin:$PATH
+export PATH=$HOME/bin:$HOME/bintest:/usr/local/bin:$PATH
 export ZSH="$HOME/.oh-my-zsh"
 ZSH_THEME="powerlevel10k/powerlevel10k"
 
