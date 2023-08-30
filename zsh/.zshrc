@@ -53,6 +53,9 @@ fi
 # ALIASES
 source ~/.zsh_aliases
 
+# FUNCTIONS
+source ~/.zsh_functions
+
 # PROMPT
 # fallback
 export PS1="[%{%F{cyan}%}%n%{%f%}@%{%F{green}%}%m:%{%F{yellow}%}%~%{%f%}%]]$ "
