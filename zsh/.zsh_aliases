@@ -1,0 +1,9 @@
+#!/bin/zsh
+
+alias vim="nvim"
+alias vi="nvim"
+alias view="nvim -R"
+alias vimdiff="nvim -d"
+alias mc="mc --nosubshell"
+alias myip="curl icanhazip.com" # Show public IP
+alias python=python3

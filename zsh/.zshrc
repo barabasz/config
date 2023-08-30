@@ -10,7 +10,16 @@ fi
 [ -f ~/.bash_profile ] && source ~/.bash_profile
 [ -f ~/.iterm2_shell_integration.zsh ] && source ~/.iterm2_shell_integration.zsh
 
+# user scripts and binaries
 export PATH=$HOME/bin:$HOME/bin/install:$HOME/binc:$HOME/binc/test:/usr/local/bin:$PATH
+
+# homebrew
+if [[ -f /opt/homebrew/bin/brew ]]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+elif [[ -f /home/linuxbrew/.linuxbrew/bin/brew ]]; then
+    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+fi
+
 export ZSH="$HOME/.oh-my-zsh"
 ZSH_THEME="powerlevel10k/powerlevel10k"
 
@@ -29,8 +38,6 @@ source $ZSH/oh-my-zsh.sh
 
 # User configuration
 
-export PS1="[%{%F{cyan}%}%n%{%f%}@%{%F{green}%}%m:%{%F{yellow}%}%~%{%f%}%]]$ "
-
 # export MANPATH="/usr/local/man:$MANPATH"
 
 # You may need to manually set your language environment
@@ -43,14 +50,11 @@ else
  export EDITOR='nvim'
 fi
 
-# Aliases
-alias vim="nvim"
-alias vi="nvim"
-alias view="nvim -R"
-alias vimdiff="nvim -d"
-alias mc="mc --nosubshell"
-alias myip="curl icanhazip.com" # Show public IP
-alias python=python3
+# ALIASES
+source ~/.zsh_aliases
 
+# PROMPT
+# fallback
+export PS1="[%{%F{cyan}%}%n%{%f%}@%{%F{green}%}%m:%{%F{yellow}%}%~%{%f%}%]]$ "
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
