@@ -1,5 +1,6 @@
 #!/bin/zsh
 
+# apt unattended quiet install
 function aptinstall() {
     envopt='NEEDRESTART_MODE=a DEBIAN_FRONTEND=noninteractive'
     aptopt='-qq'
@@ -7,14 +8,31 @@ function aptinstall() {
     sudo $envopt apt-get install $aptopt $@ | grep -Ev $filter
 }
 
-function gitscript() {
+# Execute external script
+function extscript() {
     /bin/bash -c "$(curl -fsSL $1)"
 }
 
-function gitsource() {
+# Source external file
+function extsource() {
     source /dev/stdin <<< "$(curl -fsSL $1)"
 }
 
+# Display OS name
+function osname() {
+    if [[ -f /etc/os-release ]]; then
+        osid=$(cat /etc/os-release | grep "^ID=")
+        osname=${osid:3}
+    elif [[ -d /System/iOSSupport ]]; then
+        osname='macos'
+    else
+        osname='unknown'
+    fi
+    osname=$(echo $osname | awk '{print tolower($0)}' | awk '{ gsub(/ /,""); print }')
+    printf $osname
+}
+
+# Print yellow header
 function printhead() {
     bold='\e[1m'
     yellow='\e[33m'

@@ -1,0 +1,10 @@
+PRETTY_NAME="macOS Ventura 13.4.1"
+NAME="macOS Ventura"
+VERSION_ID="13.4.1"
+VERSION_CODENAME="Ventura"
+ID=macos
+ID_LIKE=macos
+HOME_URL="https://www.apple.com/macos"
+SUPPORT_URL="https://support.apple.com/macos"
+BUG_REPORT_URL="https://www.apple.com/feedback/macos.html"
+PRIVACY_POLICY_URL="https://www.apple.com/legal/privacy/en-ww/"
