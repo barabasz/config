@@ -2,11 +2,14 @@
 
 # apt unattended quiet install
 function aptinstall() {
+    needrestart-quiet
     export NEEDRESTART_MODE=a 
     export DEBIAN_FRONTEND=noninteractive
     aptopt='-qq'
-    filter='^NEEDRESTART|^update|Reading|^\s*$'
-    sudo $envopt apt-get install $aptopt $@ | grep -Ev $filter
+    grpopt='-Eiv'
+    filter='^needrestart|^update|^reading|^building|^scanning|^\(|^\s*$'
+    sudo apt-get install $aptopt $@ | grep $grpopt $filter
+    needrestart-verbose
 }
 
 # Execute external script
@@ -17,6 +20,26 @@ function extscript() {
 # Source external file
 function extsource() {
     source /dev/stdin <<< "$(curl -fsSL $1)"
+}
+
+# modify /etc/needrestart/needrestart.conf
+# use: needrestart-mod parameter value
+function needrestart-mod() {
+    sed -i "s/^#\?\s\?\$nrconf{$1}.*/\$nrconf{verbosity} = $2;/"
+}
+function needrestart-quiet() {
+    needrestart-mod verbosity 0
+    systemctl_combine 0
+    kernelhints 0
+    ucodehints 0
+    
+}
+function needrestart-verbose() {
+    needrestart-mod verbosity 1
+    systemctl_combine 1
+    kernelhints '-1'
+    ucodehints 1
+    
 }
 
 # Display OS name
