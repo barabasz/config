@@ -39,7 +39,6 @@ function needrestart-verbose() {
     systemctl_combine 1
     kernelhints '-1'
     ucodehints 1
-    
 }
 
 # Display OS name
