@@ -25,7 +25,7 @@ function extsource() {
 # modify /etc/needrestart/needrestart.conf
 # use: needrestart-mod parameter value
 function needrestart-mod() {
-    sed -i "s/^#\?\s\?\$nrconf{$1}.*/\$nrconf{verbosity} = $2;/"
+    sudo sed -i "s/^#\?\s\?\$nrconf{$1}.*/\$nrconf{verbosity} = $2;/"
 }
 function needrestart-quiet() {
     needrestart-mod verbosity 0
