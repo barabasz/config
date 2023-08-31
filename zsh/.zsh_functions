@@ -5,7 +5,7 @@ function aptinstall() {
     export NEEDRESTART_MODE=a 
     export DEBIAN_FRONTEND=noninteractive
     aptopt='-qq'
-    filter='^NEEDRESTART|^update|Reading'
+    filter='^NEEDRESTART|^update|Reading|^\s*$'
     sudo $envopt apt-get install $aptopt $@ | grep -Ev $filter
 }
 
