@@ -19,6 +19,7 @@ if [[ -f /opt/homebrew/bin/brew ]]; then
 elif [[ -f /home/linuxbrew/.linuxbrew/bin/brew ]]; then
     eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 fi
+source $HOMEBREW_PREFIX/etc/homebrew/brew.env
 
 export ZSH="$HOME/.oh-my-zsh"
 ZSH_THEME="powerlevel10k/powerlevel10k"

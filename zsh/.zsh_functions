@@ -22,6 +22,11 @@ function extsource() {
     source /dev/stdin <<< "$(curl -fsSL $1)"
 }
 
+# Create dir and enter it
+function mdcd() {
+    mkdir -p $1 && cd $_
+}
+
 # modify /etc/needrestart/needrestart.conf
 # use: needrestart-mod parameter value
 function needrestart-mod() {

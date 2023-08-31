@@ -17,6 +17,7 @@ call plug#begin()
 " Basic blugins
 Plug 'tpope/vim-sensible'
 Plug 'ntpeters/vim-better-whitespace'
+Plug 'paretje/nvim-man'
 
 " NCM2 (nvim-completion-manager)
 Plug 'ncm2/ncm2'
