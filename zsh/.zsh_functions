@@ -2,7 +2,8 @@
 
 # apt unattended quiet install
 function aptinstall() {
-    envopt='NEEDRESTART_MODE=a DEBIAN_FRONTEND=noninteractive'
+    export NEEDRESTART_MODE=a 
+    export DEBIAN_FRONTEND=noninteractive
     aptopt='-qq'
     filter='^NEEDRESTART|^update|Reading'
     sudo $envopt apt-get install $aptopt $@ | grep -Ev $filter
