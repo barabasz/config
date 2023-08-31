@@ -25,20 +25,21 @@ function extsource() {
 # modify /etc/needrestart/needrestart.conf
 # use: needrestart-mod parameter value
 function needrestart-mod() {
-    sudo sed -i "s/^#\?\s\?\$nrconf{$1}.*/\$nrconf{verbosity} = $2;/"
+    filename=/etc/needrestart/needrestart.conf
+    sudo sed -i "s/^#\?\s\?\$nrconf{$1}.*/\$nrconf{$1} = $2;/" $filename
 }
 function needrestart-quiet() {
     needrestart-mod verbosity 0
-    systemctl_combine 0
-    kernelhints 0
-    ucodehints 0
+    needrestart-mod systemctl_combine 0
+    needrestart-mod kernelhints 0
+    needrestart-mod ucodehints 0
     
 }
 function needrestart-verbose() {
     needrestart-mod verbosity 1
-    systemctl_combine 1
-    kernelhints '-1'
-    ucodehints 1
+    needrestart-mod systemctl_combine 1
+    needrestart-mod kernelhints '-1'
+    needrestart-mod ucodehints 1
 }
 
 # Display OS name
