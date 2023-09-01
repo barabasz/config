@@ -2,14 +2,18 @@
 
 # apt unattended quiet install
 function aptinstall() {
-    needrestart-quiet
+    if [[ "$(isinstalled needrestart)" == "yes" ]]; then
+        needrestart-quiet
+    fi
     export NEEDRESTART_MODE=a 
     export DEBIAN_FRONTEND=noninteractive
     aptopt='-qq'
     grpopt='-Eiv'
     filter='^needrestart|^update|^reading|^building|^scanning|^\(|^\s*$'
     sudo apt-get install $aptopt $@ | grep $grpopt $filter
-    needrestart-verbose
+    if [[ "$(isinstalled needrestart)" == "yes" ]]; then
+        needrestart-verbose
+    fi
 }
 
 # Execute external script
