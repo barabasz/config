@@ -11,7 +11,7 @@ fi
 [ -f ~/.iterm2_shell_integration.zsh ] && source ~/.iterm2_shell_integration.zsh
 
 # user scripts and binaries
-export PATH=$HOME/bin:$HOME/bin/install:$HOME/binc:$HOME/binc/test:/usr/local/bin:$PATH
+export PATH=$HOME/bin:$HOME/binc:$HOME/binc/install:$HOME/binc/test:/usr/local/bin:$PATH
 
 # homebrew
 if [[ -f /opt/homebrew/bin/brew ]]; then
