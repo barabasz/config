@@ -26,8 +26,17 @@ function extsource() {
     source /dev/stdin <<< "$(curl -fsSL $1)"
 }
 
+# Get SHELL name
+function get_shell() {
+    echo $SHELL | xargs basename
+}
+
+function command_exists() {
+   type "$1" &>/dev/null
+}
+
 # Check if programm is installed
-function isinstalled() {
+function isinstalled-old() {
     test=$(which $1 | grep -o "/$1")
     if [[ "$test" == "/$1" ]]; then
         echo 'yes'
@@ -35,6 +44,8 @@ function isinstalled() {
         echo 'no'
     fi
 }
+
+
 
 # Create dir and enter it
 function mdcd() {
