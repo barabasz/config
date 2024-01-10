@@ -36,7 +36,7 @@ function command_exists() {
 }
 
 # Check if programm is installed
-function isinstalled-old() {
+function isinstalled() {
     test=$(which $1 | grep -o "/$1")
     if [[ "$test" == "/$1" ]]; then
         echo 'yes'
@@ -44,8 +44,6 @@ function isinstalled-old() {
         echo 'no'
     fi
 }
-
-
 
 # Create dir and enter it
 function mdcd() {
