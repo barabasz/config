@@ -66,5 +66,8 @@ export PS1="[%{%F{cyan}%}%n%{%f%}@%{%F{green}%}%m:%{%F{yellow}%}%~%{%f%}%]]$ "
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 
-# Load Angular CLI autocompletion.
-source <(ng completion script)
+# Load Angular CLI autocompletion
+
+if [[ "$(isinstalled ng)" == "yes" ]]; then
+  source <(ng completion script)
+fi
