@@ -6,5 +6,6 @@ alias view='nvim -R'
 alias vimdiff='nvim -d'
 alias mc='mc --nosubshell'
 alias myip='curl icanhazip.com' # Show public IP
+alias pip='pip3'
 alias python='python3'
 alias shopt='/usr/bin/shopt'
