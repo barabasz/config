@@ -67,7 +67,11 @@ export PS1="[%{%F{cyan}%}%n%{%f%}@%{%F{green}%}%m:%{%F{yellow}%}%~%{%f%}%]]$ "
 
 
 # Load Angular CLI autocompletion
-
 if [[ "$(isinstalled ng)" == "yes" ]]; then
   source <(ng completion script)
+fi
+
+# The Fuck helper
+if [[ "$(isinstalled thefuck)" == "yes" ]]; then
+  eval $(thefuck --alias)
 fi
