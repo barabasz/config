@@ -1,14 +1,15 @@
 #!/bin/zsh
 
-alias vim='nvim'
-alias vi='nvim'
-alias view='nvim -R'
-alias vimdiff='nvim -d'
+alias 7zip='7zz'
+alias dir='nnn -deH'
+alias imagemagick='magick'
 alias mc='mc --nosubshell'
 alias myip='curl icanhazip.com' # Show public IP
-alias imagemagick='magick'
 alias pip='pip3'
 alias python='python3'
 alias shopt='/usr/bin/shopt'
+alias vi='nvim'
+alias view='nvim -R'
+alias vim='nvim'
+alias vimdiff='nvim -d'
 alias youtube-dl='yt-dlp'
-alias 7zip='7zz'
