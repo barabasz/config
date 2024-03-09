@@ -71,7 +71,6 @@ function needrestart-quiet() {
     needrestart-mod systemctl_combine 0
     needrestart-mod kernelhints 0
     needrestart-mod ucodehints 0
-    
 }
 function needrestart-verbose() {
     needrestart-mod verbosity 1
