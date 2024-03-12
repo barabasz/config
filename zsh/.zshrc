@@ -22,7 +22,8 @@ fi
 source $HOMEBREW_PREFIX/etc/homebrew/brew.env
 
 # Python
-export PATH="$(brew --prefix)/bin:$PATH"
+# export PATH="$(brew --prefix)/bin:$PATH"
+export PATH="/Library/Frameworks/Python.framework/Versions/3.12/bin:${PATH}"
 
 export ZSH="$HOME/.oh-my-zsh"
 ZSH_THEME="powerlevel10k/powerlevel10k"

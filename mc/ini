@@ -90,7 +90,7 @@ shell_directory_timeout=900
 
 [Layout]
 output_lines=0
-left_panel_size=64
+left_panel_size=67
 top_panel_size=0
 message_visible=false
 keybar_visible=true
