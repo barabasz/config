@@ -1,0 +1,3 @@
+! Hide Facebook Reels
+! facebook.com##[aria-posinset] [href="/reel/?s=ifu_see_more"]:upward([aria-posinset]) 
+facebook.com##[role=main]>div [aria-label="Reels"]:upward(3)
