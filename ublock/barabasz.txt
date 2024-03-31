@@ -1,3 +1,13 @@
-! Hide Facebook Reels
+! Title: uBlock extra filters by Barabasz
+! Author: Barabasz
+! Last modified: 31 March 2023
+! Expires: 1 days
+! Version: 20230331001
+! License: https://creativecommons.org/licenses/by-nc-sa/4.0/
+!
+!----------------------- Facebook -----------------------!
+! Hide Reels
 ! facebook.com##[aria-posinset] [href="/reel/?s=ifu_see_more"]:upward([aria-posinset]) 
 facebook.com##[role=main]>div [aria-label="Reels"]:upward(3)
+
+!----------------------- Youtube  -----------------------!
