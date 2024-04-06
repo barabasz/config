@@ -1,0 +1,9 @@
+{
+  "bootsound": true,
+  "max_brightness": 70,
+  "min_brightness": 1,
+  "mirror_screen": false,
+  "new_year": true,
+  "sensor_reading": false,
+  "temp_dec_places": 0
+}
