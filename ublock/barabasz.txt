@@ -1,8 +1,9 @@
 ! Title: uBlock extra filters by Barabasz
-! Author: Barabasz
-! Last modified: 31 March 2023
+! Author: @barabasz
+! Last modified: 13 April 2024
 ! Expires: 1 days
-! Version: 20230331001
+! Version: 20240413001
+! Source: https://github.com/barabasz/config/blob/main/ublock/barabasz.txt
 ! License: https://creativecommons.org/licenses/by-nc-sa/4.0/
 !
 !----------------------- Facebook -----------------------!
