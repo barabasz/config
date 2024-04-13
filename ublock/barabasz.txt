@@ -11,3 +11,6 @@
 facebook.com##[role=main]>div [aria-label="Reels"]:upward(3)
 
 !----------------------- Youtube  -----------------------!
+
+!----------------------- TVN24.pl -----------------------!
+tvn24.pl##.__ipPerunElement
