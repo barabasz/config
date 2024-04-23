@@ -79,3 +79,8 @@ fi
 if [[ "$(isinstalled thefuck)" == "yes" ]]; then
   eval $(thefuck --alias)
 fi
+
+# fzf shell integration
+if [[ "$(isinstalled fzf)" == "yes" ]]; then
+  eval "$(fzf --zsh)"
+fi
