@@ -9,12 +9,18 @@
 # it gets replaced by the "replace" string.
 matches:
   # Simple text replacement
-  - trigger: ":espanso"
-    replace: "Hi there!"
-  - trigger: ":ab"
+  - trigger: ";kst"
+    replace: "Departament Strategii"
+  - trigger: ";kso"
+    replace: "Wydział Koordynacji Kontroli"
+  - trigger: ";ab"
     replace: "Andrzej Barabasz"
-  - trigger: ":nik"
+  - trigger: ";nik"
     replace: "Najwyższa Izba Kontroli"
+  - trigger: ";pab"
+    replace: "Pozdrawiam,\nAndrzej Barabasz"
+  - trigger: ";pa"
+    replace: "Pozdrawiam,\nAndrzej"
 
   # NOTE: espanso uses YAML to define matches, so pay attention to the indentation!
 
