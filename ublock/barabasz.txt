@@ -6,6 +6,14 @@
 ! Source: https://github.com/barabasz/config/blob/main/ublock/barabasz.txt
 ! License: https://creativecommons.org/licenses/by-nc-sa/4.0/
 !
+!------------------------ Allegro -----------------------!
+allegro.pl##div[data-role="showcase"]>ol
+allegro.pl##div[data-box-name="Slider"]
+allegro.pl##div[data-box-name="Showcase Container"]
+allegro.pl##div[data-box-name="AdsPremium"]
+allegro.pl##div[data-box-name="allegro.ads.dss.banner"]
+allegro.pl##div[data-box-name="survey-container"]
+allegro.pl##div[data-box-name="ads.dss.listing.bottom.container"]
 !----------------------- Facebook -----------------------!
 ! Hide Reels
 ! facebook.com##[aria-posinset] [href="/reel/?s=ifu_see_more"]:upward([aria-posinset]) 
