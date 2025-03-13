@@ -1,5 +1,17 @@
 [
     {
+        "key": "alt+z",
+        "command": "-editor.action.toggleWordWrap"
+    },
+    {
+        "key": "insert",
+        "command": "editor.action.toggleOvertypeInsertMode"
+    },
+    {
+        "key": "f1",
+        "command": "-workbench.action.showCommands"
+    },
+    {
         "key": "ctrl+tab",
         "command": "-workbench.action.quickOpenPreviousRecentlyUsedEditorInGroup",
         "when": "!activeEditorGroupEmpty"
@@ -18,3 +30,4 @@
         "command": "workbench.action.previousEditor"
     }
 ]
+

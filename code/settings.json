@@ -1,0 +1,34 @@
+{
+    "[sql]": {
+        "editor.defaultFormatter": "adpyke.vscode-sql-formatter"
+    },
+    "diffEditor.ignoreTrimWhitespace": false,
+    "editor.accessibilitySupport": "off",
+    "editor.cursorBlinking": "smooth",
+    "editor.cursorSmoothCaretAnimation": "on",
+    "editor.fontFamily": "JetBrainsMono NF",
+    "editor.fontLigatures": true,
+    "editor.fontSize": 13,
+    "editor.semanticHighlighting.enabled": true,
+    "editor.smoothScrolling": true,
+    "editor.unicodeHighlight.ambiguousCharacters": false,
+    "editor.unicodeHighlight.nonBasicASCII": false,
+    "editor.wordWrap": "on",
+    "git.autofetch": true,
+    "git.confirmSync": false,
+    "git.enableSmartCommit": true,
+    "json.schemas": [],
+    "redhat.telemetry.enabled": true,
+    "security.workspace.trust.untrustedFiles": "open",
+    "terminal.integrated.cursorBlinking": true,
+    "terminal.integrated.smoothScrolling": true,
+    "workbench.colorCustomizations": {
+        //"editor.findMatchBorder": "#ff0000",
+        "[Tokyo Night]": { // or "[Tokyo Night Storm]"
+            "editorCodeLens.foreground": "#ffff00" // Preferred hex color
+        }
+    },
+    "workbench.iconTheme": "material-icon-theme",
+    "workbench.list.smoothScrolling": true,
+    "workbench.startupEditor": "none"
+}
