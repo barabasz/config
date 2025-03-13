@@ -11,9 +11,48 @@
     "editor.fontSize": 13,
     "editor.semanticHighlighting.enabled": true,
     "editor.smoothScrolling": true,
+    "editor.tokenColorCustomizations": {
+        "textMateRules": [
+        {
+            "name": "italic font",
+            "scope": [
+            "comment",
+            "keyword",
+            "storage",
+            "keyword.control",
+            "keyword.control.from",
+            "keyword.control.flow",
+            "keyword.operator.new",
+            "keyword.control.import",
+            "keyword.control.export",
+            "keyword.control.default",
+            "keyword.control.trycatch",
+            "keyword.control.conditional",
+            "storage.type",
+            "storage.type.class",
+            "storage.modifier.tsx",
+            "storage.type.function",
+            "storage.modifier.async",
+            "variable.language",
+            "variable.language.this",
+            "variable.language.super",
+            "meta.class",
+            "meta.var.expr",
+            "constant.language.null",
+            "support.type.primitive",
+            "entity.name.method.js",
+            "entity.other.attribute-name",
+            "punctuation.definition.comment"
+            ],
+            "settings": {
+            "fontStyle": "italic",
+            }
+        }
+        ]
+    },
     "editor.unicodeHighlight.ambiguousCharacters": false,
     "editor.unicodeHighlight.nonBasicASCII": false,
-    "editor.wordWrap": "on",
+    "editor.wordWrap": "off",
     "git.autofetch": true,
     "git.confirmSync": false,
     "git.enableSmartCommit": true,
@@ -23,12 +62,14 @@
     "terminal.integrated.cursorBlinking": true,
     "terminal.integrated.smoothScrolling": true,
     "workbench.colorCustomizations": {
-        //"editor.findMatchBorder": "#ff0000",
+        "editor.findMatchBorder": "#D1A03A",
+        //"editor."
         "[Tokyo Night]": { // or "[Tokyo Night Storm]"
             "editorCodeLens.foreground": "#ffff00" // Preferred hex color
         }
     },
-    "workbench.iconTheme": "material-icon-theme",
+    "workbench.iconTheme": "Monokai Pro (Filter Spectrum) Icons",
     "workbench.list.smoothScrolling": true,
-    "workbench.startupEditor": "none"
+    "workbench.startupEditor": "none",
+    "workbench.colorTheme": "One Dark Pro Night Flat"
 }
