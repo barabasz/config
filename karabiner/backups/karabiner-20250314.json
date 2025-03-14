@@ -4,19 +4,37 @@
             "complex_modifications": {
                 "rules": [
                     {
-                        "description": "escape on hold → hyper key ✦",
+                        "description": "fn (globe) → hyper key ✦",
                         "manipulators": [
                             {
-                                "description": "esc when tapped, hyper key ✦ when hold",
-                                "from": { "key_code": "escape" },
-                                "parameters": { "basic.to_if_held_down_threshold_milliseconds": 25 },
-                                "to_if_alone": [{ "key_code": "escape" }],
-                                "to_if_held_down": [
+                                "from": { "key_code": "fn" },
+                                "to": [
                                     {
                                         "key_code": "left_command",
                                         "modifiers": ["left_shift", "left_control", "left_option"]
                                     }
                                 ],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
+                        "description": "caps_lock and return → command on hold",
+                        "manipulators": [
+                            {
+                                "description": "caps_lock when tapped, right_command on hold",
+                                "from": { "key_code": "caps_lock" },
+                                "parameters": { "basic.to_if_held_down_threshold_milliseconds": 25 },
+                                "to_if_alone": [{ "key_code": "caps_lock" }],
+                                "to_if_held_down": [{ "key_code": "left_command" }],
+                                "type": "basic"
+                            },
+                            {
+                                "description": "return when tapped, right_command on hold",
+                                "from": { "key_code": "return_or_enter" },
+                                "parameters": { "basic.to_if_held_down_threshold_milliseconds": 25 },
+                                "to_if_alone": [{ "key_code": "return_or_enter" }],
+                                "to_if_held_down": [{ "key_code": "right_command" }],
                                 "type": "basic"
                             }
                         ]
@@ -53,62 +71,47 @@
                         ]
                     },
                     {
-                        "description": "tab and backshash on hold → left command",
+                        "description": "#️⃣2️⃣ tab and backshash → right_control on hold (layer modifier)",
                         "manipulators": [
                             {
-                                "description": "tab when tapped, left control when hold",
+                                "description": "tab when tapped, right_control when hold (2nd layer left key)",
                                 "from": { "key_code": "tab" },
                                 "parameters": { "basic.to_if_held_down_threshold_milliseconds": 25 },
                                 "to_if_alone": [{ "key_code": "tab" }],
-                                "to_if_held_down": [{ "key_code": "left_command" }],
+                                "to_if_held_down": [{ "key_code": "right_control" }],
                                 "type": "basic"
                             },
                             {
-                                "description": "backslash when tapped, left control when hold",
+                                "description": "backslash when tapped, right_control when hold (2nd layer right key)",
                                 "from": { "key_code": "backslash" },
                                 "parameters": { "basic.to_if_held_down_threshold_milliseconds": 25 },
                                 "to_if_alone": [{ "key_code": "backslash" }],
-                                "to_if_held_down": [{ "key_code": "left_command" }],
-                                "type": "basic"
-                            }
-                        ]
-                    },
-                    {
-                        "description": "2️⃣ layer modifier (caps lock or return on hold)",
-                        "manipulators": [
-                            {
-                                "description": "return when tapped, right control on hold",
-                                "from": { "key_code": "return_or_enter" },
-                                "parameters": { "basic.to_if_held_down_threshold_milliseconds": 25 },
-                                "to_if_alone": [{ "key_code": "return_or_enter" }],
-                                "to_if_held_down": [{ "key_code": "right_control" }],
-                                "type": "basic"
-                            },
-                            {
-                                "description": "return when tapped, right control on hold",
-                                "from": { "key_code": "caps_lock" },
-                                "parameters": { "basic.to_if_held_down_threshold_milliseconds": 25 },
-                                "to_if_alone": [{ "key_code": "return_or_enter" }],
                                 "to_if_held_down": [{ "key_code": "right_control" }],
                                 "type": "basic"
                             }
                         ]
                     },
                     {
-                        "description": "2️⃣ back-tick → eject",
+                        "description": "#️⃣2️⃣ back-tick → eject (power-off dialog)",
                         "manipulators": [
                             {
+                                "description": "show a power-off dialog",
                                 "from": {
                                     "key_code": "grave_accent_and_tilde",
                                     "modifiers": { "mandatory": ["right_control"] }
                                 },
-                                "to": [{ "consumer_key_code": "eject" }],
+                                "to": [
+                                    {
+                                        "key_code": "power",
+                                        "modifiers": ["left_control"]
+                                    }
+                                ],
                                 "type": "basic"
                             }
                         ]
                     },
                     {
-                        "description": "2️⃣ escape → system settings",
+                        "description": "#️⃣2️⃣ escape → system settings",
                         "manipulators": [
                             {
                                 "from": {
@@ -126,7 +129,7 @@
                         ]
                     },
                     {
-                        "description": "2️⃣ function keys cluster",
+                        "description": "#️⃣2️⃣ function keys cluster",
                         "manipulators": [
                             {
                                 "from": {
@@ -447,11 +450,27 @@
                                     }
                                 ],
                                 "type": "basic"
+                            },
+                            {
+                                "from": {
+                                    "key_code": "return_or_enter",
+                                    "modifiers": {
+                                        "mandatory": ["right_control"],
+                                        "optional": ["any"]
+                                    }
+                                },
+                                "to": [
+                                    {
+                                        "key_code": "f5",
+                                        "modifiers": ["fn"]
+                                    }
+                                ],
+                                "type": "basic"
                             }
                         ]
                     },
                     {
-                        "description": "2️⃣ delete cluster",
+                        "description": "#️⃣2️⃣ delete cluster",
                         "manipulators": [
                             {
                                 "description": "hyphen → delete the previous word",
@@ -502,63 +521,7 @@
                         ]
                     },
                     {
-                        "description": "2️⃣ tabs cluster",
-                        "manipulators": [
-                            {
-                                "description": "previous tab",
-                                "from": {
-                                    "key_code": "open_bracket",
-                                    "modifiers": {
-                                        "mandatory": ["right_control"],
-                                        "optional": ["any"]
-                                    }
-                                },
-                                "to": [
-                                    {
-                                        "key_code": "left_arrow",
-                                        "modifiers": ["left_option", "left_command"]
-                                    }
-                                ],
-                                "type": "basic"
-                            },
-                            {
-                                "description": "next tab",
-                                "from": {
-                                    "key_code": "close_bracket",
-                                    "modifiers": {
-                                        "mandatory": ["right_control"],
-                                        "optional": ["any"]
-                                    }
-                                },
-                                "to": [
-                                    {
-                                        "key_code": "right_arrow",
-                                        "modifiers": ["left_option", "left_command"]
-                                    }
-                                ],
-                                "type": "basic"
-                            },
-                            {
-                                "description": "new tab",
-                                "from": {
-                                    "key_code": "backslash",
-                                    "modifiers": {
-                                        "mandatory": ["right_control"],
-                                        "optional": ["any"]
-                                    }
-                                },
-                                "to": [
-                                    {
-                                        "key_code": "t",
-                                        "modifiers": ["left_command"]
-                                    }
-                                ],
-                                "type": "basic"
-                            }
-                        ]
-                    },
-                    {
-                        "description": "2️⃣ navigation cluster",
+                        "description": "#️⃣2️⃣ navigation cluster",
                         "manipulators": [
                             {
                                 "description": "go to the beginning of file",
@@ -626,7 +589,41 @@
                                 "type": "basic"
                             },
                             {
-                                "description": "go to the end of file",
+                                "description": "previous tab",
+                                "from": {
+                                    "key_code": "open_bracket",
+                                    "modifiers": {
+                                        "mandatory": ["right_control"],
+                                        "optional": ["any"]
+                                    }
+                                },
+                                "to": [
+                                    {
+                                        "key_code": "left_arrow",
+                                        "modifiers": ["left_option", "left_command"]
+                                    }
+                                ],
+                                "type": "basic"
+                            },
+                            {
+                                "description": "next tab",
+                                "from": {
+                                    "key_code": "close_bracket",
+                                    "modifiers": {
+                                        "mandatory": ["right_control"],
+                                        "optional": ["any"]
+                                    }
+                                },
+                                "to": [
+                                    {
+                                        "key_code": "right_arrow",
+                                        "modifiers": ["left_option", "left_command"]
+                                    }
+                                ],
+                                "type": "basic"
+                            },
+                            {
+                                "description": "go to the beginning of the line or paragraph",
                                 "from": {
                                     "key_code": "h",
                                     "modifiers": {
@@ -636,7 +633,7 @@
                                 },
                                 "to": [
                                     {
-                                        "key_code": "down_arrow",
+                                        "key_code": "a",
                                         "modifiers": ["left_control"]
                                     }
                                 ],
@@ -691,9 +688,38 @@
                                 "type": "basic"
                             },
                             {
-                                "description": "go one word left",
+                                "description": "go to the end of the line or paragraph",
+                                "from": {
+                                    "key_code": "quote",
+                                    "modifiers": {
+                                        "mandatory": ["right_control"],
+                                        "optional": ["any"]
+                                    }
+                                },
+                                "to": [
+                                    {
+                                        "key_code": "e",
+                                        "modifiers": "left_control"
+                                    }
+                                ],
+                                "type": "basic"
+                            },
+                            {
+                                "description": "go back (in history)",
                                 "from": {
                                     "key_code": "n",
+                                    "modifiers": {
+                                        "mandatory": ["right_control"],
+                                        "optional": ["any"]
+                                    }
+                                },
+                                "to": [{ "pointing_button": "button4" }],
+                                "type": "basic"
+                            },
+                            {
+                                "description": "go one word left",
+                                "from": {
+                                    "key_code": "m",
                                     "modifiers": {
                                         "mandatory": ["right_control"],
                                         "optional": ["any"]
@@ -708,9 +734,26 @@
                                 "type": "basic"
                             },
                             {
+                                "description": "go to the end of file",
+                                "from": {
+                                    "key_code": "comma",
+                                    "modifiers": {
+                                        "mandatory": ["right_control"],
+                                        "optional": ["any"]
+                                    }
+                                },
+                                "to": [
+                                    {
+                                        "key_code": "down_arrow",
+                                        "modifiers": ["left_command"]
+                                    }
+                                ],
+                                "type": "basic"
+                            },
+                            {
                                 "description": "go one word right",
                                 "from": {
-                                    "key_code": "m",
+                                    "key_code": "period",
                                     "modifiers": {
                                         "mandatory": ["right_control"],
                                         "optional": ["any"]
@@ -725,21 +768,9 @@
                                 "type": "basic"
                             },
                             {
-                                "description": "go backward (in history)",
-                                "from": {
-                                    "key_code": "comma",
-                                    "modifiers": {
-                                        "mandatory": ["right_control"],
-                                        "optional": ["any"]
-                                    }
-                                },
-                                "to": [{ "pointing_button": "button4" }],
-                                "type": "basic"
-                            },
-                            {
                                 "description": "go forward (in history)",
                                 "from": {
-                                    "key_code": "period",
+                                    "key_code": "slash",
                                     "modifiers": {
                                         "mandatory": ["right_control"],
                                         "optional": ["any"]
@@ -747,12 +778,7 @@
                                 },
                                 "to": [{ "pointing_button": "button5" }],
                                 "type": "basic"
-                            }
-                        ]
-                    },
-                    {
-                        "description": "2️⃣ arrows cluster",
-                        "manipulators": [
+                            },
                             {
                                 "from": {
                                     "key_code": "left_arrow",
@@ -820,20 +846,8 @@
                         ]
                     },
                     {
-                        "description": "2️⃣ extra keys",
+                        "description": "#️⃣2️⃣ extra keys",
                         "manipulators": [
-                            {
-                                "description": "refresh or run",
-                                "from": {
-                                    "key_code": "quote",
-                                    "modifiers": {
-                                        "mandatory": ["right_control"],
-                                        "optional": ["any"]
-                                    }
-                                },
-                                "to": [{ "key_code": "f5" }],
-                                "type": "basic"
-                            },
                             {
                                 "description": "sleep",
                                 "from": {
@@ -920,23 +934,6 @@
                                 "type": "basic"
                             },
                             {
-                                "description": "command palette",
-                                "from": {
-                                    "key_code": "slash",
-                                    "modifiers": {
-                                        "mandatory": ["right_control"],
-                                        "optional": ["any"]
-                                    }
-                                },
-                                "to": [
-                                    {
-                                        "key_code": "p",
-                                        "modifiers": ["left_shift", "left_command"]
-                                    }
-                                ],
-                                "type": "basic"
-                            },
-                            {
                                 "description": "print screen",
                                 "from": {
                                     "key_code": "right_shift",
@@ -987,7 +984,7 @@
                         ]
                     },
                     {
-                        "description": "2️⃣ right command → extra shift",
+                        "description": "#️⃣2️⃣ right_command → extra shift",
                         "manipulators": [
                             {
                                 "from": {
