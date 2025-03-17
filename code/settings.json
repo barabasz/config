@@ -33,6 +33,6 @@
     "workbench.list.smoothScrolling": true,
     "workbench.startupEditor": "none",
     "oneDarkPro.editorTheme": "One Dark Pro Night Flat",
-    "workbench.colorTheme": "Drakula",
-    "editor.multiCursorModifier": "ctrlCmd"
+    "editor.multiCursorModifier": "ctrlCmd",
+    "workbench.colorTheme": "Drakula"
 }
