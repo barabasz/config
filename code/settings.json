@@ -6,9 +6,11 @@
     "editor.accessibilitySupport": "off",
     "editor.cursorBlinking": "smooth",
     "editor.cursorSmoothCaretAnimation": "on",
+    "editor.cursorWidth": 2,
     "editor.fontFamily": "JetBrainsMono NF",
     "editor.fontLigatures": true,
     "editor.fontSize": 13,
+    "editor.letterSpacing": 0.1,
     "editor.semanticHighlighting.enabled": true,
     "editor.smoothScrolling": true,
     "editor.unicodeHighlight.ambiguousCharacters": false,
@@ -23,15 +25,14 @@
     "terminal.integrated.cursorBlinking": true,
     "terminal.integrated.smoothScrolling": true,
     "workbench.colorCustomizations": {
-        "editor.findMatchBorder": "#D1A03A",
-        //"editor."
-        "[Tokyo Night]": { // or "[Tokyo Night Storm]"
-            "editorCodeLens.foreground": "#ffff00" // Preferred hex color
+        "[Drakula]": {
+            //"editor.background": "#241C30"
         }
     },
-    "workbench.iconTheme": "Monokai Pro (Filter Spectrum) Icons",
+    "workbench.iconTheme": null,
     "workbench.list.smoothScrolling": true,
     "workbench.startupEditor": "none",
-    "workbench.colorTheme": "GitHub Dark Default",
-    "oneDarkPro.editorTheme": "One Dark Pro Night Flat"
+    "oneDarkPro.editorTheme": "One Dark Pro Night Flat",
+    "workbench.colorTheme": "Drakula",
+    "editor.multiCursorModifier": "ctrlCmd"
 }
