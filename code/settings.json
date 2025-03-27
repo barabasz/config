@@ -10,12 +10,13 @@
     "editor.cursorWidth": 3,
 
     "editor.fontFamily": "JetBrainsMono NF",
+    "editor.fontLigatures": "'calt', 'cv07', 'cv08', 'cv11', 'cv12', 'cv17', 'cv18', 'cv19', 'cv20'",
     //"editor.fontFamily": "Berkeley Mono Trial",
-    
-    "editor.fontLigatures": "'calt', 'cv02', 'cv08', 'cv12', 'cv17', 'cv18', 'cv19', 'cv20'",
+    //"editor.fontFamily": "TX-02",
+    //"editor.fontLigatures": true,
     "editor.fontWeight": "400",
-    "editor.fontSize": 14,
-    "editor.letterSpacing": 0.1,
+    "editor.fontSize": 15,
+    //"editor.letterSpacing": 0.1,
     "editor.lineNumbers": "on",
     "editor.lineHeight": 1.45,
 
