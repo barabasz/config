@@ -3,4 +3,5 @@
 # fzf shell integration
 
 source <(fzf --zsh)
+set rtp+=/opt/homebrew/opt/fzf
 
