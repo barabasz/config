@@ -3,12 +3,6 @@
 
 local tabsize = 4 -- Number of spaces that a <Tab> in the file counts for.
 
--- vim.opt
-
-vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣', eol = '↵' }
-
--- vim.o
-
 local options = {
   autoindent = true, -- Copy indent from current line when starting a new line
   breakindent = true, -- Enable break indent
@@ -16,10 +10,11 @@ local options = {
   confirm = true, -- Ask for confirmation when closing unsaved buffers
   cursorline = true, -- Highlight the screen line of the cursor with CursorLine
   encoding = "UTF-8", -- Sets the character encoding used inside Vim.
-  expandtab = true, -- In Insert mode: Use the appropriate number of spaces to insert a <Tab>.
+  expandtab = false, -- In Insert mode: Use the appropriate number of spaces to insert a <Tab>.
   hidden = true, -- When on a buffer becomes hidden when it is |abandon|ed
   ignorecase = true, -- Case-insensitive searching UNLESS \C or one or more capital letters are used
   inccommand = "split", -- Show substitution results as you type
+  listchars = "eol:↵,tab:» ,trail:·,extends:>,precedes:<", -- Characters to use for displaying whitespace
   list = true, -- Show some invisible characters (tabs...)
   mouse = "a", -- Enable the use of the mouse. "a" you can use on all modes
   number = true, -- Print the line number in front of each line
@@ -34,7 +29,7 @@ local options = {
   signcolumn = 'yes', -- Always show the signcolumn, otherwise it would shift the text each time
   smartcase = true, -- Override the 'ignorecase' option if the search pattern contains upper case characters
   smartindent = true, -- Do smart autoindenting when starting a new line
-  softtabstop = 4, -- Number of spaces that a <Tab> counts for while performing editing operations, like inserting a <Tab> or using <BS>
+  softtabstop = tabsize, -- Number of spaces that a <Tab> counts for while performing editing operations, like inserting a <Tab> or using <BS>
   splitbelow = true, -- When on, splitting a window will put the new window below the current one
   splitright = true, -- When on, splitting a window will put the new window right of the current one
   syntax = "on", -- When this option is set, the syntax with this name is loaded
