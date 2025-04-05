@@ -1,33 +1,50 @@
-local global = vim.g
-local o = vim.opt
+-- Neovim options
+-----------------
 
--- Editor options
+local tabsize = 4 -- Number of spaces that a <Tab> in the file counts for.
 
--- Print the line number in front of each line
-o.number = true
--- Show the line number relative to the line with the cursor in front of each line
-o.relativenumber = false
--- uses the clipboard register for all operations except yank
-o.clipboard = "unnamedplus"
--- When this option is set, the syntax with this name is loaded
-o.syntax = "on"
--- Copy indent from current line when starting a new line
-o.autoindent = true
--- Highlight the screen line of the cursor with CursorLine
-o.cursorline = true
-o.expandtab = true -- In Insert mode: Use the appropriate number of spaces to insert a <Tab>.
-o.shiftwidth = 2 -- Number of spaces to use for each step of (auto)indent.
-o.tabstop = 2 -- Number of spaces that a <Tab> in the file counts for.
-o.encoding = "UTF-8" -- Sets the character encoding used inside Vim.
-o.ruler = true -- Show the line and column number of the cursor position, separated by a comma.
-o.mouse = "a" -- Enable the use of the mouse. "a" you can use on all modes
-o.title = true -- When on, the title of the window will be set to the value of 'titlestring'
-o.hidden = true -- When on a buffer becomes hidden when it is |abandon|ed
-o.ttimeoutlen = 0 -- The time in milliseconds that is waited for a key code or mapped key sequence to complete.
-o.wildmenu = true -- When 'wildmenu' is on, command-line completion operates in an enhanced mode.
-o.showcmd = true -- Show (partial) command in the last line of the screen. Set this option off if your terminal is slow.
-o.showmatch = true -- When a bracket is inserted, briefly jump to the matching one.
-o.inccommand = "split" -- When nonempty, shows the effects of :substitute, :smagic, :snomagic and user commands with the :command-preview flag as you type.
-o.splitright = true
-o.splitbelow = true -- When on, splitting a window will put the new window below the current one
-o.termguicolors = true
+-- vim.opt
+
+vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣', eol = '↵' }
+
+-- vim.o
+
+local options = {
+  autoindent = true, -- Copy indent from current line when starting a new line
+  breakindent = true, -- Enable break indent
+  clipboard = "unnamedplus", -- uses the clipboard register for all operations except yank
+  confirm = true, -- Ask for confirmation when closing unsaved buffers
+  cursorline = true, -- Highlight the screen line of the cursor with CursorLine
+  encoding = "UTF-8", -- Sets the character encoding used inside Vim.
+  expandtab = true, -- In Insert mode: Use the appropriate number of spaces to insert a <Tab>.
+  hidden = true, -- When on a buffer becomes hidden when it is |abandon|ed
+  ignorecase = true, -- Case-insensitive searching UNLESS \C or one or more capital letters are used
+  inccommand = "split", -- Show substitution results as you type
+  list = true, -- Show some invisible characters (tabs...)
+  mouse = "a", -- Enable the use of the mouse. "a" you can use on all modes
+  number = true, -- Print the line number in front of each line
+  relativenumber = false, -- Show the line number relative to the line with the cursor in front of each line
+  ruler = true, -- Show the line and column number of the cursor position, separated by a comma
+  scrolloff = 10, -- Minimal number of screen lines to keep above and below the cursor
+  shiftwidth = tabsize, -- Number of spaces to use for each step of (auto)indent.
+  showcmd = true, -- Show (partial) command in the last line of the screen. Set this option off if your terminal is slow.
+  showmatch = true, -- When a bracket is inserted, briefly jump to the matching one.
+  showmode = false, -- Don't show the mode, since it's already in the status line
+  showtabline = 2, -- Tabline: 1 - at least two windows, 2 - always, 0 - never
+  signcolumn = 'yes', -- Always show the signcolumn, otherwise it would shift the text each time
+  smartcase = true, -- Override the 'ignorecase' option if the search pattern contains upper case characters
+  smartindent = true, -- Do smart autoindenting when starting a new line
+  softtabstop = 4, -- Number of spaces that a <Tab> counts for while performing editing operations, like inserting a <Tab> or using <BS>
+  splitbelow = true, -- When on, splitting a window will put the new window below the current one
+  splitright = true, -- When on, splitting a window will put the new window right of the current one
+  syntax = "on", -- When this option is set, the syntax with this name is loaded
+  tabstop = tabsize, -- Number of spaces that a <Tab> in the file counts for.
+  termguicolors = true, -- Use 24-bit (true-color) mode in the terminal
+  title = true, -- When on, the title of the window will be set to the value of 'titlestring'
+  ttimeoutlen = 0, -- The time in milliseconds that is waited for a key code or mapped key sequence to complete.
+  undofile = true, -- Save undo history
+  wildmenu = true, -- When 'wildmenu' is on, command-line completion operates in an enhanced mode.
+  wrap = false, -- When true, lines longer than the width of the window will wrap and displaying continues on the next line.
+}
+
+for k, v in pairs(options) do vim.o[k] = v end

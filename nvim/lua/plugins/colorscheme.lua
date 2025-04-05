@@ -1,8 +1,7 @@
 return {
-    "tiagovla/tokyodark.nvim",
-    lazy = false,
-    priority = 1000,
+    "Mofiqul/dracula.nvim",
+    opts = {},
     config = function()
-        vim.cmd("colorscheme tokyodark")
+        vim.cmd("colorscheme dracula")
     end,
 }

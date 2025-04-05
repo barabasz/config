@@ -1,2 +1,6 @@
-require("config.settings")
-require("config.lazy")
+require("config.globals")   -- vim.g
+require("config.settings")  -- vim.o
+require("config.api")       -- vim.api
+require("config.keymaps")   -- vim.keymap
+require("config.lazy")      -- lazy.nvim
+require("config.clipboard") -- vim.clipboard
