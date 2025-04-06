@@ -1,4 +1,7 @@
--- Bootstrap lazy.nvim
+-- lazy.nvim is a modern plugin manager for Neovim
+-- https://lazy.folke.io • https://github.com/folke/lazy.nvim
+
+-- Bootstrap
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
     local lazyrepo = "https://github.com/folke/lazy.nvim.git"
@@ -12,19 +15,9 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
--- Setup lazy.nvim
+-- Setup 
 require("lazy").setup({
-    spec = { -- import your plugins
-    {
-        import = "plugins"
-    }},
-    -- Configure any other settings here. See the documentation for more details.
-    -- colorscheme that will be used when installing plugins.
-    install = {
-        colorscheme = {"dracula"}
-    },
-    -- automatically check for plugin updates
-    checker = {
-        enabled = true
-    }
+    spec = { { import = "plugins" }, },
+    install = { colorscheme = { "tokyonight" } },
+    checker = { enabled = true },
 })

@@ -1,13 +1,27 @@
--- Neovim options
------------------
+-- Globals
+
+local globals = {
+  deprecation_warnings = false, -- Disable deprecation warnings
+  lazy = true, -- Enable lazy loading of plugins
+  mapleader = " ", -- Set the leader key
+  maplocalleader = "\\", -- Set the local leader key
+  have_nerd_font = true, -- Set to true if you have a Nerd Font installed
+  python3_host_prog = "/opt/homebrew/bin/python3", -- Path to the Python 3 interpreter
+  snacks_animate = true, -- Enable animations for snacks.nvim
+  trouble_lualine = true, -- Enable lualine integration for trouble.nvim
+}
+
+for k, v in pairs(globals) do vim.g[k] = v end
+
+-- Options
 
 local tabsize = 4 -- Number of spaces that a <Tab> in the file counts for.
 
 local options = {
   autoindent = true, -- Copy indent from current line when starting a new line
   breakindent = true, -- Enable break indent
-  clipboard = "unnamedplus", -- uses the clipboard register for all operations except yank
-  confirm = false, -- Ask for confirmation when closing unsaved buffers
+  clipboard = vim.env.SSH_TTY and "" or "unnamedplus", -- uses the clipboard register for all operations except yank
+  confirm = true, -- Ask for confirmation when closing unsaved buffers
   cursorline = true, -- Highlight the screen line of the cursor with CursorLine
   encoding = "UTF-8", -- Sets the character encoding used inside Vim.
   expandtab = false, -- In Insert mode: Use the appropriate number of spaces to insert a <Tab>.
@@ -38,6 +52,8 @@ local options = {
   title = true, -- When on, the title of the window will be set to the value of 'titlestring'
   ttimeoutlen = 0, -- The time in milliseconds that is waited for a key code or mapped key sequence to complete.
   undofile = true, -- Save undo history
+  undolevels = 10000, -- The maximum number of changes that can be undone
+  updatetime = 200, -- Faster completion (4000ms default)
   wildmenu = true, -- When 'wildmenu' is on, command-line completion operates in an enhanced mode.
   wrap = false, -- When true, lines longer than the width of the window will wrap and displaying continues on the next line.
 }

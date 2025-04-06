@@ -40,7 +40,13 @@ return {
         },
         toggle = {
             which_key = true
-        }
+        },
+        animations = {
+            enabled = true,
+            duration = 100,
+            fade_in = true,
+            fade_out = true,
+        },
     }
 }
 
