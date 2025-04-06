@@ -3,7 +3,10 @@
 -- To check current config use :lua print(vim.inspect(require('lualine').get_config()))
 return {
     "nvim-lualine/lualine.nvim",
-    dependencies = {"nvim-tree/nvim-web-devicons"},
+    dependencies = {
+        "nvim-tree/nvim-web-devicons",
+        "stevearc/aerial.nvim"
+    },
     config = function()
         require('lualine').setup {
             options = {
@@ -49,17 +52,9 @@ return {
                             unnamed = '[?]',
                             newfile = '[*]'}}
                 },
-                lualine_x = {
-                    {'encoding', show_bomb = true},
-                    'fileformat',
-                    {'filetype', colored = true, icon_only = false},
-                },
-                lualine_y = {
-                    'progress'
-                },
-                lualine_z = {
-                    'location'
-                }
+                lualine_x = {},
+                lualine_y = { {'encoding', show_bomb = true}, 'fileformat' },
+                lualine_z = { {'filetype', colored = true, icon_only = false} }
             },
             inactive_sections = {
                 lualine_a = {},
@@ -71,9 +66,16 @@ return {
             },
             -- tabline --> tabline.lua
             tabline = {},
-            winbar = {},
+            winbar = {
+                lualine_a = { "location" },
+                lualine_b = { "progress" },
+                lualine_c = { "aerial"},
+                lualine_x = {},
+                lualine_y = {},
+                lualine_z = { {"datetime", style = '%H:%M:%S'} }
+            },
             inactive_winbar = {},
-            extensions = {'quickfix', 'fugitive', 'fzf'}
+            extensions = {'aerial', 'quickfix', 'fugitive', 'fzf'}
         }
     end
 }
