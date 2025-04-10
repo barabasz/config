@@ -46,5 +46,6 @@
     "workbench.list.smoothScrolling": true,
     "workbench.startupEditor": "none",
     "workbench.tree.indent": 18,
-    "workbench.colorTheme": "Drakula"
+    "workbench.colorTheme": "Drakula",
+    "python.defaultInterpreterPath": "/Users/barabasz/.venv/python"
 }
