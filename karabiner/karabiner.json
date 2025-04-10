@@ -4,13 +4,31 @@
             "complex_modifications": {
                 "rules": [
                     {
-                        "description": "escape on hold → hyper key ✦",
+                        "description": "escape → disable / hyper key ✦ on hold",
                         "manipulators": [
                             {
-                                "description": "esc when tapped, hyper key ✦ when hold",
+                                "description": "nothing when tapped, hyper key ✦ when hold",
                                 "from": { "key_code": "escape" },
+                                "parameters": { "basic.to_if_held_down_threshold_milliseconds": 50 },
+                                "to_if_alone": [{ "key_code": "vk_none" }],
+                                "to_if_held_down": [
+                                    {
+                                        "key_code": "left_command",
+                                        "modifiers": ["left_shift", "left_control", "left_option"]
+                                    }
+                                ],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
+                        "description": "grave on hold → hyper key ✦",
+                        "manipulators": [
+                            {
+                                "description": "grave when tapped, hyper key ✦ when hold",
+                                "from": { "key_code": "grave_accent_and_tilde" },
                                 "parameters": { "basic.to_if_held_down_threshold_milliseconds": 25 },
-                                "to_if_alone": [{ "key_code": "escape" }],
+                                "to_if_alone": [{ "key_code": "grave_accent_and_tilde" }],
                                 "to_if_held_down": [
                                     {
                                         "key_code": "left_command",
@@ -74,7 +92,7 @@
                         ]
                     },
                     {
-                        "description": "2️⃣ caps lock → escape/layer modifier on hold",
+                        "description": "caps lock → escape / layer modifier on hold",
                         "manipulators": [
                             {
                                 "description": "caps lock: escape when tapped, right control on hold",
@@ -90,7 +108,7 @@
                         ]
                     },
                     {
-                        "description": "2️⃣ return → return/layer modifier on hold",
+                        "description": "return → return / layer modifier on hold",
                         "manipulators": [
                             {
                                 "description": "return: return when tapped, right control on hold",
