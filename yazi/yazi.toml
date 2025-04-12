@@ -1,7 +1,3 @@
-[flavor]
-use = "tokyonight-night"
-dark = "tokyonight-night"
-
 [[plugin.prepend_fetchers]]
 id   = "git"
 name = "*"
