@@ -1,3 +1,3 @@
 [flavor]
-use = "dracula"
-dark = "dracula"
+use = "tokyonight-night"
+dark = "tokyonight-night"
