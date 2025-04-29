@@ -25,6 +25,11 @@ if [[ $(isinstalled bat) == 1 ]]; then
     alias cat='bat'
 fi
 
+## brew
+if [[ $(isinstalled brew) == 1 ]]; then
+    alias brewu='brew update && brew upgrade && brew missing && brew autoremove && brew cleanup && brew doctor'
+fi
+
 ## cal
 if [[ $(isinstalled cal) == 1 ]]; then
     alias cal='cal -m3'
