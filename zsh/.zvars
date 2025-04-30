@@ -23,7 +23,7 @@ export GHDIR=$HOME/GitHub
 export GHBINDIR=$GHDIR/bin
 export GHLIBDIR=$GHDIR/lib
 export GHCONFDIR=$GHDIR/config
-export GHCONFPRIVDIR=$GHDIR/confpriv
+export GHPRIVDIR=$GHDIR/priv
 ### SSH
 export SSH_HOME=~/.config/ssh
 export SSH_AUTH_SOCK="$SSH_HOME/ssh_auth.sock"
