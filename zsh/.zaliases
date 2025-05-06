@@ -76,6 +76,11 @@ if [[ "$(osname)" == "macos" ]]; then
     fi
 fi
 
+## http-server
+if [[ $(isinstalled http-server) == 1 ]]; then
+    alias serve='http-server -c-1 -o'
+fi
+
 ## mc
 if [[ $(isinstalled mc) == 1 ]]; then
     alias mc='mc --nosubshell'
