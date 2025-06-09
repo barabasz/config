@@ -47,5 +47,6 @@
     "workbench.startupEditor": "none",
     "workbench.tree.indent": 18,
     "workbench.colorTheme": "Drakula",
-    "python.defaultInterpreterPath": "/Users/barabasz/.venv/python"
+    "python.defaultInterpreterPath": "/Users/barabasz/.venv/python",
+    "svelte.enable-ts-plugin": true
 }
