@@ -48,5 +48,6 @@
     "workbench.tree.indent": 18,
     "workbench.colorTheme": "Drakula",
     "python.defaultInterpreterPath": "/Users/barabasz/.venv/python",
-    "svelte.enable-ts-plugin": true
+    "svelte.enable-ts-plugin": true,
+    "github.copilot.nextEditSuggestions.enabled": true
 }
