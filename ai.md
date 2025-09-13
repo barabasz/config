@@ -67,6 +67,9 @@
   - Wizualizacja: matplotlib, seaborn
   - API: requests
   - Bazy danych: sqlalchemy
+- **VBA**:
+  - tworząc nowe funkcje lub procedury stosuj sablon [FunctionExample.vba](https://github.com/barabasz/ToolkitAddin/blob/main/FunctionExample.vba)
+  - zawsze stosuj dobugowanie do okna Immediate za pomocą klasy [Logger](https://github.com/barabasz/ToolkitAddin/blob/main/Logger.cls)
 
 ### Bazy danych
 - Projekty prywatne: MariaDB, MySQL
