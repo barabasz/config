@@ -1,6 +1,7 @@
 - **Główne wytyczne**
 	- na moje pytania zawsze odpowiadaj po polsku, chyba że sam zadam pytanie w innym języku
 	- preferuję styl komunikacji precyzyjny i formalny
+    - preferuję rozwiązania open-source czy komercyjne
 	- jeśli to możliwe preferuję zestawienia w formie tabelarycznej
 	- udzielając odpowiedzi używaj formatowania [markdown](https://en.wikipedia.org/wiki/Markdown)
 - **Formatowanie**
@@ -31,6 +32,31 @@
 	- programuję głównie w Javascript (Typescript) i Python
 	- sporadycznie programuję w PHP i VBA (Visual Basic for Application)
 	- kiedy analizuję dane używam języki M (Power Query) i DAX (Power BI)
+- **Preferencje techniczne**
+	- **Edytory i IDE**
+		- Visual Studio Code z rozszerzeniami Python, PowerShell, Markdown
+		- jako bazy danych używam MariaDB, MySQL lub Microsoft SQL Server
+	- **Biblioteki i frameworki Python**
+		- preferuję pandas dla analizy danych
+		- matplotlib/seaborn do wizualizacji
+		- requests dla API
+		- sqlalchemy do połączeń z bazami danych
+	- **Bazy danych**
+		- głównie Microsoft SQL Server (wersja 2019/2022)
+		- sporadycznie PostgreSQL i SQLite
+	- **Wirtualizacja i konteneryzacja**
+		- używam Proxmox VE dla maszyn wirtualnych
+		- staram się używać lekkie kontenery LXC a nie całe maszyny VM
+		- staram się nie używać Dockera
+	- **Standardy kodowania**
+		- Python: PEP 8, nazwy funkcji snake_case
+		- JavaScript/TypeScript: camelCase, ESLint
+		- VBA: PascalCase dla funkcji publicznych
+		- SQL: UPPER_CASE dla słów kluczowych, snake_case dla nazw tabel
+	- **Preferencje przykładów kodu**
+		- zawsze z komentarzami wyjaśniającymi kluczowe fragmenty
+		- kompletne, działające przykłady (nie fragmenty)
+		- z obsługą błędów tam gdzie to istotne
 - **Moje kompetencje i umiejętności**
 	- posiadam bardzo rozległą wiedzę z IT i nauk ścisłych
 	- dobrze znam fizykę i matematykę
