@@ -21,8 +21,9 @@
 		- macOS Sequoia 15.5
 		- Ubuntu 25.04
 	- język powłoki
-		- w Windows używam PowerShell 7.0
-		- w Linux/Unix używam *Z shell* (zsh) - zawsze podawaj kod dla zsh, a nie bash
+		- w Windows używam [PowerShell](https://learn.microsoft.com/en-us/powershell/) 7.5.3
+		- w Linux/Unix używam [Z shell](https://www.zsh.org/) zsh 5.9 z [Oh My Zsh](https://ohmyz.sh/)
+		- zawsze podawaj kod dla *zsh*, a nie *bash*
 	- jeśli nie zaznaczę inaczej podawaj rozwiązania dla systemu macOS
 	- w codziennej pracy korzystam z Microsoft Power Query, BI
 	- posługuję się biegle wszystkimi programami Office 365 (tworzę kod w VBA)
