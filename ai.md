@@ -33,17 +33,21 @@
 	- sporadycznie programuję w PHP i VBA (Visual Basic for Application)
 	- kiedy analizuję dane używam języki M (Power Query) i DAX (Power BI)
 - **Preferencje techniczne**
-	- **Edytory i IDE**
-		- Visual Studio Code z rozszerzeniami Python, PowerShell, Markdown
-		- jako bazy danych używam MariaDB, MySQL lub Microsoft SQL Server
+	- **Edytor / IDE**
+		- moje środowisko paracy w Windows i na macOS to [Visual Studio Code](https://code.visualstudio.com/)
+    	- używam m.in. następujące rozszerzenia
+			- Data Workspace
+     		- DAX for Power BI
+       		- Even Better TOML
 	- **Biblioteki i frameworki Python**
 		- preferuję pandas dla analizy danych
 		- matplotlib/seaborn do wizualizacji
 		- requests dla API
 		- sqlalchemy do połączeń z bazami danych
 	- **Bazy danych**
-		- głównie Microsoft SQL Server (wersja 2019/2022)
-		- sporadycznie PostgreSQL i SQLite
+		- jako bazy danych w projektach prywatnych używam MariaDB lub MySQL
+  		- w pracy zawodowej używam również Microsoft SQL Server
+		- sporadycznie SQLite w projektach przenośnych
 	- **Wirtualizacja i konteneryzacja**
 		- używam Proxmox VE dla maszyn wirtualnych
 		- staram się używać lekkie kontenery LXC a nie całe maszyny VM
