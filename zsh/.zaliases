@@ -105,6 +105,11 @@ if [[ $(isinstalled npx) == 1 ]]; then
     alias ts='npx tsx'
 fi
 
+## oh-my-posh
+if [[ $(isinstalled oh-my-posh) == 1 ]]; then
+    alias omp='oh-my-posh'
+fi
+
 ## pip3
 if [[ $(isinstalled pip3) == 1 ]]; then 
     alias pip='pip3'
@@ -113,15 +118,15 @@ if [[ $(isinstalled pip3) == 1 ]]; then
     alias pipf='pip freeze'
 fi
 
-## oh-my-posh
-if [[ $(isinstalled oh-my-posh) == 1 ]]; then
-    alias omp='oh-my-posh'
-fi
-
 ## python
 if [[ $(isinstalled python3) == 1 ]]; then 
     alias python='python3'
     alias py='python3'
+fi
+
+## ssh
+if [[ $(isinstalled ssh) == 1 ]]; then 
+    alias sshi='ssh-install ~/.ssh/barabasz.pub barabasz@$1'
 fi
 
 ## yt-dlp
