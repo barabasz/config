@@ -124,11 +124,6 @@ if [[ $(isinstalled python3) == 1 ]]; then
     alias py='python3'
 fi
 
-## ssh
-if [[ $(isinstalled ssh) == 1 ]]; then 
-    alias sshi='ssh-install ~/.ssh/barabasz.pub barabasz@$1'
-fi
-
 ## yt-dlp
 if [[ $(isinstalled yt-dlp) == 1 ]]; then
     alias youtube-dl='yt-dlp'
