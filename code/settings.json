@@ -17,7 +17,7 @@
     "editor.guides.indentation": true,
     "editor.guides.highlightActiveIndentation": true,
 
-    "editor.lineNumbers": "on",
+    "editor.lineNumbers": "relative",
     "editor.lineHeight": 1.4,
 
     "editor.multiCursorModifier": "ctrlCmd",
