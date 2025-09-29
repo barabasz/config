@@ -121,7 +121,7 @@ fi
 ## python
 if [[ $(isinstalled python3) == 1 ]]; then 
     alias python='python3'
-  ))  alias py='python3'
+    alias py='python3'
 fi
 
 ## yt-dlp
