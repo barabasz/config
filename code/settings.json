@@ -47,7 +47,6 @@
     "workbench.startupEditor": "none",
     "workbench.tree.indent": 18,
     "workbench.colorTheme": "Drakula",
-    "python.defaultInterpreterPath": "/Users/barabasz/.venv/python",
     "svelte.enable-ts-plugin": true,
     "github.copilot.nextEditSuggestions.enabled": true,
     "mssql.connectionGroups": [
@@ -55,5 +54,7 @@
             "name": "ROOT",
             "id": "2E3A0716-4B3B-4968-9119-D77F6DA75B4F"
         }
-    ]
+    ],
+    "python.defaultInterpreterPath": "/Users/barabasz/.venv/python",
+    "git.openRepositoryInParentFolders": "always"
 }
