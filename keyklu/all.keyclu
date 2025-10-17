@@ -1,0 +1,30 @@
+{
+    "global": {
+        "SpaceBars": [
+            ["Ask AI", "option", 49],
+            ["Bookmarks", "command+option", 49],
+            ["Calendar", "control+option", 49],
+            ["Emoji", "control+command", 49],
+            ["Expander", "shift+option", 49],
+            ["Kill Process", "control+command+option", 49],
+            ["Menu Items", "shift+command", 49],
+            ["New Event", "shift+control+option", 49],
+            ["Open Raycast", "command", 49],
+            ["Quick Notes", "shift+command+option", 49],
+            ["Search Files", "shift+control+command+option", 49],
+            ["Unicode", "shift+control+command", 49]
+        ],
+        "Hypers": [
+            ["Browser", "shift+control+command+option", 11],
+            ["Code", "shift+control+command+option", 8],
+            ["Excel", "shift+control+command+option", 14],
+            ["Kitty", "shift+control+command+option", 40],
+            ["Mail", "shift+control+command+option", 46],
+            ["Note", "shift+control+command+optionn", 45],
+            ["Obsidian", "shift+control+command+option", 31],
+            ["Passwords", "shift+control+command+option", 35],
+            ["Signal", "shift+control+command+option", 1],
+            ["Word", "shift+control+command+option", 13]
+        ]
+    }
+}
