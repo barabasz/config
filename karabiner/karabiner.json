@@ -4,9 +4,36 @@
             "complex_modifications": {
                 "rules": [
                     {
+                        "manipulators": [
+                            {
+                                "conditions": [
+                                    {
+                                        "identifiers": [{ "is_built_in_keyboard": false }],
+                                        "type": "device_if"
+                                    }
+                                ],
+                                "description": "print_screen → meh+F20 (external)",
+                                "from": { "key_code": "print_screen" },
+                                "to": [
+                                    {
+                                        "key_code": "f20",
+                                        "modifiers": ["left_control", "left_option", "left_shift"]
+                                    }
+                                ],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
                         "description": "escape → disable / hyper key ✦ on hold",
                         "manipulators": [
                             {
+                                "conditions": [
+                                    {
+                                        "identifiers": [{ "is_built_in_keyboard": true }],
+                                        "type": "device_if"
+                                    }
+                                ],
                                 "description": "nothing when tapped, hyper key ✦ when hold",
                                 "from": { "key_code": "escape" },
                                 "parameters": { "basic.to_if_held_down_threshold_milliseconds": 50 },
@@ -25,6 +52,12 @@
                         "description": "grave on hold → hyper key ✦",
                         "manipulators": [
                             {
+                                "conditions": [
+                                    {
+                                        "identifiers": [{ "is_built_in_keyboard": true }],
+                                        "type": "device_if"
+                                    }
+                                ],
                                 "description": "grave when tapped, hyper key ✦ when hold",
                                 "from": { "key_code": "grave_accent_and_tilde" },
                                 "parameters": { "basic.to_if_held_down_threshold_milliseconds": 25 },
@@ -43,6 +76,12 @@
                         "description": "shift keys → brackets when tapped",
                         "manipulators": [
                             {
+                                "conditions": [
+                                    {
+                                        "identifiers": [{ "is_built_in_keyboard": true }],
+                                        "type": "device_if"
+                                    }
+                                ],
                                 "description": "left_shift when held, open bracket when tapped",
                                 "from": { "key_code": "left_shift" },
                                 "parameters": { "basic.to_if_held_down_threshold_milliseconds": 25 },
@@ -56,6 +95,12 @@
                                 "type": "basic"
                             },
                             {
+                                "conditions": [
+                                    {
+                                        "identifiers": [{ "is_built_in_keyboard": true }],
+                                        "type": "device_if"
+                                    }
+                                ],
                                 "description": "right_shift when held, close bracket when tapped",
                                 "from": { "key_code": "right_shift" },
                                 "parameters": { "basic.to_if_held_down_threshold_milliseconds": 25 },
@@ -74,6 +119,12 @@
                         "description": "tab and backshash on hold → left command",
                         "manipulators": [
                             {
+                                "conditions": [
+                                    {
+                                        "identifiers": [{ "is_built_in_keyboard": true }],
+                                        "type": "device_if"
+                                    }
+                                ],
                                 "description": "tab when tapped, left control when hold",
                                 "from": { "key_code": "tab" },
                                 "parameters": { "basic.to_if_held_down_threshold_milliseconds": 25 },
@@ -82,6 +133,12 @@
                                 "type": "basic"
                             },
                             {
+                                "conditions": [
+                                    {
+                                        "identifiers": [{ "is_built_in_keyboard": true }],
+                                        "type": "device_if"
+                                    }
+                                ],
                                 "description": "backslash when tapped, left control when hold",
                                 "from": { "key_code": "backslash" },
                                 "parameters": { "basic.to_if_held_down_threshold_milliseconds": 25 },
@@ -95,6 +152,12 @@
                         "description": "caps lock → escape / layer modifier on hold",
                         "manipulators": [
                             {
+                                "conditions": [
+                                    {
+                                        "identifiers": [{ "is_built_in_keyboard": true }],
+                                        "type": "device_if"
+                                    }
+                                ],
                                 "description": "caps lock: escape when tapped, right control on hold",
                                 "from": {
                                     "key_code": "caps_lock",
@@ -111,6 +174,12 @@
                         "description": "return → return / layer modifier on hold",
                         "manipulators": [
                             {
+                                "conditions": [
+                                    {
+                                        "identifiers": [{ "is_built_in_keyboard": true }],
+                                        "type": "device_if"
+                                    }
+                                ],
                                 "description": "return: return when tapped, right control on hold",
                                 "from": {
                                     "key_code": "return_or_enter",
@@ -127,6 +196,12 @@
                         "description": "right_command → right_option / 2️⃣ right_command → caps_lock",
                         "manipulators": [
                             {
+                                "conditions": [
+                                    {
+                                        "identifiers": [{ "is_built_in_keyboard": true }],
+                                        "type": "device_if"
+                                    }
+                                ],
                                 "from": {
                                     "key_code": "right_command",
                                     "modifiers": {
@@ -138,6 +213,12 @@
                                 "type": "basic"
                             },
                             {
+                                "conditions": [
+                                    {
+                                        "identifiers": [{ "is_built_in_keyboard": true }],
+                                        "type": "device_if"
+                                    }
+                                ],
                                 "from": {
                                     "key_code": "right_command",
                                     "modifiers": { "optional": ["any"] }
@@ -149,6 +230,7 @@
                     },
                     {
                         "description": "2️⃣ escape → system settings",
+                        "enabled": false,
                         "manipulators": [
                             {
                                 "from": {
@@ -167,6 +249,7 @@
                     },
                     {
                         "description": "2️⃣ tab → meh",
+                        "enabled": false,
                         "manipulators": [
                             {
                                 "from": {
@@ -954,8 +1037,8 @@
                                 },
                                 "to": [
                                     {
-                                        "key_code": "f14",
-                                        "modifiers": ["left_control"]
+                                        "key_code": "f20",
+                                        "modifiers": ["left_control", "left_option", "left_shift"]
                                     }
                                 ],
                                 "type": "basic"
@@ -1101,6 +1184,15 @@
                         "vendor_id": 13364
                     },
                     "ignore": true
+                },
+                {
+                    "identifiers": {
+                        "is_keyboard": true,
+                        "is_pointing_device": true,
+                        "product_id": 320,
+                        "vendor_id": 13364
+                    },
+                    "ignore": false
                 }
             ],
             "name": "Default profile",
