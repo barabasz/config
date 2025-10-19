@@ -25,7 +25,25 @@
                         ]
                     },
                     {
+                        "description": "disable escape",
+                        "manipulators": [
+                            {
+                                "conditions": [
+                                    {
+                                        "identifiers": [{ "is_built_in_keyboard": true }],
+                                        "type": "device_if"
+                                    }
+                                ],
+                                "description": "nothing when tapped, hyper key ✦ when hold",
+                                "from": { "key_code": "escape" },
+                                "to": [{ "key_code": "vk_none" }],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
                         "description": "escape → disable / hyper key ✦ on hold",
+                        "enabled": false,
                         "manipulators": [
                             {
                                 "conditions": [
