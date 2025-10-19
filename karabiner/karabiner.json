@@ -124,6 +124,30 @@
                         ]
                     },
                     {
+                        "description": "right_command → right_option / 2️⃣ right_command → caps_lock",
+                        "manipulators": [
+                            {
+                                "from": {
+                                    "key_code": "right_command",
+                                    "modifiers": {
+                                        "mandatory": ["right_control"],
+                                        "optional": ["any"]
+                                    }
+                                },
+                                "to": [{ "key_code": "caps_lock" }],
+                                "type": "basic"
+                            },
+                            {
+                                "from": {
+                                    "key_code": "right_command",
+                                    "modifiers": { "optional": ["any"] }
+                                },
+                                "to": [{ "key_code": "right_option" }],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
                         "description": "2️⃣ escape → system settings",
                         "manipulators": [
                             {
@@ -142,7 +166,7 @@
                         ]
                     },
                     {
-                        "description": "2️⃣ tab → caps lock",
+                        "description": "2️⃣ tab → meh",
                         "manipulators": [
                             {
                                 "from": {
@@ -1061,6 +1085,24 @@
                     }
                 ]
             },
+            "devices": [
+                {
+                    "identifiers": {
+                        "is_keyboard": true,
+                        "product_id": 2704,
+                        "vendor_id": 13364
+                    },
+                    "ignore": true
+                },
+                {
+                    "identifiers": {
+                        "is_keyboard": true,
+                        "product_id": 320,
+                        "vendor_id": 13364
+                    },
+                    "ignore": true
+                }
+            ],
             "name": "Default profile",
             "selected": true,
             "virtual_hid_keyboard": { "keyboard_type_v2": "ansi" }
