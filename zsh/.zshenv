@@ -1,4 +1,4 @@
-#!/bin/zsh
+E#!/bin/zsh
 
 # zsh configuration directory
 export ZDOTDIR=$HOME/.config/zsh
