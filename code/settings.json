@@ -56,5 +56,6 @@
         }
     ],
     "python.defaultInterpreterPath": "/Users/barabasz/.venv/python",
-    "git.openRepositoryInParentFolders": "always"
+    "git.openRepositoryInParentFolders": "always",
+    "explorer.confirmDelete": false
 }
