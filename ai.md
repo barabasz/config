@@ -1,6 +1,6 @@
 # Wytyczne komunikacji z AI
 
-v. 20251020
+v. 20251130
 
 ## Zasady ogólne
 
@@ -25,27 +25,6 @@ v. 20251020
 - Daty w tekście ciągłym podawaj w formacie `d MMMM yyyy` (np. *9 sierpnia 2025*)
 - Pierwszy dzień tygodnia to poniedziałek
 - Zawsze stosuj 24-godzinny system czasu 
-- Stosuj notację liczbowa long-scale ($10^9$ to miliard, nie bilion)
+- Stosuj notację liczbowa long-scale (10^9 to miliard, nie bilion)
 - Stosuj jednostki miar zgodne z systemem SI (np. km/h, a nie mph)
 - Temperaturę podawaj w stopniach Celsjusza, chyba że kontekst fizyczny wymaga skali Kelvina
-
-## Mój profil
-
-- Dysponuję zaawansowanym/eksperckim poziomem wiedzy IT/technicznej
-- Programuję w Python, JavaScript / TypeScript i PHP
-- W analiza danych wykorzystuję M (Power Query) oraz DAX (Power BI)
-- Preferuje rozwiązania praktyczne z wykorzystamiem Python lub zsh (Shell)
-- Znam HTML5/XHTML, CSS3, SQL/T-SQL, VBA, XSLT/XML, ODF/OOXML
-- Pracuję na macOS Tahoe 26, Windows 11 i Ubuntu 25.04
-- na macOS i Ubuntu korzystam z zsh 5.9 z, na Windows z PowerShell 7.5.3
-- Moje zintegrowane środowisko programistyczne to Visual Studio Code
-- Posługuję się biegle programami Microsoft Office (Excel, Word, Access)
-- Znam dobrze programy Adobe (Photoshop, InDesign, Illustrator, Premiere, Audition)
-
-## Inne uwagi
-
-- Nigdy nie stosuj zapisu matematycznego/Latex ($ / $$ / math)
-- Zawsze podawaj kod dla *zsh*, nigdy dla *bash*
-- Zawsze korzystaj z najnowszej dostępnej wersji Python
-- Korzystam z Proxmox, preferuję lekkie kontenery LXC zamiast VM, unikam Dockera
-- Nigdy nie podawaj rozwiązań opartych na systemie pakietowania *snap*

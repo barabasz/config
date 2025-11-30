@@ -62,7 +62,6 @@ if [[ -d $ZDOTDIR/.zsh_sessions ]]; then
     rm -rf $ZDOTDIR/.zsh_sessions > /dev/null 2>&1
 fi
 
-
 # shell files tracking - keep at the end
 ZFILES_COUNT=$((ZFILES_COUNT + 1))
 export ZFILE_RC=1

@@ -1,7 +1,7 @@
 #!/bin/zsh
 
 # If set to 1 shows login info from .zlogin
-export LOGIN_INFO=1
+export LOGIN_INFO=0
 
 # HISTORY
 export HISTFILE=$ZDOTDIR/.zsh_history
@@ -79,13 +79,14 @@ export LOG_EMOJI_ICONS=0 # log.sh: 1 for emoji, 0 for text
 # Get the colors in the opened man page itself
 export MANPAGER="sh -c 'col -bx | bat -l man -p --paging always'"
 
-# zsh variables
+# ZSH/Oh My Zsh settings
 # DISABLE_MAGIC_FUNCTIONS="true"
 # DISABLE_LS_COLORS="true"
 # DISABLE_AUTO_TITLE="true"
 # ENABLE_CORRECTION="true"
 COMPLETION_WAITING_DOTS="true"
 # DISABLE_UNTRACKED_FILES_DIRTY="true"
+HIST_STAMPS="yyyy-mm-dd"
 
 
 # shell files tracking - keep at the end
