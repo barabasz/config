@@ -15,33 +15,33 @@ alias ds='du -sh ./*/' # Show directory sizes
 # Applications
 
 ## 7zz
-if [[ $(isinstalled 7zz) == 1 ]]; then
+if isinstalled 7zz; then
     alias 7z='7zz'
 fi
 
 ## bat
-if [[ $(isinstalled bat) == 1 ]]; then
+if isinstalled bat; then
     alias bat='bat -n'
     alias cat='bat'
 fi
 
 ## brew
-if [[ $(isinstalled brew) == 1 ]]; then
+if isinstalled brew; then
     alias brewu='brew update && brew upgrade && brew missing && brew autoremove && brew cleanup && brew doctor'
 fi
 
 ## cal
-if [[ $(isinstalled cal) == 1 ]]; then
+if isinstalled cal; then
     alias cal='cal -m3'
 fi
 
 ## code
-if [[ $(isinstalled code) == 1 ]]; then
+if isinstalled code; then
     alias vsc='code'
 fi
 
 ## exa
-if [[ $(isinstalled eza) == 1 ]]; then
+if isinstalled eza; then
     alias eza='eza --icons'
     alias exa='eza --icons'
     alias ls='eza --group-directories-first'
@@ -53,12 +53,12 @@ if [[ $(isinstalled eza) == 1 ]]; then
 fi
 
 ## gdate
-if [[ $(isinstalled gdate) == 1 ]]; then    
+if isinstalled gdate; then
     alias date='gdate'
 fi
 
 ## git
-if [[ $(isinstalled git) == 1 ]]; then    
+if isinstalled git; then
     alias gaa='git add --all'
     alias gcm='git commit -m "update"'
     alias glog='git log --oneline -n 10'
@@ -71,23 +71,23 @@ fi
 
 ## gsed
 if [[ "$(osname)" == "macos" ]]; then
-    if [[ $(isinstalled gsed) ]]; then
+    if isinstalled gsed; then
         alias sed='gsed'
     fi
 fi
 
 ## http-server
-if [[ $(isinstalled http-server) == 1 ]]; then
+if isinstalled http-server; then
     alias serve='http-server -c-1 -o'
 fi
 
 ## mc
-if [[ $(isinstalled mc) == 1 ]]; then
+if isinstalled mc; then
     alias mc='mc --nosubshell'
 fi
 
 ## nivm
-if [[ $(isinstalled nvim) == 1 ]]; then 
+if isinstalled nvim; then
     alias vi='nvim'
     alias view='nvim -R'
     alias vim='nvim'
@@ -96,22 +96,22 @@ if [[ $(isinstalled nvim) == 1 ]]; then
 fi
 
 ## node
-if [[ $(isinstalled node) == 1 ]]; then
+if isinstalled node; then
     alias js='node'
 fi
 
 ## npx
-if [[ $(isinstalled npx) == 1 ]]; then
+if isinstalled npx; then
     alias ts='npx tsx'
 fi
 
 ## oh-my-posh
-if [[ $(isinstalled oh-my-posh) == 1 ]]; then
+if isinstalled oh-my-posh; then
     alias omp='oh-my-posh'
 fi
 
 ## pip3
-if [[ $(isinstalled pip3) == 1 ]]; then 
+if isinstalled pip3; then
     alias pip='pip3'
     alias pipi='pip install'
     alias pipu='pip uninstall'
@@ -119,19 +119,19 @@ if [[ $(isinstalled pip3) == 1 ]]; then
 fi
 
 ## python
-if [[ $(isinstalled python3) == 1 ]]; then 
+if isinstalled python3; then
     alias python='python3'
     alias py='python3'
 fi
 
 ## yt-dlp
-if [[ $(isinstalled yt-dlp) == 1 ]]; then
+if isinstalled yt-dlp; then
     alias youtube-dl='yt-dlp'
     alias ytdl='yt-dlp'
 fi
 
 ## z (zoxide)
-if [[ $(isinstalled zoxide) == 1 ]]; then
+if isinstalled zoxide; then
     alias cd='z'
     alias cd..='z ..'
     alias zz='z -'

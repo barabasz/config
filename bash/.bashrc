@@ -19,3 +19,4 @@ export PATH=$HOME/bin:$HOME/bin/install:$HOME/bin/test:$HOME/binos:/usr/local/bi
 export PS1="[\[\033[36m\]\u\[\033[37m\]@\[\033[32m\]\h:\[\033[33;1m\]\w\[\033[m\]]$ "
 export HOMEBREW_NO_ENV_HINTS=1
 export HOMEBREW_NO_EMOJI=1
+. "$HOME/.cargo/env"

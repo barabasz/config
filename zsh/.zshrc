@@ -3,47 +3,52 @@
 # INTEGRATIONS
 
 ## oh-my-zsh
-if [[ -f $ZSH/oh-my-zsh.sh ]]; then
+if isfile "$ZSH/oh-my-zsh.sh"; then
     sourceif $ZDOTDIR/assets/.zsh_omz $thisfile
 fi
 
 ## oh-my-posh
-if [[ $(isinstalled oh-my-posh) == 1 ]]; then
+if isinstalled oh-my-posh; then
     sourceif $ZDOTDIR/assets/.zsh_omp $thisfile
 fi
 
 ## bat (cat clone)
-if [[ $(isinstalled bat) == 1 ]]; then
+if isinstalled bat; then
     sourceif $ZDOTDIR/assets/.zsh_bat $thisfile
 fi
 
 ## brew (package manager)
-if [[ $(isinstalled brew) == 1 ]]; then
+if isinstalled brew; then
     sourceif $ZDOTDIR/assets/.zsh_brew $thisfile
 fi
 
 ## fzf (fuzzy finder)
-if [[ $(isinstalled fzf) == 1 ]]; then
+if isinstalled fzf; then
     sourceif $ZDOTDIR/assets/.zsh_fzf $thisfile
 fi
 
 ## thefuck (corrects previous command)
-if [[ $(isinstalled thefuck) == 1 ]]; then
+if isinstalled thefuck; then
     sourceif $ZDOTDIR/assets/.zsh_thefuck $thisfile
 fi
 
 ## python virtual environment
-if [[ $(isinstalled python3) == 1 ]]; then
+if isinstalled python3; then
     sourceif $ZDOTDIR/assets/.zsh_python $thisfile
 fi
 
+## rust (programming language)
+if isfile "$HOME/.cargo/env"; then
+    source "$HOME/.cargo/env"
+fi
+
 ## yazi file manager
-if [[ $(isinstalled yazi) == 1 ]]; then
+if isinstalled yazi; then
     sourceif $ZDOTDIR/assets/.zsh_yazi $thisfile
 fi
 
 ## zoxide (cd replacement)
-if [[ $(isinstalled zoxide) == 1 ]]; then
+if isinstalled zoxide; then
     sourceif $ZDOTDIR/assets/.zsh_zoxide $thisfile
 fi
 
