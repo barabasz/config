@@ -26,4 +26,3 @@ fi
 # shell files tracking - keep at the end
 ZFILES_COUNT=$((ZFILES_COUNT + 1))
 export ZFILE_ENV=1
-. "$HOME/.cargo/env"
