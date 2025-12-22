@@ -1,8 +1,14 @@
 # Colors
-theme = "Tokyo Night"
+theme = tokyonight
+background = #1e1828
+
+# Cursor
+cursor-style = bar
+cursor-color = #F9901C
  
 # Fonts
 font-family = "JetBrains Mono"
+font-size = 13
  
 # Window
 window-theme = dark
