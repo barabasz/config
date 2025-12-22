@@ -1,0 +1,11 @@
+# Colors
+theme = "Tokyo Night"
+ 
+# Fonts
+font-family = "JetBrains Mono"
+ 
+# Window
+window-theme = dark
+ 
+# Shell
+command = /bin/zsh
