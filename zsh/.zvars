@@ -1,7 +1,7 @@
 #!/bin/zsh
 
 # If set to 1 shows login info from .zlogin
-export LOGIN_INFO=1
+export LOGIN_INFO=0
 
 # HISTORY
 export HISTFILE=$ZDOTDIR/.zsh_history
