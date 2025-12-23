@@ -62,6 +62,9 @@ sourceif $ZDOTDIR/.zdirs $thisfile
 
 # CLEANUP
 
+# Unset variables
+unset d # set by zsh
+
 # https://bit.ly/zsh_sessions
 if [[ -d $ZDOTDIR/.zsh_sessions ]]; then
     rm -rf $ZDOTDIR/.zsh_sessions > /dev/null 2>&1

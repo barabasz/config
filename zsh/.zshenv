@@ -9,9 +9,10 @@ export ZFILES_COUNT=0
 source $ZDOTDIR/.zvars
 
 # load functions
-for f in "$LIBDIR"/*.sh; do
-    [[ -f "$f" && ! "$(basename "$f")" =~ ^_ ]] && source "$f"
-done
+# for f in "$LIBDIR"/*.sh; do
+#    [[ -f "$f" && ! "$(basename "$f")" =~ ^_ ]] && source "$f"
+# done
+source $LIBDIR/_all.sh
 
 # locale
 sourceif $ZDOTDIR/.zlocale $thisfile
