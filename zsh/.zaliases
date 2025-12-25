@@ -125,6 +125,11 @@ if isinstalled python3; then
     alias py='python3'
 fi
 
+## trippy
+if isinstalled trip; then
+    alias trip='sudo trip'
+fi
+
 ## yt-dlp
 if isinstalled yt-dlp; then
     alias youtube-dl='yt-dlp'

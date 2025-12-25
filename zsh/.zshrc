@@ -2,6 +2,11 @@
 
 # INTEGRATIONS
 
+## ACME Shell script: acme.sh
+if isdir "$HOME/.acme.sh"; then
+    . "$HOME/.acme.sh/acme.sh.env"
+fi
+
 ## oh-my-zsh
 if isfile "$ZSH/oh-my-zsh.sh"; then
     sourceif $ZDOTDIR/assets/.zsh_omz $thisfile
