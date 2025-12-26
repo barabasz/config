@@ -1,7 +1,11 @@
 #!/bin/zsh
 
+# zsh configuration version
+export ZSH_CONFIG_VERSION="20251226v1"
+
 # zsh configuration directory
 export ZDOTDIR=$HOME/.config/zsh
+
 # shell files counter
 export ZFILES_COUNT=0
 

@@ -1,8 +1,5 @@
 #!/bin/zsh
 
-# Configuration version
-export ZSH_CONFIG_VERSION="20251226v1"
-
 # If set to 1 shows login info from .zlogin
 export LOGIN_INFO=0
 
