@@ -21,6 +21,44 @@ export LC_TIME=pl_PL.UTF-8
 # Do not set LC_ALL, it overrides all other LC_* settings
 export LC_ALL=
 
+# Ensure required locales are generated (Linux/Debian-based only)
+__ensure_locales() {
+    [[ "$OSTYPE" != linux* ]] && return 0
+    [[ ! -f /etc/debian_version ]] && return 0
+
+    # Check if sudo is available without password (non-interactive)
+    sudo -n true 2>/dev/null || return 0
+
+    local needs_generation=false
+    local locales_to_check=("en_US.UTF-8" "pl_PL.UTF-8")
+
+    # Install locales package if missing
+    if ! dpkg -s locales &>/dev/null; then
+        sudo -n apt-get install -qq -y locales &>/dev/null || return 1
+    fi
+
+    # Check and uncomment locales in /etc/locale.gen
+    for loc in "${locales_to_check[@]}"; do
+        if ! locale -a 2>/dev/null | grep -qx "${loc/UTF-8/utf8}"; then
+            needs_generation=true
+            # Uncomment the locale line if it exists commented
+            if grep -qE "^#\s*${loc}" /etc/locale.gen 2>/dev/null; then
+                sudo -n sed -i "s/^#\s*\(${loc}\)/\1/" /etc/locale.gen 2>/dev/null
+            # Or add the line if it doesn't exist at all
+            elif ! grep -qE "^\s*${loc}" /etc/locale.gen 2>/dev/null; then
+                echo "${loc} UTF-8" | sudo -n tee -a /etc/locale.gen &>/dev/null
+            fi
+        fi
+    done
+
+    # Generate locales if needed
+    if $needs_generation; then
+        sudo -n locale-gen &>/dev/null
+    fi
+}
+
+__ensure_locales
+unset -f __ensure_locales
 
 # shell files tracking - keep at the end
 ZFILES_COUNT=$((ZFILES_COUNT + 1))
