@@ -1,8 +1,4 @@
 #!/bin/zsh
 
 # fzf shell integration
-
-if [[ "$(uname)" == "Darwin" ]]; then
-    source <(fzf --zsh)
-    set rtp+=/opt/homebrew/opt/fzf
-fi
+source <(fzf --zsh)

@@ -6,7 +6,6 @@ export LOGIN_INFO=0
 # HISTORY
 export HISTFILE=$ZDOTDIR/.zsh_history
 export HISTSIZE=1000
-export HISTFILESIZE=1000
 
 # DIRECTORIES
 

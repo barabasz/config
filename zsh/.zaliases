@@ -10,7 +10,6 @@ alias info='sysinfo && shellfiles && logininfo'
 alias reload="source $ZDOTDIR/.zshrc && omz reload" # Reload zsh configuration
 alias cls='clear' # Clear terminal
 alias myip='curl icanhazip.com' # Show public IP
-alias mdcd='mkdir -p $1 && cd $_' # Make directory and change to it
 alias ds='du -sh ./*/' # Show directory sizes
 
 # Applications
