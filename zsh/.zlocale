@@ -58,8 +58,10 @@ __ensure_locales() {
     fi
 }
 
+if [[ "$(uname)" == "Linux" ]]; then
 __ensure_locales
 unset -f __ensure_locale
+fi
 
 # shell files tracking - keep at the end
 ZFILES_COUNT=$((ZFILES_COUNT + 1))
