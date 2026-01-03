@@ -11,6 +11,10 @@ export HISTSIZE=1000
 
 ## zsh
 export ZDOTDIR=$HOME/.config/zsh
+export ZLIBDIR=$ZDOTDIR/lib
+export ZLIBFILE=$ZLIBDIR/.compiled.zsh
+export ZASSETSDIR=$ZDOTDIR/assets
+
 ## Temp
 export TMP=$HOME/.tmp
 [[ ! -d $TMP ]] && mkdir -p $TMP
