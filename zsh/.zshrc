@@ -1,28 +1,26 @@
 #!/bin/zsh
-
-# Aliases
-source $ZDOTDIR/.zaliases
+this_file=${0:A:t}
 
 # Autoloaded functions
-source $ZDOTDIR/.zautoload
+## Zsh functions
+autoload -Uz zmv
+autoload -Uz colors && colors
+## User functions
+fpath=($ZDOTDIR/functions $fpath)
+autoload -Uz $ZDOTDIR/functions/[^_.]*(.:t)
+
+# Aliases
+source $ZALIASES
 
 # Dir 
-source $ZDOTDIR/.zdirs
+source $ZDIRSFILE
+try_source $ZINCDIR/zsh_dirs.zsh $this_file
 
-# Assets (integrations)
-source $ZDOTDIR/.zassets
+# App configurations
+source $ZAPPCONF
 
-# CLEANUP
-
-# Unset variables
-unset d # set by zsh
-unset thisfile
-
-# Clear zsh_sessions
-if [[ -d $ZDOTDIR/.zsh_sessions ]]; then
-    rm -rf $ZDOTDIR/.zsh_sessions > /dev/null 2>&1
-fi
+# Interactive cleanup
+source $ZFNCDIR/zcleanup
 
 # shell files tracking - keep at the end
-ZFILES_COUNT=$((ZFILES_COUNT + 1))
-export ZFILE_RC=1
+ZFILES[$this_file]=1

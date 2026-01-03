@@ -1,4 +1,5 @@
 #!/bin/zsh
+this_file=${0:A:t}
 
 # end of shell files tracking - keep at the top
 ZFILES_COUNT=$((ZFILES_COUNT + 1))

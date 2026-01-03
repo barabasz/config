@@ -1,5 +1,6 @@
 zsh/.zsh_history
 zsh/.zsh_sessions
+zsh/lib/.compiled.zsh.tmp
 karabiner/automatic_backups
 iterm2/AppSupport
 iterm2/sockets

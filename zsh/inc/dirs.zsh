@@ -1,4 +1,7 @@
 #!/bin/zsh
+this_file=${0:A:t}
+
+# Directories shortcuts (named directories)
 
 hash -d bin=$BINDIR
 hash -d conf=$CONFDIR

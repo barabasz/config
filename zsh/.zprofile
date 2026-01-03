@@ -1,4 +1,5 @@
 #!/bin/zsh
+this_file=${0:A:t}
 
 
 # shell files tracking - keep at the end

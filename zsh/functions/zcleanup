@@ -1,0 +1,11 @@
+#!/usr/bin/env zsh
+this_file=${0:A:t}
+
+# Unset variables
+unset d # set by zsh
+unset thisfile
+
+# Clear zsh_sessions
+if [[ -d $ZDOTDIR/.zsh_sessions ]]; then
+    rm -rf $ZDOTDIR/.zsh_sessions > /dev/null 2>&1
+fi

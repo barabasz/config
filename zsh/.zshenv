@@ -1,16 +1,15 @@
 #!/bin/zsh
+this_file=${0:A:t}
 
-# Zsh configuration version
-export ZSH_CONFIG_VERSION="20260103v1"
+# Shell files tracking - keep at the top
+typeset -A ZFILES
+ZFILES[.zshenv]=0
 
 # Zsh configuration directory
 export ZDOTDIR=$HOME/.config/zsh
 
-# Shell files counter
-export ZFILES_COUNT=0
-
 # Load environment variables
-source $ZDOTDIR/.zvars
+source "$ZDOTDIR/environment.zsh"
 
 # Load helper library
 if [[ -f "$ZLIBFILE" ]]; then
@@ -32,8 +31,7 @@ elif [[ -f /home/linuxbrew/.linuxbrew/bin/brew ]]; then
 fi
 
 # Set locale
-sourceif $ZDOTDIR/.zlocale $thisfile
+source $ZLOCALEFILE
 
 # Shell files tracking - keep at the end
-ZFILES_COUNT=$((ZFILES_COUNT + 1))
-export ZFILE_ENV=1
+ZFILES[.zshenv]=1

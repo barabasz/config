@@ -1,4 +1,8 @@
 #!/bin/zsh
+this_file=${0:A:t}
+
+# Zsh configuration version
+export ZSH_CONFIG_VERSION="20260103v1"
 
 # If set to 1 shows login info from .zlogin
 export LOGIN_INFO=0
@@ -11,9 +15,18 @@ export HISTSIZE=1000
 
 ## zsh
 export ZDOTDIR=$HOME/.config/zsh
+export ZINCDIR=$ZDOTDIR/inc
 export ZLIBDIR=$ZDOTDIR/lib
-export ZLIBFILE=$ZLIBDIR/.compiled.zsh
-export ZASSETSDIR=$ZDOTDIR/assets
+export ZAPPDIR=$ZDOTDIR/apps
+export ZFNCDIR=$ZDOTDIR/functions
+
+## Zsh config files
+export ZHELPERS=$ZLIBDIR/.compiled.zsh
+export ZALIASES=$ZINCDIR/aliases.zsh
+export ZAPPCONF=$ZINCDIR/apps.zsh
+export ZLOCALES=$ZDOTDIR/locales.zsh
+export ZDIRSFILE=$ZDOTDIR/dirs.zsh
+export ZAUTOLOADFILE=$ZDOTDIR/autoload.zsh
 
 ## Temp
 export TMP=$HOME/.tmp
