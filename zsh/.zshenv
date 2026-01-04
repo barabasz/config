@@ -23,6 +23,9 @@ else
     unset lib_file
 fi
 
+# Load colors
+try_source "$ZINCDIR/colors.zsh" "$this_file"
+
 # Set locale
 try_source $ZINCDIR/locales.zsh $this_file
 
