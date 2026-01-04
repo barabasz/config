@@ -7,3 +7,6 @@ autoload -Uz colors && colors
 ## User functions
 fpath=($ZDOTDIR/functions $fpath)
 autoload -Uz $ZDOTDIR/functions/[^_.]*(.:t)
+
+## Zsh modules
+zmodload zsh/datetime

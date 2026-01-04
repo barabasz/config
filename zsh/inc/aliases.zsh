@@ -15,33 +15,33 @@ alias ds='du -sh ./*/' # Show directory sizes
 # Applications
 
 ## 7zz
-if isinstalled 7zz; then
+if is_installed 7zz; then
     alias 7z='7zz'
 fi
 
 ## bat
-if isinstalled bat; then
+if is_installed bat; then
     alias bat='bat -n'
     alias cat='bat'
 fi
 
 ## brew
-if isinstalled brew; then
+if is_installed brew; then
     alias brewu='brew update && brew upgrade && brew missing && brew autoremove && brew cleanup && brew doctor'
 fi
 
 ## cal
-if isinstalled cal; then
+if is_installed cal; then
     alias cal='cal -m3'
 fi
 
 ## code
-if isinstalled code; then
+if is_installed code; then
     alias vsc='code'
 fi
 
 ## exa
-if isinstalled eza; then
+if is_installed eza; then
     alias eza='eza --icons'
     alias exa='eza --icons'
     alias ls='eza --group-directories-first'
@@ -53,12 +53,12 @@ if isinstalled eza; then
 fi
 
 ## gdate
-if isinstalled gdate; then
+if is_installed gdate; then
     alias date='gdate'
 fi
 
 ## git
-if isinstalled git; then
+if is_installed git; then
     alias gaa='git add --all'
     alias gcm='git commit -m "update"'
     alias glog='git log --oneline -n 10'
@@ -70,24 +70,24 @@ if isinstalled git; then
 fi
 
 ## gsed
-if [[ "$(osname)" == "macos" ]]; then
-    if isinstalled gsed; then
+if is_macos; then
+    if is_installed gsed; then
         alias sed='gsed'
     fi
 fi
 
 ## http-server
-if isinstalled http-server; then
+if is_installed http-server; then
     alias serve='http-server -c-1 -o'
 fi
 
 ## mc
-if isinstalled mc; then
+if is_installed mc; then
     alias mc='mc --nosubshell'
 fi
 
 ## nivm
-if isinstalled nvim; then
+if is_installed nvim; then
     alias vi='nvim'
     alias view='nvim -R'
     alias vim='nvim'
@@ -96,22 +96,22 @@ if isinstalled nvim; then
 fi
 
 ## node
-if isinstalled node; then
+if is_installed node; then
     alias js='node'
 fi
 
 ## npx
-if isinstalled npx; then
+if is_installed npx; then
     alias ts='npx tsx'
 fi
 
 ## oh-my-posh
-if isinstalled oh-my-posh; then
+if is_installed oh-my-posh; then
     alias omp='oh-my-posh'
 fi
 
 ## pip3
-if isinstalled pip3; then
+if is_installed pip3; then
     alias pip='pip3'
     alias pipi='pip install'
     alias pipu='pip uninstall'
@@ -119,24 +119,24 @@ if isinstalled pip3; then
 fi
 
 ## python
-if isinstalled python3; then
+if is_installed python3; then
     alias python='python3'
     alias py='python3'
 fi
 
 ## trippy
-if isinstalled trip; then
+if is_installed trip; then
     alias trip='sudo trip'
 fi
 
 ## yt-dlp
-if isinstalled yt-dlp; then
+if is_installed yt-dlp; then
     alias youtube-dl='yt-dlp'
     alias ytdl='yt-dlp'
 fi
 
 ## z (zoxide)
-if isinstalled zoxide; then
+if is_installed zoxide; then
     alias cd='z'
     alias cd..='z ..'
     alias zz='z -'

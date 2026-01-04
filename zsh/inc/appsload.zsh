@@ -8,37 +8,35 @@ fi
 
 ## oh-my-zsh
 if is_file "$ZSH/oh-my-zsh.sh"; then
-    sourceif $ZDOTDIR/assets/.zsh_omz $this_file
+    try_source $ZAPPDIR/omz.zsh $this_file
 fi
 
 ## oh-my-posh
 if is_installed oh-my-posh; then
-    sourceif $ZDOTDIR/assets/.zsh_omp $this_file
+    try_source $ZAPPDIR/omp.zsh $this_file
 fi
 
 ## bat (cat clone)
 if is_installed bat; then
-    sourceif $ZDOTDIR/assets/.zsh_bat $this_file
+    try_source $ZAPPDIR/bat.zsh $this_file
 fi
 
 ## brew (package manager)
-if is_installed brew; then
-    sourceif $ZDOTDIR/assets/.zsh_brew $this_file
-fi
+# loaded in .zprofile for login shells
 
 ## fzf (fuzzy finder)
 if is_installed fzf; then
-    sourceif $ZDOTDIR/assets/.zsh_fzf $this_file
+    try_source $ZAPPDIR/fzf.zsh $this_file
 fi
 
 ## thefuck (corrects previous command)
 if is_installed thefuck; then
-    sourceif $ZDOTDIR/assets/.zsh_thefuck $this_file
+    try_source $ZAPPDIR/thefuck.zsh $this_file
 fi
 
 ## python virtual environment
 if is_installed python3; then
-    sourceif $ZDOTDIR/assets/.zsh_python $this_file
+    try_source $ZAPPDIR/python.zsh $this_file
 fi
 
 ## rust (programming language)
@@ -48,12 +46,12 @@ fi
 
 ## yazi file manager
 if is_installed yazi; then
-    sourceif $ZDOTDIR/assets/.zsh_yazi $this_file
+    try_source $ZAPPDIR/yazi.zsh $this_file
 fi
 
 ## zoxide (cd replacement)
 if is_installed zoxide; then
-    sourceif $ZDOTDIR/assets/.zsh_zoxide $this_file
+    try_source $ZAPPDIR/zoxide.zsh $this_file
 fi
 
 # Shell files tracking - keep at the end

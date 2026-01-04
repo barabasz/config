@@ -1,32 +1,43 @@
 #!/bin/zsh
 this_file=${0:A:t}
 
+# XDG
+## Base directories
+export XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-$HOME/.config}
+export XDG_CACHE_HOME=${XDG_CACHE_HOME:-$HOME/.local/cache}
+export XDG_BIN_HOME=${XDG_BIN_HOME:-$HOME/.local/bin}
+export XDG_DATA_HOME=${XDG_DATA_HOME:-$HOME/.local/share}
+export XDG_STATE_HOME=${XDG_STATE_HOME:-$HOME/.local/state}
+export XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR:-$HOME/.xdg}
+## User directories
+export XDG_DESKTOP_DIR=${XDG_DESKTOP_DIR:-$HOME/Desktop}
+export XDG_DOCUMENTS_DIR=${XDG_DOCUMENTS_DIR:-$HOME/Documents}
+export XDG_DOWNLOAD_DIR=${XDG_DOWNLOAD_DIR:-$HOME/Downloads}
+export XDG_MUSIC_DIR=${XDG_MUSIC_DIR:-$HOME/Music}
+export XDG_PICTURES_DIR=${XDG_PICTURES_DIR:-$HOME/Pictures}
+export XDG_PROJECTS_DIR=${XDG_PROJECTS_DIR:-$HOME/Projects}
+export XDG_VIDEOS_DIR=${XDG_VIDEOS_DIR:-$HOME/Videos}
+
+# ZSH
 # Zsh configuration version
-export ZSH_CONFIG_VERSION="20260103v1"
-
-# If set to 1 shows login info from .zlogin
-export LOGIN_INFO=0
-
-# HISTORY
-export HISTFILE=$ZDOTDIR/.zsh_history
-export HISTSIZE=1000
-
-# DIRECTORIES
-
-## zsh
-export ZDOTDIR=$HOME/.config/zsh
+export ZSH_CONFIG_VERSION="20260104v1"
+export ZSH_DEBUG=1
+export ZSH_LOGIN_INFO=0
+## directories
+export ZCACHEDIR=$ZDOTDIR/cache
+export SHELL_SESSION_DIR="$ZCACHEDIR/sessions"
 export ZINCDIR=$ZDOTDIR/inc
 export ZLIBDIR=$ZDOTDIR/lib
 export ZAPPDIR=$ZDOTDIR/apps
 export ZFNCDIR=$ZDOTDIR/functions
-
-## Zsh config files
+## inc config files
 export ZHELPERS=$ZLIBDIR/.compiled.zsh
-export ZALIASES=$ZINCDIR/aliases.zsh
-export ZAPPCONF=$ZINCDIR/apps.zsh
-export ZLOCALES=$ZDOTDIR/locales.zsh
-export ZDIRSFILE=$ZDOTDIR/dirs.zsh
-export ZAUTOLOADFILE=$ZDOTDIR/autoload.zsh
+
+# history
+export HISTFILE=$ZDOTDIR/.zsh_history
+export HISTSIZE=1000
+
+
 
 ## Temp
 export TMP=$HOME/.tmp
@@ -52,20 +63,9 @@ export DOCDIR=$HOME/Documents
 export CACHEDIR=$HOME/.cache
 export VENVDIR=$HOME/.venv
 
-# ZSH
-export SHELL_SESSION_DIR="$CACHEDIR/.zsh_sessions"
-export ZSH_LOAD_FILE=$ZDOTDIR/.zsh_load
-export ZSH="$CONFDIR/omz"
 
-# XDG
-export XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-$CONFDIR}
-export XDG_CACHE_HOME=${XDG_CACHE_HOME:-$CACHEDIR}
-export XDG_BIN_HOME=${XDG_BIN_HOME:-$HOME/.local/bin}
-export XDG_DATA_HOME=${XDG_DATA_HOME:-$HOME/.local/share}
-export XDG_DOWNLOAD_DIR=${XDG_DOWNLOAD_DIR:-$DLDIR}
-export XDG_STATE_HOME=${XDG_STATE_HOME:-$HOME/.local/state}
-export XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR:-$HOME/.xdg}
-export XDG_PROJECTS_DIR=${XDG_PROJECTS_DIR:-$HOME/Projects}
+
+
 
 # PATH
 # user scripts and binaries

@@ -1,8 +1,22 @@
+.DS_Store
+
+# Zsh
+zsh/cache/
+!zsh/cache/.gitkeep
 zsh/.zsh_history
 zsh/.zsh_sessions
+zsh/lib/.compiled.zsh
 zsh/lib/.compiled.zsh.tmp
+
+# Karabiner
 karabiner/automatic_backups
+
+# iTerm2
 iterm2/AppSupport
 iterm2/sockets
+
+# Yazi
 yazi/flavors/dracula.yazi
+
+# Neovim
 nvim/lazy-lock.json
