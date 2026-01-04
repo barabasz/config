@@ -12,3 +12,6 @@ hash -d lib=$LIBDIR
 hash -d tmp=$TMP
 hash -d venv=$VENVDIR
 hash -d zsh=$ZDOTDIR
+
+# shell files tracking - keep at the end
+ZFILES[$this_file]=1

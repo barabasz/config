@@ -2,6 +2,15 @@
 
 # Oh My Zsh configuration
 
+# ZSH/Oh My Zsh settings
+# DISABLE_MAGIC_FUNCTIONS="true"
+# DISABLE_LS_COLORS="true"
+# DISABLE_AUTO_TITLE="true"
+# ENABLE_CORRECTION="true"
+COMPLETION_WAITING_DOTS="true"
+# DISABLE_UNTRACKED_FILES_DIRTY="true"
+HIST_STAMPS="yyyy-mm-dd"
+
 # Path to your Oh My Zsh installation.
 export ZSH="$CONFDIR/omz"
 export ZSH_COMPDUMP=$CACHEDIR/.zcompdump-$HOST
@@ -67,6 +76,8 @@ zstyle ':omz:update' frequency 1
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(copyfile copypath history sudo zsh-autosuggestions zsh-syntax-highlighting)
 # Add macOS-specific plugins if on macOS
-[[ "$OSTYPE" == darwin* ]] && plugins+=(macos)
+if is_macos; then
+  plugins+=(macos)
+fi
 
 [[ -f $ZSH/oh-my-zsh.sh ]] && source $ZSH/oh-my-zsh.sh

@@ -7,7 +7,7 @@ if is_dir "$HOME/.acme.sh"; then
 fi
 
 ## oh-my-zsh
-if is_file "$ZSH/oh-my-zsh.sh"; then
+if is_file "$CONFDIR/omz/oh-my-zsh.sh"; then
     try_source $ZAPPDIR/omz.zsh $this_file
 fi
 

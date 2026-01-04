@@ -1,4 +1,5 @@
 #!/bin/zsh
+this_file=$(basename "${0:A}")
 
 # Global
 
@@ -142,7 +143,5 @@ if is_installed zoxide; then
     alias zz='z -'
 fi
 
-
 # shell files tracking - keep at the end
-ZFILES_COUNT=$((ZFILES_COUNT + 1))
-export ZFILE_ALIASES=1
+ZFILES[$this_file]=1

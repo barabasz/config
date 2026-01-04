@@ -1,4 +1,5 @@
 #!/bin/zsh
+this_file=$(basename "${0:A}")
 
 # English language
 export LANG=en_US.UTF-8
@@ -20,7 +21,6 @@ export LC_TIME=pl_PL.UTF-8
 
 # Do not set LC_ALL, it overrides all other LC_* settings
 export LC_ALL=
-
 
 # Ensure required locales are generated (Linux/Debian-based only)
 __ensure_locales() {
@@ -64,5 +64,4 @@ unset -f __ensure_locale
 fi
 
 # shell files tracking - keep at the end
-ZFILES_COUNT=$((ZFILES_COUNT + 1))
-export ZFILE_LOCALE=1
+ZFILES[$this_file]=1

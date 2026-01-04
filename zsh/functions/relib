@@ -6,7 +6,7 @@
 zmodload zsh/datetime  # For precise timing
 
 local -a source_files
-local compiled="$ZLIBFILE"
+local compiled="$ZHELPERS"
 local lib_dir="$ZLIBDIR"
 local file_count=0 error_count=0
 local start_time end_time elapsed
@@ -89,7 +89,8 @@ fi
 
 # Calculate elapsed time
 end_time=$EPOCHREALTIME
-elapsed=$(( int((end_time - start_time) * 1000) ))
+elapsed=$(( (end_time - start_time) * 1000 ))
+elapsed=${elapsed%.*}  # Convert to integer (milliseconds)
 
 # Source the compiled file
 print -n "\nLoading compiled library... "
