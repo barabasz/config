@@ -1,5 +1,7 @@
-#!/usr/bin/env zsh
-#
+#!/bin/zsh
+# Shell files tracking - keep at the top
+zfile_track_start ${0:A}
+
 # Filesystem related functions
 # zsh-specific functions - requires zsh, will not work in bash
 
@@ -52,3 +54,6 @@ is_pipe() {
 is_socket() {
     [[ $# -eq 1 && -S "$1" ]]
 }
+
+# shell files tracking - keep at the end
+zfile_track_end ${0:A}

@@ -1,5 +1,3 @@
-#!/usr/bin/env zsh
-
 # Retrieve the local IP address (non-localhost)
 # Usage: lanip [-6] [-i INTERFACE] [-a]
 #   -6: Get IPv6 address instead of IPv4

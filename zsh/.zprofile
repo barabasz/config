@@ -1,8 +1,10 @@
 #!/bin/zsh
-this_file=${0:A:t}
+# Shell files tracking - keep at the top
+zfile_track_start "$ZDOTDIR/.zprofile"
 
-try_source $ZAPPDIR/brew.zsh $this_file
+# This file is sourced when a zsh login shell exits.
 
 # shell files tracking - keep at the end
-ZFILES_COUNT=$((ZFILES_COUNT + 1))
-export ZFILE_PROFILE=1
+zfile_track_end "$ZDOTDIR/.zprofile"
+
+

@@ -1,0 +1,21 @@
+# Show loaded shell files in order
+local filepath filename fstatus icon time_ms total=0
+
+for filepath in $ZFILES_ORDER; do
+    filename=${filepath:t}
+    fstatus=$ZFILES[$filepath]
+    time_ms=$ZFILES_TIME[$filepath]
+    if (( fstatus == 1 )); then
+        icon="${g}✓${x}"
+    else
+        icon="${r}✗${x}"
+    fi
+    if [[ $filename == .z* ]]; then
+        printf "%s ${y}%-20s %6.2fms${x}\n" "$icon" "$filename" "$time_ms"
+        total=$(( total + time_ms ))
+    else
+        printf "  %s ${c}%-18s %6.2fms${x}  %s\n" "$icon" "$filename" "$time_ms" "${filepath:h:t}"
+    fi
+done
+
+printf "\n${w}Total: %.2fms${x}\n" "$total"

@@ -1,0 +1,25 @@
+{
+  "version": 3,
+  "blocks": [
+    {
+      "type": "prompt",
+      "alignment": "left",
+      "segments": [
+        {
+          "type": "path",
+          "style": "plain",
+          "template": "{{ .Path }} "
+        },
+        {
+          "type": "git",
+          "style": "plain",
+          "properties": {
+            "fetch_status": true,
+            "fetch_stash_count": true
+          },
+          "template": "{{ .HEAD }} > "
+        }
+      ]
+    }
+  ]
+}

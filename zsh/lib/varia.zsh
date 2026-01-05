@@ -1,6 +1,20 @@
 #!/usr/bin/env zsh
-#
+# Shell files tracking - keep at the top
+zfile_track_start ${0:A}
+
 # Various helper functions
+
+# Check if debug mode is enabled
+is_debug() {
+    [[ $ZSH_DEBUG == 1 || $DEBUG == 1 ]]
+}
+
+# Measure execution time of a command
+etime() {
+    local start=$EPOCHREALTIME
+    "$@" > /dev/null
+    printf "%.2fms\n" $(( (EPOCHREALTIME - start) * 1000 ))
+}
 
 # Check if command(s) are installed
 # Usage: is_installed cmd1 [cmd2 ...]
@@ -47,3 +61,6 @@ try_source() {
         return 1
     fi
 }
+
+# shell files tracking - keep at the end
+zfile_track_end ${0:A}

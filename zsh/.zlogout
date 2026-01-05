@@ -1,3 +1,4 @@
 #!/bin/zsh
-this_file=${0:A:t}
+
+# This file is sourced when a zsh login shell exits.
 

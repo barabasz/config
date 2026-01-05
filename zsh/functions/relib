@@ -1,5 +1,3 @@
-#!/usr/bin/env zsh
-
 # Compile all library files into a single optimized file
 # Usage: relib
 

@@ -1,11 +1,8 @@
 #!/bin/zsh
-this_file=${0:A:t}
+# Shell files tracking - keep at the top
+zfile_track_start ${0:A}
 
 # ZSH
-# Zsh configuration version
-export ZSH_CONFIG_VERSION="20260104v2"
-export ZSH_DEBUG=1
-export ZSH_LOGIN_INFO=0
 ## directories
 export ZCACHEDIR=$ZDOTDIR/cache
 export SHELL_SESSION_DIR="$ZCACHEDIR/sessions"
@@ -13,11 +10,10 @@ export ZINCDIR=$ZDOTDIR/inc
 export ZLIBDIR=$ZDOTDIR/lib
 export ZAPPDIR=$ZDOTDIR/apps
 export ZFNCDIR=$ZDOTDIR/functions
-## inc config files
-export ZHELPERS=$ZLIBDIR/.compiled.zsh
 ## history
 export HISTFILE=$ZDOTDIR/.zsh_history
 export HISTSIZE=1000
+export SAVEHIST=1000
 
 # FOLDERS
 ## XDG base directories
@@ -36,8 +32,7 @@ export XDG_PICTURES_DIR=${XDG_PICTURES_DIR:-$HOME/Pictures}
 export XDG_PROJECTS_DIR=${XDG_PROJECTS_DIR:-$HOME/Projects}
 export XDG_VIDEOS_DIR=${XDG_VIDEOS_DIR:-$HOME/Videos}
 ## Temp
-export TMP=$HOME/.tmp
-[[ ! -d $TMP ]] && mkdir -p $TMP
+export TMP=$HOME/.tmp && mkdir -p $TMP
 export TEMP=$TMP
 export TEMPDIR=$TMP
 export TMPDIR=$TMP
@@ -47,9 +42,6 @@ export GHBINDIR=$GHDIR/bin
 export GHLIBDIR=$GHDIR/lib
 export GHCONFDIR=$GHDIR/config
 export GHPRIVDIR=$GHDIR/priv
-### SSH
-export SSH_HOME=~/.config/ssh
-export SSH_AUTH_SOCK="$SSH_HOME/ssh_auth.sock"
 ## Other
 export BINDIR=$HOME/bin
 export LIBDIR=$HOME/lib
@@ -59,18 +51,23 @@ export DOCDIR=$HOME/Documents
 export CACHEDIR=$HOME/.cache
 export VENVDIR=$HOME/.venv
 
+# Directories shortcuts (named directories)
+hash -d bin=$BINDIR
+hash -d conf=$CONFDIR
+hash -d dl=$DLDIR
+hash -d doc=$DOCDIR
+hash -d gh=$GHDIR
+hash -d lib=$LIBDIR
+hash -d tmp=$TMP
+hash -d venv=$VENVDIR
+hash -d zsh=$ZDOTDIR
+
 # PATH
 # user scripts and binaries
 export PATH=$BINDIR:$BINDIR/common:$BINDIR/install:$BINDIR/test:$BINDIR/thisos:/usr/local/bin:$HOME/.local/bin:$PATH
 
 # PROMPT fallback (will be override by oh-my-posh)
-if [ -n "$ZSH_VERSION" ]; then
-  # ZSH
-  export PS1="[%F{cyan}%n%f@%F{green}%m%f:%F{yellow}%~%f]$ "
-else
-  # Bash
-  export PS1="[\[\033[36m\]\u\[\033[37m\]@\[\033[32m\]\h:\[\033[33;1m\]\w\[\033[m\]]$ "
-fi
+export PS1="[%F{cyan}%n%f@%F{green}%m%f:%F{yellow}%~%f]$ "
 
 # EDITORS
 export EDITOR='nvim'
@@ -88,4 +85,4 @@ export LOG_EMOJI_ICONS=0 # log.sh: 1 for emoji, 0 for text
 export MANPAGER="sh -c 'col -bx | bat -l man -p --paging always'"
 
 # shell files tracking - keep at the end
-ZFILES[$this_file]=1
+zfile_track_end ${0:A}

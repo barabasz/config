@@ -1,5 +1,7 @@
 #!/bin/zsh
-this_file=$(basename "${0:A}")
+
+# Shell files tracking - keep at the top
+zfile_track_start ${0:A}
 
 # English language
 export LANG=en_US.UTF-8
@@ -64,4 +66,4 @@ unset -f __ensure_locale
 fi
 
 # shell files tracking - keep at the end
-ZFILES[$this_file]=1
+zfile_track_end ${0:A}

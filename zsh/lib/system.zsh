@@ -1,5 +1,7 @@
 #!/usr/bin/env zsh
-#
+# Shell files tracking - keep at the top
+zfile_track_start ${0:A}
+
 # OS related functions
 # zsh-specific functions - requires zsh, will not work in bash
 
@@ -47,3 +49,6 @@ os_name() {
             ;;
     esac
 }
+
+# shell files tracking - keep at the end
+zfile_track_end ${0:A}

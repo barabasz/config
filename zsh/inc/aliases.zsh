@@ -1,5 +1,6 @@
 #!/bin/zsh
-this_file=$(basename "${0:A}")
+# Shell files tracking - keep at the top
+zfile_track_start ${0:A}
 
 # Global
 
@@ -144,4 +145,4 @@ if is_installed zoxide; then
 fi
 
 # shell files tracking - keep at the end
-ZFILES[$this_file]=1
+zfile_track_end ${0:A}

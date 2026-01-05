@@ -1,5 +1,3 @@
-#!/usr/bin/env zsh
-#
 # Display login information with user, host, IP, TTY and remote connection
 # Usage: logininfo
 

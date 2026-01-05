@@ -1,19 +1,20 @@
 #!/bin/zsh
-this_file=${0:A:t}
+# Shell files tracking - keep at the top
+zfile_track_start "$ZDOTDIR/.zshrc"
 
 # Autoloaded functions
-try_source $ZINCDIR/autoload.zsh $this_file
+## Zsh functions
+autoload -Uz zmv
+autoload -Uz colors && colors
+## User functions
+fpath=($ZFNCDIR $fpath)
+autoload -Uz $ZFNCDIR/[^_.]*(.:t)
 
 # Aliases
 try_source $ZINCDIR/aliases.zsh $this_file
 
-# Directory hashing
-try_source $ZINCDIR/dirs.zsh $this_file
-
 # App configurations
-try_source $ZINCDIR/appsload.zsh $this_file
+source_zsh_dir "$ZAPPDIR"
 
 # shell files tracking - keep at the end
-ZFILES[$this_file]=1
-
-
+zfile_track_end "$ZDOTDIR/.zshrc"

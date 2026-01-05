@@ -1,33 +1,48 @@
 #!/bin/zsh
-this_file=${0:A:t}
 
-# Shell files tracking - keep at the top
+# Shell files tracking infrastructure
+zmodload zsh/datetime
 typeset -A ZFILES
-ZFILES[.zshenv]=0
+typeset -A ZFILES_TIME
+typeset -A ZFILES_START
+typeset -a ZFILES_ORDER
 
-# Zsh configuration directory
+zfile_track_start() {
+    local filepath=$1
+    this_file=${filepath:t}
+    ZFILES[$filepath]=0
+    ZFILES_ORDER+=($filepath)
+    ZFILES_START[$filepath]=$EPOCHREALTIME
+}
+
+zfile_track_end() {
+    local filepath=$1
+    ZFILES[$filepath]=1
+    ZFILES_TIME[$filepath]=$(( (EPOCHREALTIME - ZFILES_START[$filepath]) * 1000 ))
+    (( ZSH_DEBUG == 1 )) && printf "✅ %s sourced in %.2fms\n" ${filepath:t} $ZFILES_TIME[$filepath]
+}
+
+# Track this file
+zfile_track_start ${0:A}
+this_file=${0:t}
+
+# Zsh core configuration
 export ZDOTDIR=$HOME/.config/zsh
+export ZSH_CONFIG_VERSION="20260104v4"
+export ZSH_DEBUG=1
+export ZSH_LOGIN_INFO=0
 
 # Load environment variables
 source "$ZDOTDIR/inc/environment.zsh"
 
-# Load helper library
-if [[ -f "$ZHELPERS" ]]; then
-    # Use compiled version if available
-    source "$ZHELPERS"
-else
-    # Fallback: source individual files
-    for lib_file in $ZLIBDIR/*.zsh(N); do
-        source "$lib_file"
-    done
-    unset lib_file
-fi
+# Load bootstrap functions
+source "$ZINCDIR/bootstrap.zsh"
 
-# Load colors
-try_source "$ZINCDIR/colors.zsh" "$this_file"
+# Load helper library
+source_zsh_dir "$ZLIBDIR"
 
 # Set locale
 try_source $ZINCDIR/locales.zsh $this_file
 
 # Shell files tracking - keep at the end
-ZFILES[.zshenv]=1
+zfile_track_end ${0:A}

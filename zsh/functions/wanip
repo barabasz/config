@@ -1,5 +1,3 @@
-#!/usr/bin/env zsh
-
 # Retrieve the public IP address (IPv4 or IPv6)
 # Usage: wanip [-6] [-v] [-t TIMEOUT]
 #   -6: Get IPv6 address instead of IPv4
