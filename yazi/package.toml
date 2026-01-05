@@ -1,39 +1,39 @@
 [[plugin.deps]]
 use = "yazi-rs/plugins:mount"
-rev = "a1738e8"
-hash = "dd97eede8e20e59cd2604e8006e470e2"
+rev = "03cdd4b"
+hash = "e2d4bfccf31e5ab05f46fee4797c5215"
 
 [[plugin.deps]]
 use = "yazi-rs/plugins:full-border"
-rev = "a1738e8"
-hash = "1f3dad061209081a6b04dd6ff2cb06c7"
+rev = "03cdd4b"
+hash = "3996fc74044bc44144b323686f887e1"
 
 [[plugin.deps]]
 use = "yazi-rs/plugins:git"
-rev = "a1738e8"
-hash = "e0ada736ea676c2bbb3ec705a49526ef"
+rev = "03cdd4b"
+hash = "eb301feb9e125adf5aa4f59f2aa54e44"
 
 [[plugin.deps]]
 use = "yazi-rs/plugins:smart-enter"
-rev = "a1738e8"
-hash = "7918aab6a71caf31b58411f789195677"
+rev = "03cdd4b"
+hash = "56fdabc96fc1f4d53c96eb884b02a5be"
 
 [[plugin.deps]]
 use = "yazi-rs/plugins:smart-filter"
-rev = "a1738e8"
-hash = "f0c4b41b5d19a3144958383333eff6e7"
+rev = "03cdd4b"
+hash = "407d19bc4fb46eff5fa8ff8337644847"
 
 [[plugin.deps]]
 use = "yazi-rs/plugins:mime-ext"
-rev = "a1738e8"
-hash = "5e24c167e9ae9a203a48f2a438b8c705"
+rev = "03cdd4b"
+hash = "48a77ab785d1ee73bc2d7bbe2a4c2090"
 
 [[plugin.deps]]
 use = "boydaihungst/mediainfo"
-rev = "436cb5f"
-hash = "144c0ac7a449fcab4e78e942eb41702c"
+rev = "90a1652"
+hash = "7a83bfab51d1d2ba6558cc56bd52539a"
 
 [[flavor.deps]]
 use = "kalidyasin/yazi-flavors:tokyonight-night"
-rev = "92a09a6"
-hash = "845c5ee33e147b1a57f48728e42600ee"
+rev = "fa19b40"
+hash = "648270973268682226755084692d6dfc"

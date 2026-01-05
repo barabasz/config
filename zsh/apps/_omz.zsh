@@ -1,4 +1,7 @@
 #!/bin/zsh
+# NOTE: Prefixed with _ to load BEFORE omp.zsh
+# OMP requires OMZ hooks to be registered first for transient prompt
+
 # Shell files tracking - keep at the top
 zfile_track_start ${0:A}
 

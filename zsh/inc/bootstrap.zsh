@@ -2,15 +2,27 @@
 # Shell files tracking - keep at the top
 zfile_track_start ${0:A}
 
-# ANSI basic color codes
-r=$'\033[0;31m'      # Red
-g=$'\033[0;32m'      # Green
-y=$'\033[0;33m'      # Yellow
-b=$'\033[0;34m'      # Blue
-p=$'\033[0;35m'      # Purple
-c=$'\033[0;36m'      # Cyan
-w=$'\033[0;37m'      # White
-x=$'\033[0m'         # Reset
+# ANSI color codes (interactive sessions only)
+if [[ -o interactive ]]; then
+    # basic colors
+    r=$'\033[0;31m'      # red
+    g=$'\033[0;32m'      # green
+    y=$'\033[0;33m'      # yellow
+    b=$'\033[0;34m'      # blue
+    p=$'\033[0;35m'      # purple
+    c=$'\033[0;36m'      # cyan
+    w=$'\033[0;37m'      # white
+    # bright colors
+    br=$'\033[0;91m'     # bright red
+    bg=$'\033[0;92m'     # bright green
+    by=$'\033[0;93m'     # bright yellow
+    bb=$'\033[0;94m'     # bright blue
+    bp=$'\033[0;95m'     # bright purple
+    bc=$'\033[0;96m'     # bright cyan
+    bw=$'\033[0;97m'     # bright white
+    # reset
+    x=$'\033[0m'
+fi
 
 # Check if debug mode is enabled
 is_debug() {
@@ -27,9 +39,9 @@ source_zsh_dir() {
 
 # Print source time for a file
 source_time() {
-    file_path=$1
-    file_time="$ZFILES_TIME[$1]"
-    file_name=${file_path:t}
+    local file_path=$1
+    local file_time=$ZFILES_TIME[$1]
+    local file_name=${file_path:t}
     printf "✅ %s sourced in %.2f ms\n" "$file_name" "$file_time"
 }
 
