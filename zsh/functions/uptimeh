@@ -1,0 +1,12 @@
+# Calculate uptime in human-readable format
+local uptime_sec boot_time
+
+if is_macos; then
+    boot_time=${$(sysctl -n kern.boottime)[(w)4]//,}
+    uptime_sec=$(( EPOCHSECONDS - boot_time ))
+else
+    read uptime_sec _ < /proc/uptime
+    uptime_sec=${uptime_sec%.*}
+fi
+
+print "$(htime $uptime_sec)"

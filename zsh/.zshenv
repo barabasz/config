@@ -29,7 +29,7 @@ this_file=${0:t}
 # Zsh core configuration
 export ZDOTDIR=$HOME/.config/zsh
 export ZSH_CONFIG_VERSION="20260104v4"
-export ZSH_DEBUG=1
+export ZSH_DEBUG=0
 export ZSH_LOGIN_INFO=0
 
 # Load environment variables

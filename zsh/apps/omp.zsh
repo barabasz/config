@@ -6,10 +6,10 @@ zfile_track_start ${0:A}
 
 if is_installed oh-my-posh; then
 
-    theme=$CONFDIR/omp/my.omp.json
+    export OMP_THEME=$CONFDIR/omp/my.omp.json
 
-    if is_file $theme; then
-        eval "$(oh-my-posh --config $theme init zsh)"
+    if is_file $OMP_THEME; then
+        eval "$(oh-my-posh --config $OMP_THEME init zsh)"
     else
         eval "$(oh-my-posh init zsh)"
     fi

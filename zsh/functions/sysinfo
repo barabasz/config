@@ -1,0 +1,14 @@
+# Display system info
+local os icon kernel shell_v arch uptime version codename
+
+os=$(os_name)
+icon=$(os_icon)
+kernel=$(uname -r)
+shell_v=$(shell_ver)
+arch=$(uname -m)
+uptime=$(uptimeh)
+version=$(os_version)
+codename=$(os_codename)
+
+printf "This is %s ${y}%s${x} %s (%s) " "$icon" "$os" "$version" "$codename"
+printf "with ${y}zsh${x} %s running on ${y}%s${x} for ${c}%s${x}\n" "$shell_v" "$arch" "$uptime"

@@ -1,4 +1,4 @@
-#!/usr/bin/env zsh
+#!/bin/zsh
 # Shell files tracking - keep at the top
 zfile_track_start ${0:A}
 
@@ -32,23 +32,70 @@ is_linux() {
 
 # Get OS name
 os_name() {
-    local ostype=${(L)$(uname -s)}
-    
-    case $ostype in
-        darwin)
-            print "macos"
-            ;;
-        linux)
+    case $OSTYPE in
+        darwin*)
+            print "macos" ;;
+        linux*)
             if [[ -f /etc/os-release ]]; then
                 local id=${${(M)${(f)"$(</etc/os-release)"}:#ID=*}#ID=}
                 print ${id//\"/}
-            fi
-            ;;
+            fi ;;
         *)
-            print "unknown"
-            ;;
+            print "unknown" ;;
     esac
 }
 
-# shell files tracking - keep at the end
+# Get OS code name
+os_codename() {
+    if is_macos; then
+        macos_codename
+    else
+        linux_codename
+    fi
+}
+
+# Get Linux codename
+linux_codename() {
+    [[ -f /etc/os-release ]] || return 1
+    local line=${(M)${(f)"$(</etc/os-release)"}:#VERSION_CODENAME=*}
+    local codename=${${line#VERSION_CODENAME=}//\"/}
+    print "${(C)codename}"
+}
+
+# Get macOS codename
+macos_codename() {
+    local ver=${$(sw_vers -productVersion)%%.*}
+    case $ver in
+        26) print "Tahoe" ;;
+        15) print "Sequoia" ;;
+        14) print "Sonoma" ;;
+        13) print "Ventura" ;;
+        12) print "Monterey" ;;
+        11) print "Big Sur" ;;
+        *)  print "Unknown (version $ver)" ;;
+    esac
+}
+
+# Display OS version
+os_version() {
+    if is_macos; then
+        sw_vers -productVersion
+    elif [[ -f /etc/os-release ]]; then
+        local line=${(M)${(f)"$(</etc/os-release)"}:#VERSION_ID=*}
+        print ${${line#VERSION_ID=}//\"/}
+    fi
+}
+
+# Get OS icon
+os_icon() {
+    case $(os_name) in
+        macos)  print "\Uf8ff" ;;
+        ubuntu) print "\Uf31b" ;;
+        debian) print "\Uf306" ;;
+        redhat) print "\Uef5d" ;;
+        *)      print "" ;;
+    esac
+}
+
+# Shell files tracking - keep at the end
 zfile_track_end ${0:A}
