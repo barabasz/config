@@ -1,21 +1,49 @@
 # Show loaded shell files in order
 local filepath filename fstatus icon time_ms total=0
+local time_color name_color indent folder
+local i=0 count=${#ZFILES_ORDER}
+local width=${#count}
+
+print "${w}Zsh Shell Configuration Load Time Report${x}"
+print "${w}=========================================${x}"
 
 for filepath in $ZFILES_ORDER; do
+    (( i++ ))
     filename=${filepath:t}
     fstatus=$ZFILES[$filepath]
     time_ms=$ZFILES_TIME[$filepath]
+
+    # Status icon
     if (( fstatus == 1 )); then
         icon="${g}✓${x}"
     else
         icon="${r}✗${x}"
     fi
+
+    # Time color
+    if (( time_ms > 10 )); then
+        time_color=$r
+    elif (( time_ms > 5 )); then
+        time_color=$y
+    else
+        time_color=$w
+    fi
+
+    # Main files vs sourced files
     if [[ $filename == .z* ]]; then
-        printf "%s ${y}%-20s %6.2fms${x}\n" "$icon" "$filename" "$time_ms"
+        name_color=$y
+        indent=""
+        folder=""
         total=$(( total + time_ms ))
     else
-        printf "  %s ${c}%-18s %6.2fms${x}  %s\n" "$icon" "$filename" "$time_ms" "${filepath:h:t}"
+        name_color=$c
+        indent="  "
+        folder="${filepath:h:t}"
     fi
+
+    printf "${w}%${width}d.${x} %s ${name_color}%-20s${x} ${time_color}%6.2f ms${x}  ${w}%s${x}\n" \
+        "$i" "$icon" "${indent}${filename}" "$time_ms" "$folder"
 done
 
-printf "\n${w}Total: %.2fms${x}\n" "$total"
+print "${w}------------------------------------------${x}"
+printf "${w}Total loading time:       %7.2f ms${x}\n" "$total"
