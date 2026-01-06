@@ -6,9 +6,6 @@ zfile_track_start ${0:A}
 
 if is_dir "$HOME/.acme.sh"; then
     . "$HOME/.acme.sh/acme.sh.env"
-    #is_debug && print "✅ $this_file loaded."
-else
-    #is_debug && print "⚠️ $this_file not loaded."
 fi
 
 # shell files tracking - keep at the end

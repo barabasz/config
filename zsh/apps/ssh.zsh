@@ -2,7 +2,7 @@
 # Shell files tracking - keep at the top
 zfile_track_start ${0:A}
 
-## ACME Shell script: acme.sh
+## SSH configuration
 
 if is_installed ssh; then
 

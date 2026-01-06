@@ -10,7 +10,7 @@ export ZINCDIR=$ZDOTDIR/inc
 export ZLIBDIR=$ZDOTDIR/lib
 export ZAPPDIR=$ZDOTDIR/apps
 export ZFNCDIR=$ZDOTDIR/functions
-export ZSH_DEBUG=0
+export ZSH_DEBUG=1
 export ZSH_LOGIN_INFO=1
 export ZSH_SYS_INFO=0
 

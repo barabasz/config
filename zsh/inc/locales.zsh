@@ -61,8 +61,8 @@ __ensure_locales() {
 }
 
 if [[ "$(uname)" == "Linux" ]]; then
-__ensure_locales
-unset -f __ensure_locale
+    __ensure_locales
+    unset -f __ensure_locales
 fi
 
 # shell files tracking - keep at the end

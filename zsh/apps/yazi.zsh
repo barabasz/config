@@ -6,13 +6,17 @@ zfile_track_start ${0:A}
 # https://yazi-rs.github.io/docs/quick-start/#shell-wrapper
 
 if is_installed yazi; then
-    function y() {
-        local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+    y() {
+        local tmp="$(mktemp -t "yazi-cwd.XXXXXX")"
         yazi "$@" --cwd-file="$tmp"
-        if cwd="$(command cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
-            builtin cd -- "$cwd"
+        # Check if the file exists and has content
+        if [[ -f "$tmp" ]]; then
+            local cwd="$(<"$tmp")"
+            if [[ -n "$cwd" && "$cwd" != "$PWD" ]]; then
+                builtin cd -- "$cwd"
+            fi
+            rm -f -- "$tmp"
         fi
-        rm -f -- "$tmp"
     }
 fi
 

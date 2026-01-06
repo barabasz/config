@@ -8,7 +8,6 @@
 - [Core Components](#core-components)
 - [Naming Conventions](#naming-conventions)
 - [File Tracking System](#file-tracking-system)
-- [Library Compilation](#library-compilation)
 - [Development Guidelines](#development-guidelines)
 - [Examples & Use Cases](#examples--use-cases)
 
@@ -22,7 +21,7 @@ This is a modular, performance-optimized zsh configuration focused on maintainab
 - File tracking system with performance monitoring
 - Modular library of helper functions
 - Lazy loading for heavy applications
-- Library compilation for optimal performance
+- Dynamic loading of all library and app files
 - Autoloaded user functions
 - Comprehensive aliasing system
 
@@ -36,9 +35,9 @@ This is a modular, performance-optimized zsh configuration focused on maintainab
 
 1. **Performance First**
    - Track loading times of all sourced files
-   - Compile libraries for faster access
    - Lazy load heavy applications
    - Minimize startup time
+   - Dynamic loading (no compilation)
 
 2. **Modularity**
    - Each component in separate file
@@ -66,6 +65,7 @@ This is a modular, performance-optimized zsh configuration focused on maintainab
 - **Helper library** - Small, fast functions loaded first in `.zshenv`
 - **Application configs** - Loaded last, can depend on helpers
 - **Tracking everywhere** - Every file reports loading time
+- **Dynamic loading** - All files in `lib/` and `apps/` are sourced dynamically at shell startup
 
 ---
 
@@ -81,20 +81,19 @@ This is a modular, performance-optimized zsh configuration focused on maintainab
 ├── .zsh_history      # Command history
 ├── inc/              # Core includes
 │   ├── zfiles.zsh       # Shell files tracking infrastructure
-│   ├── zdg.zsh          # XDG Directories
+│   ├── xdg.zsh          # XDG Base Directories
 │   ├── variables.zsh    # Environment variables
 │   ├── bootstrap.zsh    # Bootstrap functions & colors
-│   ├── path.zsh         # Path settings
+│   ├── path.zsh         # PATH configuration
+│   ├── hashdirs.zsh     # Named directory hashes
 │   ├── aliases.zsh      # Aliases
-│   ├── hashdirs.zsh     # Directory hashes
-│   └── locales.zsh      # Locale settings (linux only)
+│   └── locales.zsh      # Locale settings
 ├── lib/              # Helper library (fast utilities)
 │   ├── files.zsh        # File/path test functions
 │   ├── system.zsh       # OS detection & info
 │   ├── strings.zsh      # String manipulation
 │   ├── shell.zsh        # Shell info functions
-│   ├── varia.zsh        # Miscellaneous helpers
-│   └── ...              # Other helpers
+│   └── varia.zsh        # Miscellaneous helpers
 ├── apps/             # Application integrations
 │   ├── _omz.zsh         # Oh-my-zsh (with _ to be loaded first)
 │   ├── brew.zsh         # Homebrew
@@ -118,38 +117,87 @@ This is a modular, performance-optimized zsh configuration focused on maintainab
 **Purpose:** Always sourced first, sets up tracking and loads critical components.
 
 **Responsibilities:**
-- Set `$ZDOTDIR` and core variables
-- Load  `zfile.zsh` file tracking system
-- Load  `xdg.zsh`,  `variables.zsh` , `bootstrap.zsh` and  `path.zsh`  
+- Set `$ZDOTDIR` and core zsh directory variables
+- Load file tracking system (`zfiles.zsh`)
+- Load XDG directories, environment variables, bootstrap functions
 - Source entire `lib/` directory (helper functions)
-- Set locale
+- Configure PATH and locale
 
 **Key Variables:**
 ```zsh
 ZDOTDIR=$HOME/.config/zsh
-ZSH_CONFIG_VERSION="20260104v4"
+ZSH_CONFIG_VERSION="20260106v1"
 ZSH_DEBUG=0              # Set to 1 for verbose output
 ZSH_LOGIN_INFO=1         # Show login info
+ZSH_SYS_INFO=0           # Show system info
 ```
 
 **Flow:**
 ```
 .zshenv
-  → inc/zfile.zsh (file tracking setup)
-  → inc/zdg.zsh (XDG)
-  → inc/variables.zsh (exports)
+  → inc/zfiles.zsh (file tracking setup)
+  → inc/xdg.zsh (XDG directories)
+  → inc/variables.zsh (environment exports)
   → inc/bootstrap.zsh (colors, helpers)
   → lib/*.zsh (all helper functions)
-  → inc/path.zsh (path)
+  → inc/path.zsh (PATH configuration)
   → inc/locales.zsh (locale settings)
 ```
 
-### 2. `inc/bootstrap.zsh` - Core Functions
+### 2. `inc/zfiles.zsh` - File Tracking Infrastructure
+
+**Purpose:** Provides tracking functions for measuring load times of sourced files.
+
+**Exports:**
+- `ZFILES` - associative array: filepath → status (0=loading, 1=loaded)
+- `ZFILES_TIME` - associative array: filepath → load time in ms
+- `ZFILES_START` - associative array: filepath → start time
+- `ZFILES_ORDER` - array of filepaths in load order
+- `zfile_track_start()` - Start tracking a file
+- `zfile_track_end()` - End tracking and calculate time
+
+### 3. `inc/xdg.zsh` - XDG Base Directories
+
+**Purpose:** Set XDG Base Directory Specification variables.
+
+**Exports:**
+```zsh
+XDG_CONFIG_HOME=$HOME/.config
+XDG_CACHE_HOME=$HOME/.local/cache
+XDG_BIN_HOME=$HOME/.local/bin
+XDG_DATA_HOME=$HOME/.local/share
+XDG_STATE_HOME=$HOME/.local/state
+XDG_RUNTIME_DIR=$HOME/.xdg
+# User directories
+XDG_DESKTOP_DIR, XDG_DOCUMENTS_DIR, XDG_DOWNLOAD_DIR, etc.
+```
+
+### 4. `inc/variables.zsh` - Environment Variables
+
+**Purpose:** Set general environment variables.
+
+**Key Exports:**
+```zsh
+# History
+HISTFILE, HISTSIZE, SAVEHIST
+
+# Folders
+TMP, BINDIR, LIBDIR, DLDIR, DOCDIR, CACHEDIR, VENVDIR
+
+# Editors
+EDITOR='nvim', VISUAL='code', PAGER='less'
+
+# Prompt fallback
+PS1="[%F{cyan}%n%f@%F{green}%m%f:%F{yellow}%~%f]$ "
+```
+
+### 5. `inc/bootstrap.zsh` - Core Functions
 
 **Purpose:** Provide essential functions needed during initialization.
 
 **Exports:**
-- ANSI color codes (interactive only): `$r`, `$g`, `$y`, `$b`, etc.
+- ANSI color codes (interactive only): `$r`, `$g`, `$y`, `$b`, `$p`, `$c`, `$w`, `$x` (reset)
+- Bright variants: `$br`, `$bg`, `$by`, `$bb`, `$bp`, `$bc`, `$bw`
 - `is_debug()` - Check if debug mode enabled
 - `source_zsh_dir()` - Source all .zsh files in directory
 - `source_time()` - Print source time for file
@@ -162,30 +210,21 @@ if is_debug; then
 fi
 ```
 
-### 3. `inc/environment.zsh` - Environment Setup
+### 6. `inc/path.zsh` - PATH Configuration
 
-**Purpose:** Set all environment variables, paths, and directory shortcuts.
+**Purpose:** Build PATH with platform-specific directories.
 
-**Key Sections:**
+**Features:**
+- Adds common paths: `$BINDIR`, `~/.local/bin`, `/usr/local/bin`
+- macOS-specific: `/opt/homebrew/bin`, VSCode path
+- Linux-specific: linuxbrew paths, `/snap/bin`
+- Removes duplicates and non-existent directories
 
-**Zsh Directories:**
-```zsh
-ZCACHEDIR=$ZDOTDIR/cache
-ZINCDIR=$ZDOTDIR/inc
-ZLIBDIR=$ZDOTDIR/lib
-ZAPPDIR=$ZDOTDIR/apps
-ZFNCDIR=$ZDOTDIR/functions
-```
+### 7. `inc/hashdirs.zsh` - Named Directories
 
-**XDG Base Directories:**
-```zsh
-XDG_CONFIG_HOME=$HOME/.config
-XDG_CACHE_HOME=$HOME/.local/cache
-XDG_DATA_HOME=$HOME/.local/share
-# ... etc
-```
+**Purpose:** Create directory shortcuts using zsh hash feature.
 
-**Named Directories:**
+**Exports:**
 ```zsh
 hash -d bin=$BINDIR
 hash -d conf=$CONFDIR
@@ -194,12 +233,25 @@ hash -d zsh=$ZDOTDIR
 # Usage: cd ~zsh, ls ~gh
 ```
 
-**PATH Construction:**
-```zsh
-PATH=$BINDIR:$BINDIR/common:$BINDIR/install:/usr/local/bin:$HOME/.local/bin:$PATH
-```
+### 8. `inc/aliases.zsh` - Aliases
 
-### 4. `lib/` - Helper Library
+**Purpose:** Define command aliases with dependency checks.
+
+**Categories:**
+- Global aliases: `alias -g G='| grep'`
+- Common aliases: `cls`, `reload`, `myip`, `ds`
+- Application-specific (only if installed): bat, brew, eza, git, nvim, zoxide, etc.
+
+### 9. `inc/locales.zsh` - Locale Settings
+
+**Purpose:** Configure language and locale settings.
+
+**Features:**
+- English language (`LANG=en_US.UTF-8`)
+- Polish locale for formatting (`LC_*=pl_PL.UTF-8`)
+- Auto-generation of locales on Debian-based systems
+
+### 10. `lib/` - Helper Library
 
 **Purpose:** Fast, frequently-used utility functions loaded in `.zshenv`.
 
@@ -210,15 +262,25 @@ PATH=$BINDIR:$BINDIR/common:$BINDIR/install:/usr/local/bin:$HOME/.local/bin:$PAT
 is_file PATH        # True if regular file
 is_dir PATH         # True if directory
 is_link PATH        # True if symbolic link
-# ... etc
+is_exists PATH      # True if path exists (any type)
+is_hardlink PATH    # True if hard link (link count > 1)
+is_block_device PATH
+is_char_device PATH
+is_pipe PATH
+is_socket PATH
 ```
 
 #### `lib/system.zsh` - OS Detection & Info
 ```zsh
 is_debian           # True if pure Debian
+is_debian_based     # True if Debian-based (Ubuntu, Mint, etc.)
 is_ubuntu           # True if Ubuntu
 is_macos            # True if macOS
-# ... etc
+is_linux            # True if Linux
+os_name             # Return OS name string
+os_version          # Return OS version
+os_codename         # Return codename (Sequoia, Bookworm, etc.)
+os_icon             # Return Nerd Font icon
 ```
 
 #### `lib/strings.zsh` - String Manipulation
@@ -240,11 +302,30 @@ is_installed CMD... # True if all commands exist
 try_source FILE [CALLER] # Source file with error handling
 ```
 
-### 5. `apps/` - Application Integrations
+### 11. `apps/` - Application Integrations
 
 **Purpose:** Configure external tools and applications. Loaded last in `.zshrc`.
 
-**Naming Convention:** `apps/{tool}.zsh`
+**Naming Convention:** 
+- `apps/{tool}.zsh` - regular app config
+- `apps/_{tool}.zsh` - prefixed with `_` to load first (alphabetical order)
+
+**Current Apps:**
+| File | Purpose |
+|------|---------|
+| `_omz.zsh` | Oh My Zsh (loaded first for OMP hooks) |
+| `acme.zsh` | ACME.sh SSL certificates |
+| `bat.zsh` | bat (cat replacement) |
+| `brew.zsh` | Homebrew |
+| `fzf.zsh` | fzf fuzzy finder |
+| `git.zsh` | GitHub directories |
+| `omp.zsh` | Oh My Posh prompt |
+| `python.zsh` | Python virtual environment |
+| `rust.zsh` | Rust/Cargo environment |
+| `ssh.zsh` | SSH configuration |
+| `thefuck.zsh` | thefuck (lazy loaded) |
+| `yazi.zsh` | yazi file manager |
+| `zoxide.zsh` | zoxide (z command) |
 
 **Template Structure:**
 ```zsh
@@ -253,7 +334,6 @@ try_source FILE [CALLER] # Source file with error handling
 zfile_track_start ${0:A}
 
 # {Tool Name} configuration
-# {Tool Name short description}
 
 if is_installed {tool}; then
     # Configuration here
@@ -263,19 +343,24 @@ fi
 zfile_track_end ${0:A}
 ```
 
-### 6. `functions/` - Autoloaded Functions
+### 12. `functions/` - Autoloaded Functions
 
 **Purpose:** Complex user functions that are autoloaded on demand.
 
-### 7. `.zshrc` - Interactive Shell
+**Current Functions:**
+| Function | Purpose |
+|----------|---------|
+| `htime` | Convert seconds to human-readable time |
+| `lanip` | Get local IP address |
+| `wanip` | Get public IP address |
+| `logininfo` | Display login information |
+| `sysinfo` | Display system information |
+| `uptimeh` | Get uptime in human format |
+| `zfiles` | Show loaded files report |
+
+### 13. `.zshrc` - Interactive Shell
 
 **Purpose:** Set up interactive shell features.
-
-**Responsibilities:**
-- Autoload zsh functions (`zmv`, `colors`)
-- Autoload user functions from `$ZFNCDIR`
-- Source aliases
-- Load app configurations
 
 **Flow:**
 ```
@@ -284,15 +369,17 @@ zfile_track_end ${0:A}
   → autoload functions/*
   → inc/aliases.zsh
   → apps/*.zsh (all apps)
+  → inc/hashdirs.zsh
 ```
 
-### 8. `.zlogin` - Post-Login
+### 14. `.zlogin` - Post-Login
 
 **Purpose:** Actions after login shell initialization.
 
 **Responsibilities:**
 - Clean up temporary variables
-- Display system info (if `ZSH_LOGIN_INFO=1`)
+- Display system info (if `ZSH_SYS_INFO=1`)
+- Display login info (if `ZSH_LOGIN_INFO=1`)
 - Calculate total load time
 - Cleanup tracking variables
 
@@ -318,7 +405,7 @@ zfile_track_end ${0:A}
 
 **Utility Functions:**
 - Short, descriptive names
-- Examples: `etime`, `relib`, `sysinfo`
+- Examples: `etime`, `sysinfo`
 
 ### Variable Names
 
@@ -342,14 +429,14 @@ zfile_track_end ${0:A}
 **Library Files:** `{category}.zsh`
 - Examples: `files.zsh`, `system.zsh`, `strings.zsh`
 
-**App Files:** `{tool}.zsh`
-- Examples: `brew.zsh`, `fzf.zsh`, `omp.zsh`
+**App Files:** `{tool}.zsh` or `_{tool}.zsh` (for priority loading)
+- Examples: `brew.zsh`, `fzf.zsh`, `_omz.zsh`
 
 **Include Files:** `{purpose}.zsh`
-- Examples: `bootstrap.zsh`, `environment.zsh`, `aliases.zsh`
+- Examples: `bootstrap.zsh`, `path.zsh`, `aliases.zsh`
 
 **Functions:** No extension, lowercase
-- Examples: `sysinfo`, `logininfo`, `relib`
+- Examples: `sysinfo`, `logininfo`, `zfiles`
 
 ---
 
@@ -380,7 +467,7 @@ zfile_track_end ${0:A}     # End tracking (bottom of file)
 When `ZSH_DEBUG=1`:
 ```
 ✅ bootstrap.zsh sourced in 1.89ms
-✅ environment.zsh sourced in 2.31ms
+✅ xdg.zsh sourced in 0.45ms
 ✅ files.zsh sourced in 0.67ms
 ...
 ```
@@ -415,22 +502,30 @@ Use `zfiles` function to see full report:
 Zsh Shell Configuration Load Time Report
 =========================================
  1. ✓ .zshenv              12.45 ms
- 2. ✓   environment.zsh     2.31 ms  inc
- 3. ✓   bootstrap.zsh       1.89 ms  inc
- 4. ✓   files.zsh           0.67 ms  lib
- 5. ✓   system.zsh          1.23 ms  lib
- 6. ✓   strings.zsh         0.45 ms  lib
- 7. ✓   shell.zsh           0.34 ms  lib
- 8. ✓   varia.zsh           0.78 ms  lib
- 9. ✓   locales.zsh         0.89 ms  inc
-10. ✓ .zshrc               8.91 ms
-11. ✓   aliases.zsh         2.45 ms  inc
-12. ✓   brew.zsh            3.21 ms  apps
-13. ✓   omp.zsh            45.67 ms  apps
-14. ✓   fzf.zsh            12.34 ms  apps
+ 2. ✓   xdg.zsh             0.45 ms  inc
+ 3. ✓   variables.zsh       0.32 ms  inc
+ 4. ✓   bootstrap.zsh       1.89 ms  inc
+ 5. ✓   files.zsh           0.67 ms  lib
+ 6. ✓   system.zsh          1.23 ms  lib
+ 7. ✓   strings.zsh         0.45 ms  lib
+ 8. ✓   shell.zsh           0.34 ms  lib
+ 9. ✓   varia.zsh           0.78 ms  lib
+10. ✓   path.zsh            0.56 ms  inc
+11. ✓   locales.zsh         0.89 ms  inc
+12. ✓ .zshrc                8.91 ms
+13. ✓   aliases.zsh         2.45 ms  inc
+14. ✓   brew.zsh            3.21 ms  apps
+15. ✓   omp.zsh            45.67 ms  apps
+16. ✓   hashdirs.zsh        0.12 ms  inc
 ------------------------------------------
-Total loading time:        93.59 ms
+Total loading time:        80.39 ms
 ```
+
+**Color coding:**
+- Green: < 1ms
+- White: 1-5ms
+- Yellow: 5-10ms
+- Red: > 10ms
 
 ---
 
@@ -480,20 +575,6 @@ Total loading time:        93.59 ms
    is_macos() {
        [[ $OSTYPE == darwin* ]]
    }
-   
-   # Bad - multiple responsibilities
-   os_check() {
-       if [[ $OSTYPE == darwin* ]]; then
-           print "macos"
-           return 0
-       elif [[ $OSTYPE == linux* ]]; then
-           print "linux"
-           return 0
-       else
-           print "unknown"
-           return 1
-       fi
-   }
    ```
 
 6. **Add tracking:**
@@ -510,25 +591,9 @@ Total loading time:        93.59 ms
 
 7. **Test thoroughly:**
    ```zsh
-   # Test all code paths
    is_file /etc/hosts     # should return 0
    is_file /etc           # should return 1
    is_file /nonexistent   # should return 1
-   ```
-
-8. **Document if complex:**
-   ```zsh
-   # Extract version number from a string
-   # Usage: get_version "string containing version"
-   # Returns: version number or exits with 1
-   get_version() {
-       # ... implementation
-   }
-   ```
-
-9. **Recompile library:**
-   ```zsh
-   relib
    ```
 
 ### Adding New App Integration
@@ -551,90 +616,70 @@ Total loading time:        93.59 ms
    zfile_track_end ${0:A}
    ```
 
-3. **Check installation:**
+3. **For priority loading:** Use `_` prefix (e.g., `_omz.zsh` loads before `omp.zsh`)
+
+4. **Check installation:**
    ```zsh
    if is_installed mytool; then
        # Only configure if available
    fi
    ```
 
-4. **Use helpers:**
+5. **Use lazy loading for slow tools:**
    ```zsh
-   if is_macos; then
-       export TOOL_PATH=/opt/tool
-   elif is_linux; then
-       export TOOL_PATH=/usr/local/tool
-   fi
-   ```
-
-5. **Test:**
-   ```zsh
-   # With tool installed
-   source apps/mytool.zsh
+   # Instead of:
+   eval "$(slowtool init zsh)"
    
-   # Without tool
-   which mytool || source apps/mytool.zsh  # should not error
+   # Use:
+   slowtool() {
+       unfunction slowtool
+       eval "$(command slowtool init zsh)"
+       slowtool "$@"
+   }
    ```
 
 ### Adding New User Function
 
 1. **Create file:** `functions/{name}` (no extension)
 
-2. **Make executable:**
-   ```zsh
-   chmod +x functions/{name}
-   ```
-
-3. **Use autoload variables:**
-   ```zsh
-   # Available in autoloaded functions:
-   # - All lib/* functions
-   # - All environment variables
-   # - Color variables (if interactive)
-   ```
-
-4. **Example:**
+2. **Write function body directly** (no function declaration needed):
    ```zsh
    # functions/myinfo
    local hostname=$(hostname)
    local os=$(os_name)
-   local uptime=$(uptime | awk '{print $3}')
    
    print "Host: $hostname"
    print "OS: $os"
-   print "Uptime: $uptime"
    ```
 
-5. **Test:**
+3. **Available in autoloaded functions:**
+   - All `lib/*` functions
+   - All environment variables
+   - Color variables (if interactive)
+
+4. **Test:**
    ```zsh
    # In new shell
    myinfo  # should work automatically
    ```
 
-### Adding New Alias
+### Adding New Include File
 
-1. **Edit:** `inc/aliases.zsh`
+1. **Create file:** `inc/{purpose}.zsh`
 
-2. **Group logically:**
+2. **Add tracking:**
    ```zsh
-   # Global aliases
-   alias -g G='| grep'
+   #!/bin/zsh
+   # Shell files tracking - keep at the top
+   zfile_track_start ${0:A}
    
-   # Common aliases
-   alias cls='clear'
+   # Content here
    
-   # Application-specific
-   if is_installed bat; then
-       alias cat='bat'
-   fi
+   # shell files tracking - keep at the end
+   zfile_track_end ${0:A}
    ```
 
-3. **Check dependencies:**
-   ```zsh
-   if is_installed tool; then
-       alias shortcut='tool --with-flags'
-   fi
-   ```
+3. **Source it** in appropriate location (`.zshenv` or `.zshrc`)
 
 ### Performance Optimization
 
@@ -657,14 +702,11 @@ Total loading time:        93.59 ms
 
 4. **Lazy loading example:**
    ```zsh
-   # Instead of:
-   eval "$(slowtool init zsh)"
-   
-   # Use:
-   slowtool() {
-       unfunction slowtool
-       eval "$(command slowtool init zsh)"
-       slowtool "$@"
+   # See apps/thefuck.zsh for example
+   fuck() {
+       unfunction fuck
+       eval $(thefuck --alias)
+       fuck "$@"
    }
    ```
 
@@ -684,7 +726,6 @@ Total loading time:        93.59 ms
 
 3. **Test functions:**
    ```zsh
-   # In test shell
    is_file /etc/hosts && print "OK" || print "FAIL"
    print $(os_name)
    ```
@@ -714,11 +755,6 @@ if is_installed mytool; then
     fi
     
     export PATH=$MYTOOL_PATH/bin:$PATH
-    
-    # Load completion if available
-    if [[ -f $MYTOOL_PATH/share/completion.zsh ]]; then
-        source $MYTOOL_PATH/share/completion.zsh
-    fi
 fi
 
 zfile_track_end ${0:A}
@@ -727,27 +763,7 @@ zfile_track_end ${0:A}
 ### Example 2: Conditional Feature Loading
 
 ```zsh
-# lib/varia.zsh - excerpt
-try_source() {
-    [[ $# -ge 1 ]] || return 1
-    
-    if [[ -f "$1" ]]; then
-        if source "$1"; then
-            return 0
-        else
-            local exit_code=$?
-            if is_debug; then
-                print "Error: failed to source $1 (exit: $exit_code)" >&2
-            fi
-            return $exit_code
-        fi
-    else
-        is_debug && print "Warning: missing file: $1" >&2
-        return 1
-    fi
-}
-
-# Usage in .zshenv:
+# Using try_source for optional files
 try_source "$HOME/.secrets" "${0:t}"
 try_source "$HOME/.local.zsh" "${0:t}"
 ```
@@ -757,20 +773,15 @@ try_source "$HOME/.local.zsh" "${0:t}"
 ```zsh
 # functions/devinfo
 local python_ver node_ver git_ver
-local venv_active=""
 
 python_ver=$(python3 --version 2>&1 | get_version)
 node_ver=$(node --version 2>&1 | get_version)
 git_ver=$(git --version 2>&1 | get_version)
 
-[[ -n $VIRTUAL_ENV ]] && venv_active=" ${g}(venv)${x}"
-
 print "Development Environment:"
-print "  Python: ${y}${python_ver}${x}${venv_active}"
+print "  Python: ${y}${python_ver}${x}"
 print "  Node.js: ${y}${node_ver}${x}"
 print "  Git: ${y}${git_ver}${x}"
-
-# Usage: devinfo
 ```
 
 ### Example 4: Performance Measurement
@@ -783,50 +794,23 @@ zsh -lic "exit"  0.08s user 0.04s system 93% cpu 0.134 total
 # Detailed breakdown
 $ ZSH_DEBUG=1 zsh -lic "exit"
 ✅ bootstrap.zsh sourced in 1.89ms
-✅ environment.zsh sourced in 2.31ms
-✅ files.zsh sourced in 0.67ms
+✅ xdg.zsh sourced in 0.45ms
 ...
 
 # View full report
 $ zfiles
 ```
 
-### Example 5: Adding Version Check Function
+### Example 5: Lazy Loading Pattern
 
 ```zsh
-# lib/varia.zsh - add this function
-
-# Check if version meets minimum requirement
-# Usage: version_check "1.2.3" "1.2.0"
-# Returns: 0 if first >= second, 1 otherwise
-version_check() {
-    [[ $# -eq 2 ]] || return 1
-    
-    local ver1=$1 ver2=$2
-    local IFS='.'
-    local -a v1=($=ver1) v2=($=ver2)
-    local i
-    
-    for i in {1..3}; do
-        local n1=${v1[$i]:-0} n2=${v2[$i]:-0}
-        if (( n1 > n2 )); then
-            return 0
-        elif (( n1 < n2 )); then
-            return 1
-        fi
-    done
-    
-    return 0
-}
-
-# Usage in apps:
-if is_installed mytool; then
-    local ver=$(mytool --version | get_version)
-    if version_check "$ver" "2.0.0"; then
-        # Use new features
-    else
-        # Use legacy mode
-    fi
+# apps/heavytool.zsh
+if is_installed heavytool; then
+    heavytool() {
+        unfunction heavytool
+        eval "$(command heavytool init zsh)"
+        heavytool "$@"
+    }
 fi
 ```
 
@@ -840,7 +824,6 @@ fi
 - **Always** check installation before configuring
 - **Always** use zsh-native syntax
 - **Always** test functions before committing
-- **Always** recompile library after changes
 - Use `is_installed` before configuring tools
 - Use `is_debug` for conditional logging
 - Use named directories (`~zsh`, `~gh`, etc.)
@@ -848,6 +831,7 @@ fi
 - Document complex logic
 - Use meaningful variable names
 - Prefer builtins over external commands
+- Use lazy loading for slow tools
 
 ### Don'ts ❌
 
@@ -856,7 +840,6 @@ fi
 - **Never** use `[ ]` (use `[[ ]]`)
 - **Never** skip tracking in sourced files
 - **Never** assume tools are installed
-- **Never** edit `.compiled.zsh` manually
 - Don't use global variables in functions unnecessarily
 - Don't create dependencies between lib files
 - Don't put heavy operations in `.zshenv`
@@ -905,14 +888,14 @@ zfile_track_end ${0:A}
 ### Function Not Found
 
 1. Check if in `lib/` or `functions/`
-2. For `lib/`: run `relib`
-3. For `functions/`: check `$fpath`
-4. Verify file permissions (functions should be readable)
+2. For `functions/`: check `$fpath`
+3. Verify file permissions (functions should be readable)
+4. Start new shell: `exec zsh`
 
 ### Changes Not Applied
 
-1. For `lib/`: run `relib`
-2. For other files: `source ~/.zshenv`
+1. For `lib/` or `inc/`: `source ~/.zshenv`
+2. For `apps/`: `source ~/.zshrc`
 3. Or start new shell: `exec zsh`
 
 ### Syntax Errors
@@ -942,7 +925,6 @@ zfile_track_end ${0:A}
 
 ### Maintenance Tasks
 
-- Regular `relib` after library changes
 - Periodic review of `zfiles` output
 - Remove unused app configurations
 - Archive old functions
@@ -975,9 +957,6 @@ print $ZSH_CONFIG_VERSION
 # Show all loaded files
 zfiles
 
-# Recompile library
-relib
-
 # Show system info
 sysinfo
 
@@ -993,5 +972,5 @@ time zsh -lic "exit"
 
 ---
 
-*Last updated: 2026-01-05*
-*Configuration version: 20260104v4*
+*Last updated: 2026-01-06*
+*Configuration version: 20260106v1*
