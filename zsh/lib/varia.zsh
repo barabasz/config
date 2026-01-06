@@ -11,9 +11,9 @@ is_debug() {
 
 # Measure execution time of a command
 etime() {
-    local start=$EPOCHREALTIME
+    local _etime_start=$EPOCHREALTIME
     "$@" > /dev/null
-    printf "%.2fms\n" $(( (EPOCHREALTIME - start) * 1000 ))
+    printf "%.2fms\n" $(( (EPOCHREALTIME - _etime_start) * 1000 ))
 }
 
 # Check if command(s) are installed

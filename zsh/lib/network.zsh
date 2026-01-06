@@ -242,8 +242,9 @@ is_valid_ip() {
 
     # IPv4 validation
     if [[ $ip =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ ]]; then
-        local IFS='.'
-        local -a octets=($ip)
+        # Use Zsh parameter expansion flag (s:.:) to split string by dots
+        local -a octets=(${(s:.:)ip})
+        
         for octet in $octets; do
             (( octet >= 0 && octet <= 255 )) || return 1
         done

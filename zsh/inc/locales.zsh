@@ -60,7 +60,7 @@ __ensure_locales() {
     fi
 }
 
-if [[ "$(uname)" == "Linux" ]]; then
+if [[ "$OSTYPE" != darwin* ]]; then
     __ensure_locales
     unset -f __ensure_locales
 fi
