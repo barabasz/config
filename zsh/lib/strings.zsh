@@ -56,12 +56,14 @@ uppercase() {
     print -- "${1:u}"
 }
 
-# Capitalize first letter of string
-# Usage: capitalize "hello world"
+# Capitalize first letter of string (Sentence case)
+# Usage: capitalize "hello WORLD"
 # Returns: "Hello world"
 capitalize() {
     [[ $# -eq 1 ]] || return 1
-    print -- "${(C)1}"
+    # 1. Take 1st char and uppercase it: ${(U)1[1]}
+    # 2. Take rest of string (2 to end) and lowercase it: ${1[2,-1]:l}
+    print -- "${(U)1[1]}${1[2,-1]:l}"
 }
 
 # Convert string to title case (AP/Chicago style logic)
@@ -73,6 +75,7 @@ title_case() {
     local -a words=(${(s: :)str})
     local -a result=()
     local i word len
+    # Minor words list for English titles
     local -a minor_words=(
         'a' 'an' 'the' 'to'
         'at' 'by' 'down' 'for' 'from' 'in' 'into' 'like' 'near' 'of' 'off' 'on' 'onto' 'over' 'past' 'upon' 'with'
@@ -226,6 +229,7 @@ is_alphanumeric() {
 # Get substring
 # Usage: substring "hello world" 6 5
 # Returns: "world" (start at position 6, length 5)
+# Note: Zsh variable slicing ${var:offset:length} is 0-based
 substring() {
     [[ $# -ge 2 && $# -le 3 ]] || return 1
     local str="$1"

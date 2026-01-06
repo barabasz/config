@@ -66,6 +66,7 @@ array_last() {
 
 # Append element to array
 # Usage: array_push arr_name "element"
+# Returns: 0 on success (modifies array)
 array_push() {
     [[ $# -eq 2 ]] || return 1
     # Ordinary assignment works by appending to name
@@ -106,6 +107,7 @@ array_shift() {
 
 # Add element to beginning of array
 # Usage: array_unshift arr_name "element"
+# Returns: 0 on success (modifies array)
 array_unshift() {
     [[ $# -eq 2 ]] || return 1
     local name=$1

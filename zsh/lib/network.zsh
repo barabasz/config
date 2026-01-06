@@ -2,38 +2,34 @@
 # Shell files tracking - keep at the top
 zfile_track_start ${0:A}
 
-# Check if network is connected
+# Load Zsh TCP module for native port checking
+zmodload zsh/net/tcp
+
+# Check if network is connected (basic interface check)
 # Usage: is_connected
 # Returns: 0 (true) if connected, 1 (false) otherwise
 is_connected() {
     if is_macos; then
-        # macOS: check if any network service is active
-        networksetup -getairportnetwork en0 &>/dev/null || \
-        networksetup -listallnetworkservices | grep -v "An asterisk" | \
-        while read service; do
-            [[ -n "$service" ]] && networksetup -getinfo "$service" 2>/dev/null | grep -q "IP address:" && return 0
-        done
-        return 1
+        # macOS: Check strictly if we have an IP on primary interfaces
+        local ip
+        ip=$(ipconfig getifaddr en0 2>/dev/null) || ip=$(ipconfig getifaddr en1 2>/dev/null)
+        [[ -n "$ip" ]]
     elif is_linux; then
-        # Linux: check if default route exists
-        ip route show default &>/dev/null || return 1
-        return 0
+        # Linux: Check if default route exists
+        ip route show default &>/dev/null
+    else
+        return 1
     fi
-    return 1
 }
 
-# Check if internet is reachable
+# Check if internet is reachable (ping reliable DNS)
 # Usage: is_online
 # Returns: 0 (true) if online, 1 (false) otherwise
 is_online() {
-    # Try to ping common DNS servers
-    if is_installed ping; then
-        # Try Cloudflare DNS (1.1.1.1)
-        ping -c 1 -W 2 1.1.1.1 &>/dev/null && return 0
-        # Try Google DNS (8.8.8.8)
-        ping -c 1 -W 2 8.8.8.8 &>/dev/null && return 0
-    fi
-    return 1
+    # Try Cloudflare (1.1.1.1) then Google (8.8.8.8)
+    # Ping options: -c 1 (count), -W 1 (wait 1s), -q (quiet)
+    ping -c 1 -W 1 -q 1.1.1.1 &>/dev/null || \
+    ping -c 1 -W 1 -q 8.8.8.8 &>/dev/null
 }
 
 # Get default gateway IP address
@@ -41,39 +37,58 @@ is_online() {
 # Returns: gateway IP address
 get_gateway() {
     local gateway
-
     if is_macos; then
-        gateway=$(route -n get default 2>/dev/null | awk '/gateway:/ {print $2}')
+        # route -n get default returns a block, we parse "gateway: x.x.x.x"
+        local out
+        out=$(route -n get default 2>/dev/null)
+        # Extract IP using Zsh pattern matching instead of awk
+        # Remove everything before "gateway: ", then take the first word
+        gateway=${${out##*gateway: }%% *}
     elif is_linux; then
-        gateway=$(ip route show default 2>/dev/null | awk '/default/ {print $3}')
+        # ip route show default -> "default via 192.168.1.1 dev eth0 ..."
+        local out
+        out=$(ip route show default 2>/dev/null)
+        gateway=${${out##*via }%% *}
     fi
 
     if [[ -n "$gateway" ]]; then
-        print "$gateway"
+        print -- "$gateway"
         return 0
     fi
     return 1
 }
 
-# Get local IP address
+# Get local IP address (LAN)
 # Usage: get_local_ip
 # Returns: local IP address
 get_local_ip() {
     local ip
-
     if is_macos; then
-        # Try en0 (Ethernet/WiFi on Mac)
         ip=$(ipconfig getifaddr en0 2>/dev/null)
-        # If en0 fails, try en1
         [[ -z "$ip" ]] && ip=$(ipconfig getifaddr en1 2>/dev/null)
     elif is_linux; then
-        # Get IP from default route interface
-        local iface=$(ip route show default 2>/dev/null | awk '/default/ {print $5}')
-        [[ -n "$iface" ]] && ip=$(ip addr show "$iface" 2>/dev/null | awk '/inet / {print $2}' | cut -d/ -f1)
+        # hostname -I is the most standard Linux way, fallback to ip command
+        if is_installed hostname; then
+             ip=$(hostname -I 2>/dev/null | cut -d' ' -f1)
+        fi
+        if [[ -z "$ip" ]]; then
+            # Get IP from the interface with default route
+            local iface
+            local out
+            out=$(ip route show default 2>/dev/null)
+            iface=${${out##*dev }%% *}
+            
+            if [[ -n "$iface" ]]; then
+                # Parse "inet 192.168.1.10/24"
+                local addr_info
+                addr_info=$(ip -4 addr show $iface 2>/dev/null)
+                ip=${${${addr_info##*inet }%%/*}##* }
+            fi
+        fi
     fi
 
     if [[ -n "$ip" ]]; then
-        print "$ip"
+        print -- "$ip"
         return 0
     fi
     return 1
@@ -84,20 +99,29 @@ get_local_ip() {
 # Returns: public IP address
 get_public_ip() {
     local ip
+    # Define providers to rotate
+    local urls=(
+        "https://api.ipify.org"
+        "https://ifconfig.me"
+        "https://icanhazip.com"
+    )
 
-    # Try multiple services in order
     if is_installed curl; then
-        ip=$(curl -s --max-time 5 https://api.ipify.org 2>/dev/null) || \
-        ip=$(curl -s --max-time 5 https://ifconfig.me 2>/dev/null) || \
-        ip=$(curl -s --max-time 5 https://icanhazip.com 2>/dev/null)
+        for url in $urls; do
+            ip=$(curl -s --max-time 2 "$url" 2>/dev/null)
+            if [[ -n "$ip" ]]; then
+                print -- "$ip"
+                return 0
+            fi
+        done
     elif is_installed wget; then
-        ip=$(wget -qO- --timeout=5 https://api.ipify.org 2>/dev/null) || \
-        ip=$(wget -qO- --timeout=5 https://ifconfig.me 2>/dev/null)
-    fi
-
-    if [[ -n "$ip" ]]; then
-        print "$ip"
-        return 0
+        for url in $urls; do
+            ip=$(wget -qO- --timeout=2 "$url" 2>/dev/null)
+            if [[ -n "$ip" ]]; then
+                print -- "$ip"
+                return 0
+            fi
+        done
     fi
     return 1
 }
@@ -106,44 +130,33 @@ get_public_ip() {
 # Usage: get_interfaces
 # Returns: list of network interfaces
 get_interfaces() {
-    local interfaces
-
     if is_macos; then
-        interfaces=$(networksetup -listallhardwareports 2>/dev/null | awk '/Device:/ {print $2}')
+        # Lists hardware ports (e.g., "Wi-Fi", "Thunderbolt Bridge")
+        # networksetup is reliable on macOS
+        networksetup -listallhardwareports 2>/dev/null | grep "Device:" | cut -d' ' -f2
     elif is_linux; then
-        interfaces=$(ip -o link show 2>/dev/null | awk -F': ' '{print $2}')
+        # /sys/class/net is the cleanest way on Linux (no parsing overhead)
+        print -l /sys/class/net/*(:t)
     fi
-
-    if [[ -n "$interfaces" ]]; then
-        print "$interfaces"
-        return 0
-    fi
-    return 1
 }
 
-# Get active network interface
+# Get active network interface (primary)
 # Usage: get_active_interface
-# Returns: name of active network interface
+# Returns: name of active network interface (e.g. en0, eth0)
 get_active_interface() {
-    local iface
-
     if is_macos; then
-        # Check en0 first (common for WiFi/Ethernet)
-        if ipconfig getifaddr en0 &>/dev/null; then
+        # Check en0 then en1
+        if [[ -n $(ipconfig getifaddr en0 2>/dev/null) ]]; then
             print "en0"
-            return 0
-        elif ipconfig getifaddr en1 &>/dev/null; then
+        elif [[ -n $(ipconfig getifaddr en1 2>/dev/null) ]]; then
             print "en1"
-            return 0
         fi
     elif is_linux; then
-        iface=$(ip route show default 2>/dev/null | awk '/default/ {print $5}')
-        if [[ -n "$iface" ]]; then
-            print "$iface"
-            return 0
-        fi
+        # Interface associated with default route
+        local out
+        out=$(ip route show default 2>/dev/null)
+        print -- ${${out##*dev }%% *}
     fi
-    return 1
 }
 
 # Get MAC address of interface
@@ -151,18 +164,22 @@ get_active_interface() {
 # Returns: MAC address
 get_mac_address() {
     local iface="${1:-$(get_active_interface)}"
-    local mac
-
     [[ -z "$iface" ]] && return 1
 
+    local mac
     if is_macos; then
-        mac=$(ifconfig "$iface" 2>/dev/null | awk '/ether/ {print $2}')
+        local out=$(ifconfig "$iface" 2>/dev/null)
+        # Extract after "ether "
+        mac=${${out##*ether }%% *}
+        # Clean up if extraction failed (e.g. got whole string)
+        [[ "$mac" == "$out" ]] && mac=""
     elif is_linux; then
-        mac=$(ip link show "$iface" 2>/dev/null | awk '/link\/ether/ {print $2}')
+        # Read directly from sysfs - fastest method
+        [[ -r "/sys/class/net/$iface/address" ]] && mac=$(<"/sys/class/net/$iface/address")
     fi
 
     if [[ -n "$mac" ]]; then
-        print "$mac"
+        print -- "$mac"
         return 0
     fi
     return 1
@@ -172,62 +189,38 @@ get_mac_address() {
 # Usage: get_dns_servers
 # Returns: list of DNS servers
 get_dns_servers() {
-    local dns
-
     if is_macos; then
-        dns=$(scutil --dns 2>/dev/null | awk '/nameserver\[0\]/ {print $3}')
+        scutil --dns 2>/dev/null | grep "nameserver\[[0-9]\]" | awk '{print $3}' | sort -u
     elif is_linux; then
-        if [[ -f /etc/resolv.conf ]]; then
-            dns=$(grep "^nameserver" /etc/resolv.conf | awk '{print $2}')
+        # resolvectl is modern systemd standard, fallback to resolv.conf
+        if is_installed resolvectl; then
+            resolvectl dns 2>/dev/null | awk '{print $2}'
+        elif [[ -f /etc/resolv.conf ]]; then
+            grep "^nameserver" /etc/resolv.conf | awk '{print $2}'
         fi
     fi
-
-    if [[ -n "$dns" ]]; then
-        print "$dns"
-        return 0
-    fi
-    return 1
 }
 
 # Get WiFi SSID (macOS only)
 # Usage: get_wifi_ssid
 # Returns: WiFi network name
 get_wifi_ssid() {
-    [[ ! $(is_macos) ]] && return 1
-
-    local ssid
-
-    if is_installed networksetup; then
-        ssid=$(networksetup -getairportnetwork en0 2>/dev/null | awk -F': ' '{print $2}')
+    is_macos || return 1
+    
+    # Fast CoreWLAN check via airport utility symlink usually found here
+    local airport="/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport"
+    
+    if [[ -x "$airport" ]]; then
+        local ssid=$("$airport" -I | awk -F': ' '/ SSID/ {print $2}')
+        [[ -n "$ssid" ]] && print -- "$ssid" && return 0
     fi
-
+    
+    # Fallback to networksetup
+    local out=$(networksetup -getairportnetwork en0 2>/dev/null)
+    local ssid=${out#*Current Wi-Fi Network: }
+    
     if [[ -n "$ssid" && "$ssid" != "You are not associated with an AirPort network." ]]; then
-        print "$ssid"
-        return 0
-    fi
-    return 1
-}
-
-# Get network speed/bandwidth for interface
-# Usage: get_interface_speed [interface]
-# Returns: interface speed
-get_interface_speed() {
-    local iface="${1:-$(get_active_interface)}"
-    local speed
-
-    [[ -z "$iface" ]] && return 1
-
-    if is_macos; then
-        speed=$(networksetup -getMedia "$iface" 2>/dev/null | grep "Active:" | awk '{print $2}')
-    elif is_linux; then
-        if [[ -f "/sys/class/net/$iface/speed" ]]; then
-            speed=$(cat "/sys/class/net/$iface/speed" 2>/dev/null)
-            [[ -n "$speed" && "$speed" != "-1" ]] && speed="${speed}Mbps"
-        fi
-    fi
-
-    if [[ -n "$speed" ]]; then
-        print "$speed"
+        print -- "$ssid"
         return 0
     fi
     return 1
@@ -261,12 +254,13 @@ is_port_open() {
     local host=$1
     local port=$2
 
-    if is_installed nc; then
-        nc -z -w 2 "$host" "$port" &>/dev/null
-        return $?
-    elif is_installed timeout; then
-        timeout 2 bash -c "echo >/dev/tcp/$host/$port" &>/dev/null
-        return $?
+    # Use native Zsh TCP module - much faster than spawning nc/telnet
+    ztcp "$host" "$port" 2>/dev/null
+    local fd=$REPLY
+    
+    if [[ $fd -gt 0 ]]; then
+        ztcp -c $fd # Close the connection immediately
+        return 0
     fi
     return 1
 }
@@ -275,36 +269,24 @@ is_port_open() {
 # Usage: get_hostname
 # Returns: system hostname
 get_hostname() {
-    local hostname
-
-    if is_installed hostname; then
-        hostname=$(hostname -s 2>/dev/null || hostname 2>/dev/null)
-    elif [[ -f /etc/hostname ]]; then
-        hostname=$(cat /etc/hostname 2>/dev/null)
-    fi
-
-    if [[ -n "$hostname" ]]; then
-        print "$hostname"
-        return 0
-    fi
-    return 1
+    # $HOST is a standard Zsh parameter
+    print -- "${HOST%%.*}"
 }
 
 # Get fully qualified domain name
 # Usage: get_fqdn
 # Returns: fully qualified domain name
 get_fqdn() {
+    # Try hostname -f first
     local fqdn
-
-    if is_installed hostname; then
-        fqdn=$(hostname -f 2>/dev/null || hostname 2>/dev/null)
+    fqdn=$(hostname -f 2>/dev/null)
+    
+    if [[ -z "$fqdn" ]]; then
+         # Fallback to Zsh param
+         print -- "$HOST"
+    else
+         print -- "$fqdn"
     fi
-
-    if [[ -n "$fqdn" ]]; then
-        print "$fqdn"
-        return 0
-    fi
-    return 1
 }
 
 # shell files tracking - keep at the end

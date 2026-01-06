@@ -2,19 +2,16 @@
 # Shell files tracking - keep at the top
 zfile_track_start ${0:A}
 
+# Load Zsh math functions (sqrt, ceil, floor, sin, cos, etc.)
+zmodload zsh/mathfunc
+
 # Get minimum of two or more numbers
 # Usage: min 5 3 8 1
 # Returns: 1
 min() {
     [[ $# -ge 1 ]] || return 1
-    local min_val=$1
-    shift
-
-    for num in "$@"; do
-        (( num < min_val )) && min_val=$num
-    done
-
-    print $min_val
+    # Sort arguments numerically (n) and print the first element
+    print -- ${${(n)@}[1]}
 }
 
 # Get maximum of two or more numbers
@@ -22,14 +19,8 @@ min() {
 # Returns: 8
 max() {
     [[ $# -ge 1 ]] || return 1
-    local max_val=$1
-    shift
-
-    for num in "$@"; do
-        (( num > max_val )) && max_val=$num
-    done
-
-    print $max_val
+    # Sort arguments numerically (n) and print the last element
+    print -- ${${(n)@}[-1]}
 }
 
 # Calculate sum of numbers
@@ -38,47 +29,44 @@ max() {
 sum() {
     [[ $# -ge 1 ]] || return 1
     local total=0
-
+    local num
+    
     for num in "$@"; do
         (( total += num ))
     done
-
-    print $total
+    print -- $total
 }
 
-# Calculate average (mean) of numbers
+# Calculate average (mean) of numbers (integer)
 # Usage: avg 1 2 3 4 5
 # Returns: 3
 avg() {
     [[ $# -ge 1 ]] || return 1
     local total=0
-    local count=$#
-
+    local num
+    
     for num in "$@"; do
         (( total += num ))
     done
-
-    print $(( total / count ))
+    
+    # Integer division
+    print -- $(( total / $# ))
 }
 
 # Calculate average with floating point
 # Usage: avgf 1 2 3 4 5
-# Returns: 3.0
+# Returns: 3.00
 avgf() {
     [[ $# -ge 1 ]] || return 1
     local total=0
-    local count=$#
-
+    local num
+    
     for num in "$@"; do
         (( total += num ))
     done
-
-    # Use bc for floating point if available
-    if is_installed bc; then
-        print "scale=2; $total / $count" | bc
-    else
-        print $(( total / count ))
-    fi
+    
+    # Force float context by multiplying by 1.0 or using typeset -F
+    printf "%.2f\n" $(( total * 1.0 / $# ))
 }
 
 # Get absolute value
@@ -87,62 +75,26 @@ avgf() {
 abs() {
     [[ $# -eq 1 ]] || return 1
     local num=$1
-    (( num < 0 )) && num=$(( -num ))
-    print $num
+    # Ternary operator inside arithmetic expansion
+    print -- $(( num < 0 ? -num : num ))
 }
 
 # Calculate power
 # Usage: pow 2 8
-# Returns: 256 (2^8)
+# Returns: 256
 pow() {
     [[ $# -eq 2 ]] || return 1
-    local base=$1
-    local exp=$2
-    local result=1
-
-    if (( exp == 0 )); then
-        print 1
-        return 0
-    fi
-
-    for ((i=0; i<exp; i++)); do
-        (( result *= base ))
-    done
-
-    print $result
+    # Zsh has a built-in power operator
+    print -- $(( $1 ** $2 ))
 }
 
-# Calculate square root (integer)
+# Calculate square root
 # Usage: sqrt 16
-# Returns: 4
+# Returns: 4.0
 sqrt() {
     [[ $# -eq 1 ]] || return 1
-    local num=$1
-
-    if is_installed bc; then
-        print "scale=0; sqrt($num)" | bc
-    else
-        # Simple integer sqrt using binary search
-        local low=0
-        local high=$num
-        local mid result
-
-        while (( low <= high )); do
-            mid=$(( (low + high) / 2 ))
-            result=$(( mid * mid ))
-
-            if (( result == num )); then
-                print $mid
-                return 0
-            elif (( result < num )); then
-                low=$(( mid + 1 ))
-            else
-                high=$(( mid - 1 ))
-            fi
-        done
-
-        print $high
-    fi
+    # Uses zsh/mathfunc
+    print -- $(( sqrt($1) ))
 }
 
 # Generate random number between min and max (inclusive)
@@ -152,10 +104,13 @@ random() {
     [[ $# -eq 2 ]] || return 1
     local min=$1
     local max=$2
-
-    (( max < min )) && { local tmp=$min; min=$max; max=$tmp; }
-
-    print $(( RANDOM % (max - min + 1) + min ))
+    
+    # Swap if min > max
+    (( min > max )) && { local tmp=$min; min=$max; max=$tmp; }
+    
+    # Uses SRANDOM if available (Zsh 5.9+, 32-bit), otherwise RANDOM (15-bit)
+    local r=${SRANDOM:-$RANDOM}
+    print -- $(( r % (max - min + 1) + min ))
 }
 
 # Check if number is even
@@ -203,26 +158,37 @@ is_zero() {
 # Returns: 4
 round() {
     [[ $# -eq 1 ]] || return 1
-    local num=$1
+    # rint() is from zsh/mathfunc (round to nearest integer)
+    print -- $(( int(rint($1)) ))
+}
 
-    if is_installed bc; then
-        print "scale=0; ($num + 0.5) / 1" | bc
-    else
-        # Integer only
-        print $(( ${num%%.*} ))
-    fi
+# Round number up (ceiling)
+# Usage: ceil 3.1
+# Returns: 4
+ceil() {
+    [[ $# -eq 1 ]] || return 1
+    # ceil() from zsh/mathfunc
+    print -- $(( int(ceil($1)) ))
+}
+
+# Round number down (floor)
+# Usage: floor 3.9
+# Returns: 3
+floor() {
+    [[ $# -eq 1 ]] || return 1
+    # floor() from zsh/mathfunc
+    print -- $(( int(floor($1)) ))
 }
 
 # Calculate factorial
 # Usage: factorial 5
-# Returns: 120 (5! = 5*4*3*2*1)
+# Returns: 120
 factorial() {
     [[ $# -eq 1 ]] || return 1
     local num=$1
     local result=1
 
     if (( num < 0 )); then
-        print "Error: Factorial not defined for negative numbers" >&2
         return 1
     fi
 
@@ -230,49 +196,42 @@ factorial() {
         (( result *= i ))
     done
 
-    print $result
+    print -- $result
 }
 
 # Calculate percentage
 # Usage: percent 25 200
-# Returns: 50 (25% of 200)
+# Returns: 50.00
 percent() {
     [[ $# -eq 2 ]] || return 1
-    local percentage=$1
-    local total=$2
-
-    if is_installed bc; then
-        print "scale=2; ($percentage * $total) / 100" | bc
-    else
-        print $(( (percentage * total) / 100 ))
-    fi
+    # Floating point calculation naturally
+    printf "%.2f\n" $(( $1 * $2 / 100.0 ))
 }
 
-# Check if number is in range
+# Check if number is in range (inclusive)
 # Usage: in_range 5 1 10
 # Returns: 0 (true) if 5 is between 1 and 10
 in_range() {
     [[ $# -eq 3 ]] || return 1
-    local num=$1
-    local min=$2
-    local max=$3
-
-    (( num >= min && num <= max ))
+    (( $1 >= $2 && $1 <= $3 ))
 }
 
 # Clamp number to range
 # Usage: clamp 15 0 10
-# Returns: 10 (clamps 15 to max of 10)
+# Returns: 10
 clamp() {
     [[ $# -eq 3 ]] || return 1
-    local num=$1
+    local val=$1
     local min=$2
     local max=$3
 
-    (( num < min )) && num=$min
-    (( num > max )) && num=$max
-
-    print $num
+    if (( val < min )); then
+        print -- $min
+    elif (( val > max )); then
+        print -- $max
+    else
+        print -- $val
+    fi
 }
 
 # Calculate GCD (Greatest Common Divisor)
@@ -285,12 +244,10 @@ gcd() {
     local temp
 
     while (( b != 0 )); do
-        temp=$b
-        b=$(( a % b ))
-        a=$temp
+        (( temp = b, b = a % b, a = temp ))
     done
 
-    print $a
+    print -- $a
 }
 
 # Calculate LCM (Least Common Multiple)
@@ -300,39 +257,33 @@ lcm() {
     [[ $# -eq 2 ]] || return 1
     local a=$1
     local b=$2
-    local gcd_val=$(gcd $a $b)
+    local gcd_val
+    
+    # Calculate GCD inline
+    local ta=$a tb=$b tt
+    while (( tb != 0 )); do
+        (( tt = tb, tb = ta % tb, ta = tt ))
+    done
+    gcd_val=$ta
 
-    print $(( (a * b) / gcd_val ))
+    print -- $(( (a * b) / gcd_val ))
 }
 
 # Convert degrees to radians
 # Usage: deg2rad 180
-# Returns: 3.14159... (π)
+# Returns: 3.14159...
 deg2rad() {
     [[ $# -eq 1 ]] || return 1
-    local deg=$1
-
-    if is_installed bc; then
-        print "scale=6; $deg * 3.141592653589793 / 180" | bc
-    else
-        print "Error: bc required for floating point operations" >&2
-        return 1
-    fi
+    # 4 * atan(1) is a precise way to get PI using zsh/mathfunc
+    printf "%.8f\n" $(( $1 * (4 * atan(1.0)) / 180.0 ))
 }
 
 # Convert radians to degrees
 # Usage: rad2deg 3.14159
-# Returns: 180
+# Returns: 180.00...
 rad2deg() {
     [[ $# -eq 1 ]] || return 1
-    local rad=$1
-
-    if is_installed bc; then
-        print "scale=6; $rad * 180 / 3.141592653589793" | bc
-    else
-        print "Error: bc required for floating point operations" >&2
-        return 1
-    fi
+    printf "%.8f\n" $(( $1 * 180.0 / (4 * atan(1.0)) ))
 }
 
 # Calculate fibonacci number at position n
@@ -350,17 +301,15 @@ fibonacci() {
         return 0
     fi
 
-    local a=0
-    local b=1
-    local temp
+    local a=0 b=1 temp
+    local i
 
+    # Zsh optimizes this arithmetic loop well
     for ((i=2; i<=n; i++)); do
-        temp=$b
-        (( b = a + b ))
-        a=$temp
+        (( temp = b, b = a + b, a = temp ))
     done
 
-    print $b
+    print -- $b
 }
 
 # shell files tracking - keep at the end

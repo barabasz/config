@@ -2,25 +2,26 @@
 # Shell files tracking - keep at the top
 zfile_track_start ${0:A}
 
-# Get shell version
+# Get Zsh version
 # Usage: shell_ver
 # Returns: version number (e.g., "5.9")
 shell_ver() {
-    print $(get_version "$(zsh --version 2>&1)")
+    # Use internal variable instead of spawning a process
+    print -- $ZSH_VERSION
 }
 
-# Get shell name
+# Get current shell name
 # Usage: shell_name
 # Returns: shell name (e.g., "zsh")
 shell_name() {
-    print "${SHELL:t}"
+    print -- $ZSH_NAME
 }
 
-# Get full shell path
+# Get full shell path (environment variable)
 # Usage: shell_path
 # Returns: full path to current shell
 shell_path() {
-    print "$SHELL"
+    print -- $SHELL
 }
 
 # Get default shell for current user
@@ -28,9 +29,18 @@ shell_path() {
 # Returns: path to default shell
 get_default_shell() {
     if is_macos; then
-        dscl . -read ~/ UserShell | awk '{print $2}'
+        # dscl is unavoidable on macOS
+        local record
+        record=$(dscl . -read ~/ UserShell 2>/dev/null)
+        # Parse output "UserShell: /bin/zsh" using Zsh expansion
+        print -- ${record##* }
     elif is_linux; then
-        getent passwd "$USER" | cut -d: -f7
+        # Use getent, but parse with Zsh expansion instead of cut
+        local ent
+        if ent=$(getent passwd "$USER"); then
+            # Get everything after the last colon
+            print -- ${ent##*:}
+        fi
     fi
 }
 
@@ -41,22 +51,26 @@ set_default_shell() {
     [[ $# -eq 1 ]] || return 1
     local new_shell="$1"
 
-    # Check if shell exists and is in /etc/shells
+    # Check executable permissions
     if [[ ! -x "$new_shell" ]]; then
         print "Error: Shell '$new_shell' does not exist or is not executable" >&2
         return 1
     fi
 
-    if ! grep -qx "$new_shell" /etc/shells 2>/dev/null; then
+    # Check if shell is in /etc/shells using pure Zsh reading
+    # (f) splits by line, check if new_shell is in the array
+    local -a valid_shells=("${(@f)$(</etc/shells)}")
+    if [[ ${valid_shells[(Ie)$new_shell]} -eq 0 ]]; then
         print "Error: Shell '$new_shell' is not in /etc/shells" >&2
         return 1
     fi
 
     # Change shell
-    if is_macos; then
+    if command -v chsh >/dev/null; then
         chsh -s "$new_shell" && print "Default shell changed to: $new_shell"
-    elif is_linux; then
-        chsh -s "$new_shell" && print "Default shell changed to: $new_shell"
+    else
+        print "Error: 'chsh' command not found." >&2
+        return 1
     fi
 }
 
@@ -74,24 +88,41 @@ is_login_shell() {
     [[ -o login ]]
 }
 
+# Check if running inside a subshell
+# Usage: is_subshell
+# Returns: 0 (true) or 1 (false)
+is_subshell() {
+    (( ZSH_SUBSHELL > 0 ))
+}
+
+# Check if script is being sourced (not executed directly)
+# Usage: is_sourced
+# Returns: 0 (true) or 1 (false)
+is_sourced() {
+    # If the name of the script ($0) is the same as zsh, it's likely sourced inside interactive
+    # Or check zsh_eval_context
+    [[ "$ZSH_EVAL_CONTEXT" == *"file"* || "$ZSH_EVAL_CONTEXT" == *"toplevel"* ]] && [[ "${0:t}" == "zsh" || "${0:t}" == "zsh-session" ]]
+}
+
 # Get shell level (nesting depth)
 # Usage: shell_level
 # Returns: nesting level number
 shell_level() {
-    print ${SHLVL:-1}
+    print -- ${SHLVL:-1}
 }
 
 # Get terminal type
 # Usage: terminal_type
 # Returns: terminal type (e.g., "xterm-256color")
 terminal_type() {
-    print "${TERM:-unknown}"
+    print -- "${TERM:-unknown}"
 }
 
 # Check if terminal supports colors
 # Usage: is_color_terminal
 # Returns: 0 (true) or 1 (false)
 is_color_terminal() {
+    # Check if stdout is a terminal AND TERM is set and not "dumb"
     [[ -t 1 && -n "$TERM" && "$TERM" != "dumb" ]]
 }
 
@@ -99,23 +130,34 @@ is_color_terminal() {
 # Usage: terminal_columns
 # Returns: number of columns
 terminal_columns() {
-    print ${COLUMNS:-$(tput cols 2>/dev/null || print 80)}
+    # Zsh maintains COLUMNS automatically
+    print -- ${COLUMNS:-80}
 }
 
 # Get number of terminal lines
 # Usage: terminal_lines
 # Returns: number of lines
 terminal_lines() {
-    print ${LINES:-$(tput lines 2>/dev/null || print 24)}
+    # Zsh maintains LINES automatically
+    print -- ${LINES:-24}
 }
 
 # Get available shells from /etc/shells
 # Usage: get_available_shells
 # Returns: list of available shells
 get_available_shells() {
-    if [[ -f /etc/shells ]]; then
-        grep -v '^#' /etc/shells | grep -v '^$'
-    fi
+    [[ -f /etc/shells ]] || return 1
+    
+    # Pure Zsh file reading and filtering:
+    # 1. (<file) reads file
+    # 2. (f) splits into lines
+    # 3. :#\#* removes lines starting with # (comments)
+    # 4. (M) keeps matches (but here we used negative match above so actually unnecessary if logic is inverted)
+    # Let's use clean logic:
+    
+    local -a lines=("${(@f)$(</etc/shells)}")
+    # Filter out comments (#*) and empty lines
+    print -l -- ${${lines:#\#*}:#^}
 }
 
 # Check if running under tmux
@@ -136,7 +178,20 @@ is_screen() {
 # Usage: parent_process
 # Returns: name of parent process
 parent_process() {
-    ps -p $PPID -o comm= 2>/dev/null || print "unknown"
+    # Attempt to read from /proc (Linux - fast)
+    if [[ -r "/proc/$PPID/comm" ]]; then
+        cat "/proc/$PPID/comm"
+    else
+        # Fallback to ps (portable but slower)
+        ps -p $PPID -o comm= 2>/dev/null || print "unknown"
+    fi
+}
+
+# Reload current shell configuration
+# Usage: reload_shell
+reload_shell() {
+    print "Reloading zsh configuration..."
+    source "${ZDOTDIR:-$HOME}/.zshrc"
 }
 
 # shell files tracking - keep at the end
