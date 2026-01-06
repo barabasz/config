@@ -1,45 +1,38 @@
 #!/bin/zsh
+export ZSH_CONFIG_VERSION="20260106v1"
 
-# Shell files tracking infrastructure
-zmodload zsh/datetime
-typeset -A ZFILES
-typeset -A ZFILES_TIME
-typeset -A ZFILES_START
-typeset -a ZFILES_ORDER
+# Zsh core configuration
+export CONFDIR=$HOME/.config
+export ZDOTDIR=$CONFDIR/zsh
+export ZCACHEDIR=$ZDOTDIR/cache
+export SHELL_SESSION_DIR="$ZCACHEDIR/sessions"
+export ZINCDIR=$ZDOTDIR/inc
+export ZLIBDIR=$ZDOTDIR/lib
+export ZAPPDIR=$ZDOTDIR/apps
+export ZFNCDIR=$ZDOTDIR/functions
+export ZSH_DEBUG=0
+export ZSH_LOGIN_INFO=1
+export ZSH_SYS_INFO=0
 
-zfile_track_start() {
-    local filepath=$1
-    this_file=${filepath:t}
-    ZFILES[$filepath]=0
-    ZFILES_ORDER+=($filepath)
-    ZFILES_START[$filepath]=$EPOCHREALTIME
-}
-
-zfile_track_end() {
-    local filepath=$1
-    ZFILES[$filepath]=1
-    ZFILES_TIME[$filepath]=$(( (EPOCHREALTIME - ZFILES_START[$filepath]) * 1000 ))
-    (( ZSH_DEBUG == 1 )) && printf "✅ %s sourced in %.2fms\n" ${filepath:t} $ZFILES_TIME[$filepath]
-}
-
-# Track this file
+# Shell files tracking
+source "$ZINCDIR/zfiles.zsh"
 zfile_track_start ${0:A}
 this_file=${0:t}
 
-# Zsh core configuration
-export ZDOTDIR=$HOME/.config/zsh
-export ZSH_CONFIG_VERSION="20260104v4"
-export ZSH_DEBUG=0
-export ZSH_LOGIN_INFO=1
+# Load XDG directories
+source "$ZINCDIR/xdg.zsh"
 
 # Load environment variables
-source "$ZDOTDIR/inc/environment.zsh"
+source "$ZINCDIR/variables.zsh"
 
 # Load bootstrap functions
 source "$ZINCDIR/bootstrap.zsh"
 
 # Load helper library
 source_zsh_dir "$ZLIBDIR"
+
+# Load PATH
+try_source "$ZINCDIR/path.zsh" $this_file
 
 # Set locale
 try_source $ZINCDIR/locales.zsh $this_file

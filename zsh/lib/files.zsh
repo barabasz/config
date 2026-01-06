@@ -14,6 +14,7 @@ is_file() {
 is_dir() {
     [[ $# -eq 1 && -d "$1" ]]
 }
+functions[is_folder]=$functions[is_dir]
 
 # Check if path exists and is a symbolic link
 is_link() {
