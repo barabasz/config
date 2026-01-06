@@ -7,9 +7,9 @@ zfile_track_start ${0:A}
 # Returns: 5.9
 get_version() {
     local input=$1
-
-    if [[ $input =~ '[0-9]+\.[0-9]+(\.[0-9]+)*' ]]; then
-        print $MATCH
+    # Use -o to print only the matching part (extended globbing logic inside Zsh regex)
+    if [[ $input =~ '[0-9]+(\.[0-9]+)+' ]]; then
+        print -- $MATCH
         return 0
     fi
     return 1
@@ -20,10 +20,8 @@ get_version() {
 # Returns: "hello world"
 trim() {
     [[ $# -eq 1 ]] || return 1
-    local str="$1"
-    str="${str#"${str%%[![:space:]]*}"}"
-    str="${str%"${str##*[![:space:]]}"}"
-    print "$str"
+    # Nested expansion: remove leading space, then remove trailing space
+    print -- "${${1##[[:space:]]#}%%[[:space:]]#}"
 }
 
 # Trim whitespace from left side of string
@@ -31,9 +29,7 @@ trim() {
 # Returns: "hello world"
 ltrim() {
     [[ $# -eq 1 ]] || return 1
-    local str="$1"
-    str="${str#"${str%%[![:space:]]*}"}"
-    print "$str"
+    print -- "${1##[[:space:]]#}"
 }
 
 # Trim whitespace from right side of string
@@ -41,9 +37,7 @@ ltrim() {
 # Returns: "hello world"
 rtrim() {
     [[ $# -eq 1 ]] || return 1
-    local str="$1"
-    str="${str%"${str##*[![:space:]]}"}"
-    print "$str"
+    print -- "${1%%[[:space:]]#}"
 }
 
 # Convert string to lowercase
@@ -51,7 +45,7 @@ rtrim() {
 # Returns: "hello world"
 lowercase() {
     [[ $# -eq 1 ]] || return 1
-    print "${1:l}"
+    print -- "${1:l}"
 }
 
 # Convert string to uppercase
@@ -59,7 +53,7 @@ lowercase() {
 # Returns: "HELLO WORLD"
 uppercase() {
     [[ $# -eq 1 ]] || return 1
-    print "${1:u}"
+    print -- "${1:u}"
 }
 
 # Capitalize first letter of string
@@ -67,7 +61,37 @@ uppercase() {
 # Returns: "Hello world"
 capitalize() {
     [[ $# -eq 1 ]] || return 1
-    print "${(C)1}"
+    print -- "${(C)1}"
+}
+
+# Convert string to title case (AP/Chicago style logic)
+# Usage: title_case "nothing to be afraid of"
+# Returns: "Nothing to Be Afraid Of"
+title_case() {
+    [[ $# -eq 1 ]] || return 1
+    local str="${1:l}"
+    local -a words=(${(s: :)str})
+    local -a result=()
+    local i word len
+    local -a minor_words=(
+        'a' 'an' 'the' 'to'
+        'at' 'by' 'down' 'for' 'from' 'in' 'into' 'like' 'near' 'of' 'off' 'on' 'onto' 'over' 'past' 'upon' 'with'
+        'and' 'as' 'but' 'if' 'nor' 'once' 'or' 'so' 'than' 'that' 'till' 'when' 'yet'
+    )
+    for ((i=1; i<=${#words}; i++)); do
+        word="${words[i]}"
+        len=${#word}
+        if (( i == 1 || i == ${#words} )); then
+            result+=("${(C)word}")
+        elif (( len >= 5 )); then
+            result+=("${(C)word}")
+        elif [[ ${minor_words[(I)$word]} -gt 0 ]]; then
+            result+=("$word")
+        else
+            result+=("${(C)word}")
+        fi
+    done
+    print -- "${(j: :)result}"
 }
 
 # Check if string contains substring
@@ -75,6 +99,7 @@ capitalize() {
 # Returns: 0 (true) or 1 (false)
 str_contains() {
     [[ $# -eq 2 ]] || return 1
+    # Using Zsh pattern matching
     [[ "$1" == *"$2"* ]]
 }
 
@@ -99,7 +124,7 @@ str_ends_with() {
 # Returns: 5
 str_length() {
     [[ $# -eq 1 ]] || return 1
-    print ${#1}
+    print -- ${#1}
 }
 
 # Repeat string N times
@@ -109,15 +134,12 @@ str_repeat() {
     [[ $# -eq 2 ]] || return 1
     local str="$1"
     local count=$2
-    local result=""
 
     (( count > 0 )) || return 1
-
-    for ((i=0; i<count; i++)); do
-        result+="$str"
-    done
-
-    print "$result"
+    
+    # 'repeat' is a Zsh builtin, much faster than a for loop
+    repeat $count print -n -- "$str"
+    print "" # Newline at the end
 }
 
 # Reverse string
@@ -125,15 +147,11 @@ str_repeat() {
 # Returns: "olleh"
 str_reverse() {
     [[ $# -eq 1 ]] || return 1
-    local str="$1"
-    local reversed=""
-    local i
-
-    for ((i=${#str}-1; i>=0; i--)); do
-        reversed+="${str:$i:1}"
-    done
-
-    print "$reversed"
+    # Zsh magic:
+    # (s::) - split string into characters (empty separator)
+    # (Oa)  - reverse array order
+    # (j::) - join array back into string
+    print -- "${(j::)${(Oa)${(s::)1}}}"
 }
 
 # Split string by delimiter into array
@@ -143,9 +161,11 @@ str_split() {
     [[ $# -eq 3 ]] || return 1
     local str="$1"
     local delim="$2"
-    local -n arr_ref=$3
+    local arr_name="$3"
 
-    arr_ref=("${(@s[$delim])str}")
+    # 'set -A' is the standard Zsh way to assign arrays by name
+    # (@s[$delim]) splits the string based on delimiter
+    set -A $arr_name "${(@s[$delim])str}"
 }
 
 # Join array elements with delimiter
@@ -154,9 +174,10 @@ str_split() {
 str_join() {
     [[ $# -eq 2 ]] || return 1
     local delim="$1"
-    local -n arr_ref=$2
+    local arr_name="$2"
 
-    print "${(j[$delim])arr_ref}"
+    # (P) flag interprets the value of arr_name as the variable name
+    print -- "${(j[$delim])P:arr_name}"
 }
 
 # Replace first occurrence of pattern with replacement
@@ -164,11 +185,7 @@ str_join() {
 # Returns: "hello zsh"
 str_replace() {
     [[ $# -eq 3 ]] || return 1
-    local str="$1"
-    local pattern="$2"
-    local replacement="$3"
-
-    print "${str/$pattern/$replacement}"
+    print -- "${1/$2/$3}"
 }
 
 # Replace all occurrences of pattern with replacement
@@ -176,11 +193,7 @@ str_replace() {
 # Returns: "hello zsh zsh"
 str_replace_all() {
     [[ $# -eq 3 ]] || return 1
-    local str="$1"
-    local pattern="$2"
-    local replacement="$3"
-
-    print "${str//$pattern/$replacement}"
+    print -- "${1//$2/$3}"
 }
 
 # Check if string is empty
@@ -188,8 +201,8 @@ str_replace_all() {
 # Returns: 0 (true) for empty/whitespace-only, 1 (false) otherwise
 is_empty() {
     [[ $# -eq 1 ]] || return 1
-    local str="$(trim "$1")"
-    [[ -z "$str" ]]
+    # Use modifier directly inside test, no need for subshell/function call
+    [[ -z "${${1##[[:space:]]#}%%[[:space:]]#}" ]]
 }
 
 # Check if string is numeric
@@ -197,6 +210,8 @@ is_empty() {
 # Returns: 0 (true) or 1 (false)
 is_numeric() {
     [[ $# -eq 1 ]] || return 1
+    # <-> matches any range of numbers in Zsh globbing (if extended_glob is on),
+    # but regex is safer for strict numeric check including negatives
     [[ "$1" =~ '^-?[0-9]+$' ]]
 }
 
@@ -217,7 +232,7 @@ substring() {
     local start=$2
     local length=${3:-${#str}}
 
-    print "${str:$start:$length}"
+    print -- "${str:$start:$length}"
 }
 
 # shell files tracking - keep at the end
