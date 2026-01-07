@@ -27,15 +27,17 @@ source "$ZINCDIR/variables.zsh"
 
 # Load bootstrap functions
 source "$ZINCDIR/bootstrap.zsh"
+# From this point on we have source_zsh_dir etc.
 
 # Load helper library
 source_zsh_dir "$ZLIBDIR"
+# From this point on we have try_source etc.
 
 # Load PATH
 try_source "$ZINCDIR/path.zsh" $this_file
 
 # Set locale
-try_source $ZINCDIR/locales.zsh $this_file
+try_source "$ZINCDIR/locales.zsh" $this_file
 
 # Shell files tracking - keep at the end
 zfile_track_end ${0:A}
