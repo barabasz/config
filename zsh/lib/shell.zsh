@@ -191,7 +191,9 @@ parent_process() {
 # Usage: reload_shell
 reload_shell() {
     print "Reloading zsh configuration..."
-    source "${ZDOTDIR:-$HOME}/.zshrc"
+    # exec replaces the current process with a new one.
+    # This forces a reload of .zshenv AND .zshrc, and clears old state.
+    exec zsh
 }
 
 # shell files tracking - keep at the end

@@ -9,7 +9,7 @@ alias -g G='| grep'
 # Common
 
 alias info='sysinfo && logininfo'
-alias reload="source $ZDOTDIR/.zshrc && omz reload" # Reload zsh configuration
+alias reload="reload_shell" # Reload zsh configuration
 alias cls='clear' # Clear terminal
 alias myip='curl icanhazip.com' # Show public IP
 alias ds='du -sh ./*/' # Show directory sizes

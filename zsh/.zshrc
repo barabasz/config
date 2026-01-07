@@ -21,3 +21,6 @@ try_source "$ZINCDIR/hashdirs.zsh" $this_file
 
 # shell files tracking - keep at the end
 zfile_track_end "$ZDOTDIR/.zshrc"
+
+# Ensure successful sourcing
+true

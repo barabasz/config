@@ -1,5 +1,5 @@
 #!/bin/zsh
-export ZSH_CONFIG_VERSION="20260106v1"
+export ZSH_CONFIG_VERSION="20260107v2"
 
 # Zsh core configuration
 export CONFDIR=$HOME/.config
@@ -11,7 +11,7 @@ export ZLIBDIR=$ZDOTDIR/lib
 export ZAPPDIR=$ZDOTDIR/apps
 export ZFNCDIR=$ZDOTDIR/functions
 export ZSH_DEBUG=0
-export ZSH_LOGIN_INFO=1
+export ZSH_LOGIN_INFO=0
 export ZSH_SYS_INFO=0
 
 # Shell files tracking

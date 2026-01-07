@@ -21,7 +21,6 @@ is_file() {
 is_dir() {
     [[ $# -eq 1 && -d "$1" ]]
 }
-# Create alias using standard Zsh assignment
 functions[is_folder]=$functions[is_dir]
 
 # Check if path exists and is a symbolic link
