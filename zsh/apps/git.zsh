@@ -5,7 +5,11 @@ zfile_track_start ${0:A}
 # Github configuration
 
 export MYGH="https://raw.githubusercontent.com/barabasz"
-is_folder "$HOME/GitHub" && export GHDIR=$HOME/GitHub
+
+# Guard
+is_dir "$HOME/GitHub" || return
+
+export GHDIR=$HOME/GitHub
 is_folder "$GHDIR/bin" && export GHBINDIR=$GHDIR/bin
 is_folder "$GHDIR/lib" && export GHLIBDIR=$GHDIR/lib
 is_folder "$GHDIR/config" && export GHCONFDIR=$GHDIR/config
