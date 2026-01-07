@@ -1,11 +1,36 @@
 # Show loaded shell files in order
+# Usage: zfiles [-b]
+#   -b: Show time bar visualization
+
 local filepath filename fstatus icon time_ms total=0
 local time_color name_color indent folder
 local i=0 count=${#ZFILES_ORDER} errors=0
 local width=${#count}
+local folder_color
+local title="Zsh Shell Configuration Load Time Report"
 
-print "${w}Zsh Shell Configuration Load Time Report${x}"
-print "${w}=========================================${x}"
+# Argument parsing
+local show_bar=0
+while [[ "$1" == -* ]]; do
+    case "$1" in
+        -b) show_bar=1 ;;
+        *) 
+            if (( ${+functions[printe]} )); then
+                printe "Unknown option: $1"
+            else
+                print -u2 "Unknown option: $1"
+            fi
+            return 1 
+            ;;
+    esac
+    shift
+done
+
+if (( show_bar )); then
+    printt "$title " $w $y
+else
+    print "$title:"
+fi
 
 for filepath in $ZFILES_ORDER; do
     (( i++ ))
@@ -21,12 +46,14 @@ for filepath in $ZFILES_ORDER; do
         (( errors++ ))
     fi
 
-    # Time color
-    if (( time_ms > 10 )); then
+    # Time color determination
+    local int_time=$(( ${time_ms%.*} ))
+    
+    if (( int_time > 10 )); then
         time_color=$r
-    elif (( time_ms > 5 )); then
+    elif (( int_time > 5 )); then
         time_color=$y
-    elif (( time_ms > 1 )); then
+    elif (( int_time > 1 )); then
         time_color=$w
     else
         time_color=$g
@@ -36,21 +63,48 @@ for filepath in $ZFILES_ORDER; do
     if [[ $filename == .z* ]]; then
         name_color=$y
         indent=""
-        folder=""
+        folder="zsh"
+        folder_color=$y
         total=$(( total + time_ms ))
     else
         name_color=$c
         indent="  "
         folder="${filepath:h:t}"
+        folder_color=$w
     fi
 
-    printf "${w}%${width}d.${x} %s ${name_color}%-20s${x} ${time_color}%6.2f ms${x}  ${w}%s${x}\n" \
-        "$i" "$icon" "${indent}${filename}" "$time_ms" "$folder"
+    # Time Bar Logic (Only if -b is passed)
+    local bar=""
+    if (( show_bar )); then
+        if (( int_time < 1 )); then
+            bar="${g}│${x}"
+        else
+            local filler_len=$(( int_time / 5 ))
+            local filler=""
+            if (( filler_len > 0 )); then
+                repeat $filler_len filler+="━"
+            fi
+            bar="${time_color}┝${filler}${x}"
+        fi
+    fi
+
+    # Print line
+    printf "${w}%${width}d.${x} %s ${name_color}%-20s${x} ${time_color}%6.2f ms${x}  ${folder_color}%-5s${x} %s\n" \
+        "$i" "$icon" "${indent}${filename}" "$time_ms" "$folder" "$bar"
 done
 
-print "${w}------------------------------------------${x}"
-printf "${bw}Total loading time:       %6.2f ms${x}\n" "$total"
+# Footer
+if (( show_bar )); then
+    printl $y "" 44
+fi
+printf "${bw}Total loading time:        %6.2f ms${x}\n" "$total"
 
+# Error reporting using printe
 if (( errors > 0 )); then
-    printf "${r}Errors: %d file(s) failed to load${x}\n" "$errors"
+    print "" # Spacer
+    if (( ${+functions[printe]} )); then
+        printe "$errors file(s) failed to load"
+    else
+        printf "${r}Errors: %d file(s) failed to load${x}\n" "$errors"
+    fi
 fi

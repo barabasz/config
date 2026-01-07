@@ -1,84 +1,118 @@
-# Retrieve the local IP address (non-localhost)
+# Retrieve the local IP address (interactive tool)
 # Usage: lanip [-6] [-i INTERFACE] [-a]
 #   -6: Get IPv6 address instead of IPv4
-#   -i: Specify network interface (e.g., eth0)
+#   -i: Specify network interface (e.g., eth0, en0)
 #   -a: Return all addresses instead of just the first one
 
-local ipv6 interface all_ips
-local result=""
+# Define the function body
+lanip() {
+    # Local variables for flags
+    local ipv6=0
+    local all_ips=0
+    local iface=""
+    local ip_version="inet" # Default to IPv4
+    
+    # Simple argument parsing loop
+    while [[ "$1" == -* ]]; do
+        case "$1" in
+            -6) ipv6=1; ip_version="inet6" ;;
+            -i) iface="$2"; shift ;;
+            -a) all_ips=1 ;;
+            *) 
+                # Use printe if available, otherwise stderr
+                if (( ${+functions[printe]} )); then
+                    printe "Unknown option: $1"
+                else
+                    print -u2 "Unknown option: $1"
+                fi
+                return 1 
+                ;;
+        esac
+        shift
+    done
 
-# Parse options
-while [[ "$1" == -* ]]; do
-    case "$1" in
-        -6) ipv6=1 ;;
-        -i) interface="$2"; shift ;;
-        -a) all_ips=1 ;;
-        *) echo "Unknown option: $1" >&2; return 1 ;;
-    esac
-    shift
-done
-
-# For IPv6 detection
-local ip_family="inet"
-local localhost_pattern="^127\."
-local ip_cmd_args=""
-
-if [[ -n "$ipv6" ]]; then
-    ip_family="inet6"
-    localhost_pattern="^::1"
-fi
-
-if [[ -n "$interface" ]]; then
-    ip_cmd_args="dev $interface"
-fi
-
-# Method 1: Try 'ip' command (more modern Linux systems)
-if (( $+commands[ip] )); then
-    if [[ -n "$all_ips" ]]; then
-        result=$(ip -f $ip_family addr show $ip_cmd_args 2>/dev/null | awk -v pattern="$localhost_pattern" '$1 == "inet" || $1 == "inet6" {gsub(/\/.*$/, "", $2); if ($2 !~ pattern) print $2}')
-    else
-        result=$(ip -f $ip_family addr show $ip_cmd_args 2>/dev/null | awk -v pattern="$localhost_pattern" '$1 == "inet" || $1 == "inet6" {gsub(/\/.*$/, "", $2); if ($2 !~ pattern) {print $2; exit}}')
-    fi
-# Method 2: Try 'ifconfig' (older systems)
-elif (( $+commands[ifconfig] )); then
-    if [[ -n "$interface" ]]; then
-        if [[ -n "$all_ips" ]]; then
-            result=$(ifconfig "$interface" 2>/dev/null | awk -v family="$ip_family" -v pattern="$localhost_pattern" '$1 == family && $2 !~ pattern {print $2}')
-        else
-            result=$(ifconfig "$interface" 2>/dev/null | awk -v family="$ip_family" -v pattern="$localhost_pattern" '$1 == family && $2 !~ pattern {print $2; exit}')
-        fi
-    else
-        if [[ -n "$all_ips" ]]; then
-            result=$(ifconfig 2>/dev/null | awk -v family="$ip_family" -v pattern="$localhost_pattern" '$1 == family && $2 !~ pattern {print $2}')
-        else
-            result=$(ifconfig 2>/dev/null | awk -v family="$ip_family" -v pattern="$localhost_pattern" '$1 == family && $2 !~ pattern {print $2; exit}')
+    # Optimization: If no flags provided, use the fast library function
+    if [[ $ipv6 -eq 0 && $all_ips -eq 0 && -z "$iface" ]]; then
+        if (( ${+functions[get_local_ip]} )); then
+            get_local_ip
+            return $?
         fi
     fi
-# Method 3: Try 'hostname' (fallback)
-elif (( $+commands[hostname] )); then
-    if [[ -n "$ipv6" ]]; then
-        # hostname doesn't easily distinguish IPv6 addresses
-        result=$(hostname -I 2>/dev/null | awk '{for(i=1;i<=NF;i++) if($i ~ /^[0-9a-fA-F:]+$/ && $i !~ /^::1/) print $i}')
-        if [[ -n "$all_ips" ]]; then
-            # Just keep all IPv6 results
-            :
-        else
-            # Take first result only
-            result=$(echo "$result" | head -n 1)
+
+    local result=""
+
+    # macOS implementation
+    if [[ $OSTYPE == darwin* ]]; then
+        # If interface not specified, try to detect active one via library or default to en0
+        if [[ -z "$iface" ]]; then
+            if (( ${+functions[get_active_interface]} )); then
+                iface=$(get_active_interface)
+            else
+                iface="en0"
+            fi
         fi
-    else
-        if [[ -n "$all_ips" ]]; then
-            result=$(hostname -I 2>/dev/null | awk '{for(i=1;i<=NF;i++) if($i ~ /^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$/ && $i !~ /^127\./) print $i}')
-        else
-            result=$(hostname -I 2>/dev/null | awk '{for(i=1;i<=NF;i++) if($i ~ /^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$/ && $i !~ /^127\./) {print $i; exit}}')
+
+        # Use ifconfig on macOS
+        if [[ -n "$iface" ]]; then
+            # Parsing ifconfig output:
+            # 1. Get info for interface
+            # 2. Filter lines containing 'inet' or 'inet6'
+            # 3. Exclude temporary IPv6 addresses (often junk)
+            # 4. Extract the IP (second column)
+            result=$(ifconfig "$iface" 2>/dev/null | awk -v ver="$ip_version" '$1 == ver { print $2 }')
+            
+            # Filter out secured/temporary IPv6 linkage if overly verbose (optional cleanup)
+            if [[ $ipv6 -eq 1 ]]; then
+                result=${(M)result:#*:[^%]*} # Basic filter to keep valid IPv6
+            fi
+        fi
+
+    # Linux implementation
+    elif [[ $OSTYPE == linux* ]]; then
+        # Method 1: ip command (modern)
+        if (( ${+commands[ip]} )); then
+            local args=("-f" "$ip_version")
+            [[ -n "$iface" ]] && args+=("show" "dev" "$iface") || args+=("addr" "show")
+            
+            # Parsing 'ip addr' output
+            # We look for "inet/inet6 <IP>/<CIDR>" and extract just the IP
+            result=$(ip "${args[@]}" 2>/dev/null | awk '/inet/ {print $2}' | cut -d/ -f1)
+            
+            # Filter localhost if no specific interface was requested
+            if [[ -z "$iface" ]]; then
+                if [[ $ipv6 -eq 1 ]]; then
+                     result=${result:#::1}
+                else
+                     result=${result:#127.*}
+                fi
+            fi
+
+        # Method 2: hostname -I (fallback, IPv4 mostly)
+        elif (( ${+commands[hostname]} )) && [[ $ipv6 -eq 0 && -z "$iface" ]]; then
+             result=$(hostname -I 2>/dev/null)
         fi
     fi
-fi
 
-# Return result or error
-if [[ -n "$result" ]]; then
-    echo "$result"
-    return 0
-else
-    return 1
-fi
+    # Process results (handle -a flag)
+    if [[ -n "$result" ]]; then
+        if [[ $all_ips -eq 1 ]]; then
+            # Print all lines
+            print -- "$result"
+        else
+            # Print first line only (head -n 1 equivalent using Zsh array)
+            print -- "${${(f)result}[1]}"
+        fi
+        return 0
+    else
+        # Use printe if available
+        if (( ${+functions[printe]} )); then
+            printe "No IP address found${iface:+ for interface $iface}"
+        else
+            print -u2 "No IP address found"
+        fi
+        return 1
+    fi
+}
+
+# Execute function
+lanip "$@"

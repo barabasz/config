@@ -3,6 +3,7 @@
 zfile_track_start ${0:A}
 
 # Miscellaneous helper functions & metaprogramming utilities
+# Depends on: print.zsh (for output), bootstrap.zsh (for colors)
 
 # Check if debug mode is enabled
 # Usage: is_debug
@@ -17,8 +18,14 @@ is_debug() {
 etime() {
     local start=$EPOCHREALTIME
     "$@" > /dev/null
-    # print -f is the Zsh builtin equivalent to printf
-    print -f "%.2fms\n" $(( (EPOCHREALTIME - start) * 1000 ))
+    
+    # Calculate duration
+    local duration=$(( (EPOCHREALTIME - start) * 1000 ))
+    local formatted
+    # Format to 2 decimal places using printf -v (save to variable)
+    printf -v formatted "%.2f" $duration
+    
+    printi "Execution time: ${formatted}ms"
 }
 
 # Check if command(s) are installed/available
@@ -48,11 +55,12 @@ try_source() {
         source "$file"
         local ret=$?
         if (( ret != 0 )) && is_debug; then
-            print -u2 "Error: [$context] Failed to source '$file' (exit code: $ret)"
+            printe "[$context] Failed to source '$file' (exit code: $ret)"
         fi
         return $ret
     else
-        is_debug && print -u2 "Warning: [$context] Missing file '$file'"
+        # Only warn if debug is enabled, using printw
+        is_debug && printw "[$context] Missing file '$file'"
         return 1
     fi
 }
@@ -65,17 +73,28 @@ backup_file() {
     local ts
     zmodload zsh/datetime
     strftime -s ts "%Y%m%d_%H%M%S" $EPOCHSECONDS
-    cp -a "$1" "${1}.${ts}"
+    
+    if cp -a "$1" "${1}.${ts}"; then
+        prints "Backup created: ${1}.${ts}"
+        return 0
+    else
+        printe "Failed to create backup of '$1'"
+        return 1
+    fi
 }
 
 # Ask for confirmation (Y/n)
 # Usage: confirm "Delete file?" && rm file
 # Returns: 0 (yes) or 1 (no)
 confirm() {
-    local prompt="${1:-Are you sure?} [y/N] "
+    # Use yellow color ($y) for question to match printq style
+    local prompt_text="${1:-Are you sure?}"
+    local prompt="${y}${prompt_text} [y/N]${x} "
     local response
+    
     read -q "response?${prompt}" # -q reads single char without enter
     print "" # Print newline after single char input
+    
     # Check if response is y or Y
     [[ "$response" == [yY] ]]
 }

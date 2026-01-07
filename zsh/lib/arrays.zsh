@@ -214,7 +214,8 @@ array_map() {
 array_join() {
     [[ $# -eq 2 ]] || return 1
     # (j) flag: join with separator
-    print -- "${(j[$2])P:1}"
+    # Fixed syntax: use ${(P)var} to dereference array content first
+    print -- "${(j[$2])${(P)1}}"
 }
 
 # Remove element from array by value
@@ -244,7 +245,8 @@ array_remove_at() {
 array_flatten() {
     [[ $# -eq 2 ]] || return 1
     # ${=var} performs word splitting on expansion
-    set -A $2 ${=P:1}
+    # Fixed syntax: use ${(P)var} for reliable indirect expansion
+    set -A $2 ${=${(P)1}}
 }
 
 # Concatenate multiple arrays

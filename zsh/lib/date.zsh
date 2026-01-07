@@ -384,5 +384,32 @@ get_day_of_year() {
     print -- $(( val ))
 }
 
+# Format seconds into human readable duration
+# Usage: format_duration 3665
+# Returns: "1.0 h" or "1 day 2h 30m"
+format_duration() {
+    [[ $# -eq 1 ]] || return 1
+    local sec=$1
+    local d h m
+
+    if (( sec < 60 )); then
+        print -- "${sec} sec"
+    elif (( sec < 3600 )); then
+        # Use printf for float precision
+        printf "%.1f min\n" $(( sec / 60.0 ))
+    elif (( sec < 86400 )); then
+        printf "%.1f h\n" $(( sec / 3600.0 ))
+    else
+        d=$(( sec / 86400 ))
+        h=$(( (sec % 86400) / 3600 ))
+        m=$(( (sec % 3600) / 60 ))
+        if (( d == 1 )); then
+            print -- "${d} day ${h}h ${m}m"
+        else
+            print -- "${d} days ${h}h ${m}m"
+        fi
+    fi
+}
+
 # shell files tracking - keep at the end
 zfile_track_end ${0:A}

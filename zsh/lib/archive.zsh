@@ -12,7 +12,7 @@ extract() {
     local file="$1"
 
     if [[ ! -f "$file" ]]; then
-        print -u2 "Error: '$file' is not a valid file"
+        printe "'$file' is not a valid file"
         return 1
     fi
 
@@ -33,7 +33,7 @@ extract() {
         *.7z)        7z x "$file"       ;;
         *.dmg)       hdiutil mount "$file" ;; # macOS specific
         *)           
-            print -u2 "Error: '$file' cannot be extracted via extract()" 
+            printe "'$file' cannot be extracted via extract()" 
             return 1 
             ;;
     esac
@@ -52,9 +52,9 @@ compress() {
 
     if [[ -e "$source" ]]; then
         tar -czf "$target" "$source"
-        print "Compressed '$source' to '$target'"
+        prints "Compressed '$source' to '$target'"
     else
-        print -u2 "Error: Source '$source' does not exist"
+        printe "Source '$source' does not exist"
         return 1
     fi
 }
@@ -76,9 +76,9 @@ zip_folder() {
         # -q: quiet
         # -x: exclude pattern
         zip -r -9 -q "$target" "$source" -x "*.DS_Store" "*__MACOSX*" "*.git*"
-        print "Zipped '$source' to '$target'"
+        prints "Zipped '$source' to '$target'"
     else
-        print -u2 "Error: Source '$source' is not a directory"
+        printe "Source '$source' is not a directory"
         return 1
     fi
 }

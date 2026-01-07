@@ -1,14 +1,19 @@
-# Display system info
-local os icon kernel shell_v arch uptime version codename
+# Display system information summary
+# Usage: sysinfo
 
-os=$(os_name)
-icon=$(os_icon)
-kernel=$(uname -r)
-shell_v=$(shell_ver)
-arch=$(uname -m)
-uptime=$(uptimeh)
-version=$(os_version)
-codename=$(os_codename)
+# Use library functions for consistency and performance
+local os=$(os_name)
+local icon=$(os_icon)
+local shell_v=$(shell_ver)
+local arch=$(get_arch)        # Zastępuje: uname -m
+local uptime=$(get_uptime)    # Zastępuje: uptimeh (to naprawia Twój błąd)
+local version=$(os_version)
+local codename=$(os_codename)
 
-printf "This is %s ${y}%s${x} %s (%s) " "$icon" "$os" "$version" "$codename"
-printf "with ${y}zsh${x} %s running on ${y}%s${x} for ${c}%s${x}\n" "$shell_v" "$arch" "$uptime"
+# Zmienna 'kernel' była w oryginale nieużywana w printf, więc ją usunąłem.
+# Jeśli jej potrzebujesz, odkomentuj:
+# local kernel=$(get_kernel_version)
+
+# Wyświetlanie (zachowuje format jednej długiej linii z oryginału)
+print -n -- "This is ${icon} ${y}${os}${x} ${version} (${codename}) "
+print -- "with ${y}zsh${x} ${shell_v} running on ${y}${arch}${x} for ${c}${uptime}${x}"

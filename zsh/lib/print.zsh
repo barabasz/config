@@ -3,27 +3,28 @@
 zfile_track_start ${0:A}
 
 # Output and Logging helper functions
-# Depends on colors defined in inc/bootstrap.zsh (e.g. $r, $g, $y, $b, $x)
+# Depends on colors and glyphs defined in inc/bootstrap.zsh
+# (e.g. $r, $g, $x, $GLYPH_ERROR, $GLYPH_SUCCESS etc.)
 
 # Print error message to stderr
 # Usage: printe "Error text" [text_color] [glyph] [glyph_color]
-# Default: ❌ Error text
+# Default glyph: $GLYPH_ERROR
 printe() {
     local text="$1"
-    local tc="${2:-$x}"    # Text Color
-    local glyph="${3:-❌}" # Glyph
-    local gc="${4:-$x}"    # Glyph Color
+    local tc="${2:-$x}"           # Text Color (defaults to reset)
+    local glyph="${3:-$GLYPH_ERROR}" # Glyph (defaults to global variable)
+    local gc="${4:-$x}"           # Glyph Color (defaults to reset)
     
     print -u2 -- "${gc}${glyph}${x} ${tc}${text}${x}"
 }
 
 # Print warning message to stderr
 # Usage: printw "Warning text" [text_color] [glyph] [glyph_color]
-# Default: ⚠️ Warning text
+# Default glyph: $GLYPH_WARNING
 printw() {
     local text="$1"
     local tc="${2:-$x}"
-    local glyph="${3:-⚠️}"
+    local glyph="${3:-$GLYPH_WARNING}"
     local gc="${4:-$x}"
 
     print -u2 -- "${gc}${glyph}${x} ${tc}${text}${x}"
@@ -31,11 +32,11 @@ printw() {
 
 # Print info message to stdout
 # Usage: printi "Info text" [text_color] [glyph] [glyph_color]
-# Default: ℹ️ Info text
+# Default glyph: $GLYPH_INFO
 printi() {
     local text="$1"
     local tc="${2:-$x}"
-    local glyph="${3:-ℹ️}"
+    local glyph="${3:-$GLYPH_INFO}"
     local gc="${4:-$x}"
 
     print -- "${gc}${glyph}${x} ${tc}${text}${x}"
@@ -43,32 +44,109 @@ printi() {
 
 # Print success message to stdout
 # Usage: prints "Success text" [text_color] [glyph] [glyph_color]
-# Default: ✅ Success text
+# Default glyph: $GLYPH_SUCCESS
 prints() {
     local text="$1"
     local tc="${2:-$x}"
-    local glyph="${3:-✅}"
+    local glyph="${3:-$GLYPH_SUCCESS}"
     local gc="${4:-$x}"
 
     print -- "${gc}${glyph}${x} ${tc}${text}${x}"
 }
 # Alias: printok
+# Safe to copy now as the function body uses ASCII variable names, not raw Unicode
 functions[printok]=$functions[prints]
 
 # Print debug message (only if debug mode is on)
 # Usage: printd "Debug text" [text_color] [glyph] [glyph_color]
-# Default: 💬 Debug text
+# Default glyph: $GLYPH_DEBUG
 # Returns: Prints to stderr if ZSH_DEBUG=1
 printd() {
     # Uses is_debug from varia.zsh if available, otherwise manual check
     if (( ${+functions[is_debug]} )) && is_debug || [[ $ZSH_DEBUG == 1 ]]; then
         local text="$1"
         local tc="${2:-$x}"
-        local glyph="${3:-💬}"
+        local glyph="${3:-$GLYPH_DEBUG}"
         local gc="${4:-$x}"
         
         print -u2 -- "${gc}${glyph}${x} ${tc}${text}${x}"
     fi
+}
+
+# Print a key-value pair
+# Usage: printkv "Key" "Value" [key_color] [value_color]
+# Example: printkv "IP Address" "192.168.1.1"
+# Returns: Prints "Key: Value" with formatting to stdout
+printkv() {
+    [[ $# -ge 2 ]] || return 1
+    local key="$1"
+    local val="$2"
+    local kc="${3:-$b}" # Key Color (default: blue)
+    local vc="${4:-$x}" # Value Color (default: reset)
+
+    print -- "${kc}${key}${x}: ${vc}${val}${x}"
+}
+
+# Print all elements of an array (associative or indexed) using printkv
+# Usage: printa array_name [key_color] [value_color]
+# Example: printa sys_info
+# Returns: Prints list of key-values to stdout
+printa() {
+    [[ $# -ge 1 ]] || return 1
+    local arr_name="$1"
+    local kc="${2:-$b}" # Key Color (default: blue)
+    local vc="${3:-$x}" # Value Color (default: reset)
+    
+    # Get variable type using Zsh flag (t) and pointer (P)
+    local type="${(tP)arr_name}"
+
+    if [[ "$type" == *"association"* ]]; then
+        # Associative array
+        local key param val
+        # Iterate over keys sorted alphabetically (@okP)
+        for key in "${(@okP)arr_name}"; do
+            # Construct indirect reference to get value
+            param="${arr_name}[$key]"
+            val="${(P)param}"
+            printkv "$key" "$val" "$kc" "$vc"
+        done
+    elif [[ "$type" == *"array"* ]]; then
+        # Indexed array
+        local i param val
+        # Get array length
+        local len="${#${(P)arr_name}}"
+        for ((i=1; i<=len; i++)); do
+            param="${arr_name}[$i]"
+            val="${(P)param}"
+            printkv "$i" "$val" "$kc" "$vc"
+        done
+    else
+        printe "'$arr_name' is not a valid array (Type: $type)"
+        return 1
+    fi
+}
+
+# Print text in a specific color
+# Usage: printc "Text" [color]
+# Example: printc "Done" $g
+# Returns: Prints colored text to stdout
+printc() {
+    local text="$1"
+    local color="${2:-$x}"
+    print -- "${color}${text}${x}"
+}
+
+# Print an unordered list of items
+# Usage: printul "Item 1" "Item 2" "Item 3"
+# Returns: Prints bulleted list to stdout
+printul() {
+    [[ $# -ge 1 ]] || return 1
+    local item
+    local bullet="•" 
+    
+    for item in "$@"; do
+        print -- " ${b}${bullet}${x} ${item}"
+    done
 }
 
 # Ask user for input with default value

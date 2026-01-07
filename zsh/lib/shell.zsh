@@ -2,6 +2,9 @@
 # Shell files tracking - keep at the top
 zfile_track_start ${0:A}
 
+# Shell related functions
+# Depends on: print.zsh (for output), system.zsh (for os detection)
+
 # Get Zsh version
 # Usage: shell_ver
 # Returns: version number (e.g., "5.9")
@@ -30,8 +33,9 @@ shell_path() {
 get_default_shell() {
     if is_macos; then
         # dscl is unavoidable on macOS
+        # specific path /Users/$USER is safer than ~/ expansion here
         local record
-        record=$(dscl . -read ~/ UserShell 2>/dev/null)
+        record=$(dscl . -read /Users/$USER UserShell 2>/dev/null)
         # Parse output "UserShell: /bin/zsh" using Zsh expansion
         print -- ${record##* }
     elif is_linux; then
@@ -53,7 +57,7 @@ set_default_shell() {
 
     # Check executable permissions
     if [[ ! -x "$new_shell" ]]; then
-        print "Error: Shell '$new_shell' does not exist or is not executable" >&2
+        printe "Shell '$new_shell' does not exist or is not executable"
         return 1
     fi
 
@@ -61,15 +65,20 @@ set_default_shell() {
     # (f) splits by line, check if new_shell is in the array
     local -a valid_shells=("${(@f)$(</etc/shells)}")
     if [[ ${valid_shells[(Ie)$new_shell]} -eq 0 ]]; then
-        print "Error: Shell '$new_shell' is not in /etc/shells" >&2
+        printe "Shell '$new_shell' is not in /etc/shells"
         return 1
     fi
 
     # Change shell
     if command -v chsh >/dev/null; then
-        chsh -s "$new_shell" && print "Default shell changed to: $new_shell"
+        if chsh -s "$new_shell"; then
+            prints "Default shell changed to: $new_shell"
+        else
+            printe "Failed to change shell"
+            return 1
+        fi
     else
-        print "Error: 'chsh' command not found." >&2
+        printe "'chsh' command not found."
         return 1
     fi
 }
@@ -148,15 +157,9 @@ terminal_lines() {
 get_available_shells() {
     [[ -f /etc/shells ]] || return 1
     
-    # Pure Zsh file reading and filtering:
-    # 1. (<file) reads file
-    # 2. (f) splits into lines
-    # 3. :#\#* removes lines starting with # (comments)
-    # 4. (M) keeps matches (but here we used negative match above so actually unnecessary if logic is inverted)
-    # Let's use clean logic:
-    
     local -a lines=("${(@f)$(</etc/shells)}")
-    # Filter out comments (#*) and empty lines
+    # Filter out comments (#*) and empty lines. 
+    # :#^ matches lines that DO NOT match empty string (removes empty lines)
     print -l -- ${${lines:#\#*}:#^}
 }
 
@@ -190,7 +193,7 @@ parent_process() {
 # Reload current shell configuration
 # Usage: reload_shell
 reload_shell() {
-    print "Reloading zsh configuration..."
+    printi "Reloading zsh configuration..."
     # exec replaces the current process with a new one.
     # This forces a reload of .zshenv AND .zshrc, and clears old state.
     exec zsh

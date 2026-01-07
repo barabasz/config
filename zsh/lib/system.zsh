@@ -122,7 +122,7 @@ _macos_codename() {
     local minor=${ver_parts[2]}
 
     case $major in
-        16) print "Bannff" ;; # Speculative/Future
+        26) print "Tahoe" ;;
         15) print "Sequoia" ;;
         14) print "Sonoma" ;;
         13) print "Ventura" ;;
@@ -174,26 +174,53 @@ get_kernel_version() {
 # Returns: Unicode character
 os_icon() {
     case $(os_name) in
-        macos)      print "\Uf179" ;; # Apple logo
-        ubuntu)     print "\Uf31b" ;;
-        debian)     print "\Uf306" ;;
-        redhat)     print "\Uf316" ;;
-        fedora)     print "\Uf30a" ;;
-        arch)       print "\Uf303" ;;
-        opensuse*)  print "\Uf314" ;;
-        windows)    print "\Uf17a" ;;
-        *)          print "\Ue712" ;; # Generic Linux penguin
+        macos)      print $'\Uf179' ;; # Apple logo
+        ubuntu)     print $'\Uf31b' ;;
+        debian)     print $'\Uf306' ;;
+        redhat)     print $'\Uf316' ;;
+        fedora)     print $'\Uf30a' ;;
+        arch)       print $'\Uf303' ;;
+        opensuse*)  print $'\Uf314' ;;
+        windows)    print $'\Uf17a' ;;
+        *)          print $'\Ue712' ;; # Generic Linux penguin
     esac
 }
 
 # Get system uptime (human readable)
 # Usage: get_uptime
-# Returns: "up 2 hours, 15 minutes" (simplified)
+# Returns: "2 days 4h 15m" using format_duration
 get_uptime() {
     if is_macos; then
         uptime | sed 's/.*up \([^,]*\), .*/up \1/'
     elif is_linux; then
         uptime -p 2>/dev/null || uptime | sed 's/.*up \([^,]*\), .*/up \1/'
+    fi
+}
+
+get_uptime() {
+    local uptime_sec boot_time
+
+    if is_macos; then
+        # Extract boot time from sysctl output: "kern.boottime: { sec = 1704556800, usec = 0 }"
+        # (w)4 extracts the 4th word (timestamp), //, removes the comma
+        boot_time=${$(sysctl -n kern.boottime)[(w)4]//,}
+        uptime_sec=$(( EPOCHSECONDS - boot_time ))
+    elif [[ -r /proc/uptime ]]; then
+        # Linux /proc/uptime: "34234.34 234234.34"
+        read uptime_sec _ < /proc/uptime
+        # Remove decimals to get integer seconds
+        uptime_sec=${uptime_sec%.*}
+    else
+        # Fallback to standard uptime command parsing if methods above fail
+        uptime | sed 's/.*up \([^,]*\), .*/up \1/'
+        return 0
+    fi
+
+    # Use helper from date.zsh if available
+    if (( ${+functions[format_duration]} )); then
+        format_duration "$uptime_sec"
+    else
+        print -- "${uptime_sec}s"
     fi
 }
 
@@ -208,13 +235,5 @@ get_cpu_count() {
     fi
 }
 
-# Check if command exists
-# Usage: command_exists "git"
-# Returns: 0 (true) or 1 (false)
-command_exists() {
-    [[ $# -eq 1 ]] || return 1
-    (( ${+commands[$1]} )) || command -v "$1" >/dev/null 2>&1
-}
-
-# Shell files tracking - keep at the end
+# shell files tracking - keep at the end
 zfile_track_end ${0:A}

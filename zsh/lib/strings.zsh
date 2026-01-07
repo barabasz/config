@@ -2,6 +2,9 @@
 # Shell files tracking - keep at the top
 zfile_track_start ${0:A}
 
+# String manipulation functions
+# Uses native Zsh parameter expansion flags for performance
+
 # Extract version number from a string
 # Usage: get_version "zsh 5.9"
 # Returns: 5.9
@@ -179,8 +182,8 @@ str_join() {
     local delim="$1"
     local arr_name="$2"
 
-    # (P) flag interprets the value of arr_name as the variable name
-    print -- "${(j[$delim])P:arr_name}"
+    # Fixed syntax: use ${(P)var} to dereference array content first, then join
+    print -- "${(j[$delim])${(P)arr_name}}"
 }
 
 # Replace first occurrence of pattern with replacement

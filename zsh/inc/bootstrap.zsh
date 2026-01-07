@@ -24,6 +24,15 @@ if [[ -o interactive ]]; then
     x=$'\033[0m'
 fi
 
+# Glyphs for various message types
+# Using GLYPH_ prefix for better autocomplete and namespacing
+GLYPH_ERROR="❌"
+GLYPH_WARNING="⚠️"
+GLYPH_INFO="ℹ️"
+GLYPH_SUCCESS="✅"
+GLYPH_DEBUG="💬"
+GLYPH_NOTIFY="🔔"
+
 # Check if debug mode is enabled
 is_debug() {
     [[ $ZSH_DEBUG == 1 || $DEBUG == 1 ]]
