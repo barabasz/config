@@ -29,19 +29,22 @@ etime() {
 }
 
 # Check if command(s) are installed/available
-# Usage: is_installed git curl
+# Usage: is_installed git [curl ...]
 # Returns: 0 if all commands exist, 1 otherwise
 is_installed() {
-    [[ $# -ge 1 ]] || return 1
+    # Fast path for single argument
+    if [[ $# -eq 1 ]]; then
+        (( ${+commands[$1]} ))
+        return
+    fi
+
+    # Loop for multiple arguments
     local cmd
     for cmd in "$@"; do
-        # Fast check using Zsh hash table of commands
         (( ${+commands[$cmd]} )) || return 1
     done
     return 0
 }
-# Alias for readability / compatibility
-functions[has_cmd]=$functions[is_installed]
 
 # Source file if it exists, with optional debug logging
 # Usage: try_source "/path/to/file.zsh" ["ContextName"]
