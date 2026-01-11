@@ -18,21 +18,36 @@ export ZSH_SYS_INFO=0    # set to 1 to print system info messages
 # Shell files tracking
 source "$ZINCDIR/zfiles.zsh"
 zfile_track_start ${0:A}
-this_file=${0:t}
+
+# Load zshenv bootstrap functions
+source "$ZINCDIR/bootstrap.zsh"
+
+source abcdefghijk
+require_source abcdefghijk
 
 # Load XDG directories
-source "$ZINCDIR/xdg.zsh"
+try_source "$ZINCDIR/xdg.zsh" $this_file
+
+# Load user folders
+try_source "$ZINCDIR/folders.zsh" $this_file
 
 # Load environment variables
-source "$ZINCDIR/variables.zsh"
+try_source "$ZINCDIR/variables.zsh" $this_file
 
-# Load bootstrap functions
-source "$ZINCDIR/bootstrap.zsh"
-# From this point on we have source_zsh_dir etc.
+# Interactive session only
+if [[ -o interactive ]]; then
+    # Load colors
+    try_source "$ZINCDIR/colors.zsh" $this_file
+
+    # Load icons
+    try_source "$ZINCDIR/icons.zsh" $this_file
+
+    # Load PROMPT fallback
+    try_source "$ZINCDIR/prompt.zsh" $this_file
+fi
 
 # Load helper library
 source_zsh_dir "$ZLIBDIR"
-# From this point on we have try_source etc.
 
 # Load PATH
 try_source "$ZINCDIR/path.zsh" $this_file

@@ -50,28 +50,6 @@ is_installed() {
     return 0
 }
 
-# Source file if it exists, with optional debug logging
-# Usage: try_source "/path/to/file.zsh" ["ContextName"]
-# Returns: exit code from source, or 1 if file doesn't exist
-try_source() {
-    [[ $# -ge 1 ]] || return 1
-    local file="$1"
-    local context="${2:-System}"
-
-    if [[ -r "$file" ]]; then
-        source "$file"
-        local ret=$?
-        if (( ret != 0 )) && is_debug; then
-            printe "[$context] Failed to source '$file' (exit code: $ret)"
-        fi
-        return $ret
-    else
-        # Only warn if debug is enabled, using printw
-        is_debug && printw "[$context] Missing file '$file'"
-        return 1
-    fi
-}
-
 # Create a backup of a file with timestamp
 # Usage: backup_file "config.txt"
 # Returns: 0 on success (creates config.txt.20240101_120000)
