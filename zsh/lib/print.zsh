@@ -6,14 +6,33 @@ zfile_track_start ${0:A}
 # Depends on colors and glyphs defined in inc/bootstrap.zsh
 # (e.g. $r, $g, $x, $GLYPH_ERROR, $GLYPH_SUCCESS etc.)
 
+# Print available print functions (for demo purposes)
+# Usage: printdemo
+printdemo() {
+    typeset -A print_funcs=(
+        printe Error
+        printw Warning
+        printi Info
+        prints Success
+        printd Debug
+        printb Bell
+    )
+    local func desc
+    for func desc in ${(kv)print_funcs}; do
+        if (( ${+functions[$func]} )); then
+            $func "This is a demo of $c$func$x function ($desc)."
+        fi
+    done
+}
+
 # Print error message to stderr
 # Usage: printe "Error text" [text_color] [glyph] [glyph_color]
 # Default glyph: $GLYPH_ERROR
 printe() {
     local text="$1"
-    local tc="${2:-$x}"           # Text Color (defaults to reset)
+    local tc="${2:-$x}"              # Text Color (defaults to reset)
     local glyph="${3:-$GLYPH_ERROR}" # Glyph (defaults to global variable)
-    local gc="${4:-$x}"           # Glyph Color (defaults to reset)
+    local gc="${4:-$x}"              # Glyph Color (defaults to reset)
     
     print -u2 -- "${gc}${glyph}${x} ${tc}${text}${x}"
 }
@@ -23,11 +42,23 @@ printe() {
 # Default glyph: $GLYPH_WARNING
 printw() {
     local text="$1"
-    local tc="${2:-$x}"
-    local glyph="${3:-$GLYPH_WARNING}"
-    local gc="${4:-$x}"
+    local tc="${2:-$x}"                # Text Color (defaults to reset)
+    local glyph="${3:-$GLYPH_WARNING}" # Glyph (defaults to global variable)
+    local gc="${4:-$x}"                # Glyph Color (defaults to reset)
 
     print -u2 -- "${gc}${glyph}${x} ${tc}${text}${x}"
+}
+
+# Print bell message to stdout
+# Usage: printb "Info text" [text_color] [glyph] [glyph_color]
+# Default glyph: $GLYPH_INFO
+printb() {
+    local text="$1"
+    local tc="${2:-$x}"
+    local glyph="${3:-$GLYPH_BELL}"
+    local gc="${4:-$x}"
+    print -n -- "\a"  # Emit bell character
+    print -- "${gc}${glyph}${x} ${tc}${text}${x}"
 }
 
 # Print info message to stdout

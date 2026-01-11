@@ -1,5 +1,5 @@
 #!/bin/zsh
-export ZSH_CONFIG_VERSION="20260107v2"
+export ZSH_CONFIG_VERSION="20260111v1"
 
 # Zsh core configuration
 export CONFDIR=$HOME/.config
@@ -11,8 +11,9 @@ export ZLIBDIR=$ZDOTDIR/lib
 export ZAPPDIR=$ZDOTDIR/apps
 export ZFNCDIR=$ZDOTDIR/functions
 export ZSH_DEBUG=1
-export ZSH_LOGIN_INFO=0
-export ZSH_SYS_INFO=0
+export ZSH_ZFILE_DEBUG=0 # set to 1 to enable zfile sourcing debug messages
+export ZSH_LOGIN_INFO=0  # set to 1 to print login info messages
+export ZSH_SYS_INFO=0    # set to 1 to print system info messages
 
 # Shell files tracking
 source "$ZINCDIR/zfiles.zsh"

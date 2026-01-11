@@ -12,4 +12,5 @@ unset d # set by zsh
 # Shell files tracking - keep at the end
 zfile_track_end "$ZDOTDIR/.zlogin"
 ZFILES_TIME[total]=$(( ${(j:+:)ZFILES_TIME} ))
+ZFILES_TRACKING=0
 unset this_file # ZFILES_START
