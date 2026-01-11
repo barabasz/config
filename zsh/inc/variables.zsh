@@ -28,19 +28,19 @@ export VISUAL='code'
 export PAGER='less'
 
 # Log
-export LOG_SHOW_ICONS=1 # log.sh: 1 for icons, 0 for nothing
+export LOG_SHOW_ICONS=1  # log.sh: 1 for icons, 0 for nothing
 export LOG_COLOR_TEXTS=1 # log.sh: 1 for colors, 0 for white
 export LOG_EMOJI_ICONS=0 # log.sh: 1 for emoji, 0 for text
 
-# Glyphs
-export GLYPH_BELL="🔔"
-export GLYPH_ERROR="❌"
-export GLYPH_WARNING="⚠️"
-export GLYPH_INFO="ℹ️"
-export GLYPH_SUCCESS="✅"
-export GLYPH_DEBUG="💬"
-export GLYPH_NOTIFY="🔔"
-export GLYPH_UL="•"
+# Icons / glyphs
+export ICO_BELL="🔔"
+export ICO_DEBUG="👉"
+export ICO_ERROR="⛔"
+export ICO_INFO="👍"
+export ICO_MSG="💬"
+export ICO_OK="✅"
+export ICO_UL="•"
+export ICO_WARN="⚠️"
 
 # ANSI color codes (interactive sessions only)
 if [[ -o interactive ]]; then

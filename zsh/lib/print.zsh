@@ -4,7 +4,7 @@ zfile_track_start ${0:A}
 
 # Output and Logging helper functions
 # Depends on colors and glyphs defined in inc/bootstrap.zsh
-# (e.g. $r, $g, $x, $GLYPH_ERROR, $GLYPH_SUCCESS etc.)
+# (e.g. $r, $g, $x, $ICO_ERROR, $ICO_OK etc.)
 
 # Print available print functions (for demo purposes)
 # Usage: printdemo
@@ -26,60 +26,60 @@ printdemo() {
 }
 
 # Print error message to stderr
-# Usage: printe "Error text" [text_color] [glyph] [glyph_color]
-# Default glyph: $GLYPH_ERROR
+# Usage: printe "Error text" [text_color] [glyph] [ICO_color]
+# Default glyph: $ICO_ERROR
 printe() {
     local text="$1"
     local tc="${2:-$x}"              # Text Color (defaults to reset)
-    local glyph="${3:-$GLYPH_ERROR}" # Glyph (defaults to global variable)
+    local glyph="${3:-$ICO_ERROR}" # Glyph (defaults to global variable)
     local gc="${4:-$x}"              # Glyph Color (defaults to reset)
     
     print -u2 -- "${gc}${glyph}${x} ${tc}${text}${x}"
 }
 
 # Print warning message to stderr
-# Usage: printw "Warning text" [text_color] [glyph] [glyph_color]
-# Default glyph: $GLYPH_WARNING
+# Usage: printw "Warning text" [text_color] [glyph] [ICO_color]
+# Default glyph: $ICO_WARN
 printw() {
     local text="$1"
     local tc="${2:-$x}"                # Text Color (defaults to reset)
-    local glyph="${3:-$GLYPH_WARNING}" # Glyph (defaults to global variable)
+    local glyph="${3:-$ICO_WARN}" # Glyph (defaults to global variable)
     local gc="${4:-$x}"                # Glyph Color (defaults to reset)
 
     print -u2 -- "${gc}${glyph}${x} ${tc}${text}${x}"
 }
 
 # Print bell message to stdout
-# Usage: printb "Info text" [text_color] [glyph] [glyph_color]
-# Default glyph: $GLYPH_INFO
+# Usage: printb "Info text" [text_color] [glyph] [ICO_color]
+# Default glyph: $ICO_INFO
 printb() {
     local text="$1"
     local tc="${2:-$x}"
-    local glyph="${3:-$GLYPH_BELL}"
+    local glyph="${3:-$ICO_BELL}"
     local gc="${4:-$x}"
     print -n -- "\a"  # Emit bell character
     print -- "${gc}${glyph}${x} ${tc}${text}${x}"
 }
 
 # Print info message to stdout
-# Usage: printi "Info text" [text_color] [glyph] [glyph_color]
-# Default glyph: $GLYPH_INFO
+# Usage: printi "Info text" [text_color] [glyph] [ICO_color]
+# Default glyph: $ICO_INFO
 printi() {
     local text="$1"
     local tc="${2:-$x}"
-    local glyph="${3:-$GLYPH_INFO}"
+    local glyph="${3:-$ICO_INFO}"
     local gc="${4:-$x}"
 
     print -- "${gc}${glyph}${x} ${tc}${text}${x}"
 }
 
 # Print success message to stdout
-# Usage: prints "Success text" [text_color] [glyph] [glyph_color]
-# Default glyph: $GLYPH_SUCCESS
+# Usage: prints "Success text" [text_color] [glyph] [ICO_color]
+# Default glyph: $ICO_OK
 prints() {
     local text="$1"
     local tc="${2:-$x}"
-    local glyph="${3:-$GLYPH_SUCCESS}"
+    local glyph="${3:-$ICO_OK}"
     local gc="${4:-$x}"
 
     print -- "${gc}${glyph}${x} ${tc}${text}${x}"
@@ -89,15 +89,15 @@ prints() {
 functions[printok]=$functions[prints]
 
 # Print debug message (only if debug mode is on)
-# Usage: printd "Debug text" [text_color] [glyph] [glyph_color]
-# Default glyph: $GLYPH_DEBUG
+# Usage: printd "Debug text" [text_color] [glyph] [ICO_color]
+# Default glyph: $ICO_DEBUG
 # Returns: Prints to stderr if ZSH_DEBUG=1
 printd() {
     # Uses is_debug from varia.zsh if available, otherwise manual check
     if (( ${+functions[is_debug]} )) && is_debug || [[ $ZSH_DEBUG == 1 ]]; then
         local text="$1"
         local tc="${2:-$x}"
-        local glyph="${3:-$GLYPH_DEBUG}"
+        local glyph="${3:-$ICO_DEBUG}"
         local gc="${4:-$x}"
         
         print -u2 -- "${gc}${glyph}${x} ${tc}${text}${x}"

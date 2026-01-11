@@ -13,19 +13,23 @@ is_debug() {
 }
 
 # Measure execution time of a command
-# Usage: etime ls -la
+# Usage: etime [-v] command [args...]
 # Returns: prints time in ms to stdout
 etime() {
+    [[ "$1" = "-v" ]] && local verbose=1 && shift
+    [[ $# -eq 0 ]] && return 1
     local start=$EPOCHREALTIME
-    "$@" > /dev/null
-    
+    "$@" > /dev/null 2>&1
+    local exit_code=$?
     # Calculate duration
-    local duration=$(( (EPOCHREALTIME - start) * 1000 ))
     local formatted
-    # Format to 2 decimal places using printf -v (save to variable)
-    printf -v formatted "%.2f" $duration
-    
-    printi "Execution time: ${formatted}ms"
+    printf -v formatted "%.2f" $(( (EPOCHREALTIME - start) * 1000 ))
+    if [[ $verbose == 1 ]]; then
+        printi "Command $y'$c$*$y'$x executed in $y$formatted$x ms."
+    else
+        print "$formatted ms"
+    fi
+    return $exit_code
 }
 
 # Check if command(s) are installed/available

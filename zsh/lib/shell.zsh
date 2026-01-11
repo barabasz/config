@@ -119,6 +119,15 @@ is_sourced() {
 shell_level() {
     print -- ${SHLVL:-1}
 }
+# Measure shell startup times
+# Usage: shell_speed
+# Returns: time taken to start a shell
+shell_speed() {
+    print -n "${y}Non-interactive:${x} "
+    etime zsh -c exit
+    print -n "${y}Interactive:${x}     "
+    etime zsh -i -c exit
+}
 
 # Get terminal type
 # Usage: terminal_type
