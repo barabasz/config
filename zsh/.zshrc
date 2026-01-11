@@ -11,13 +11,13 @@ fpath=($ZFNCDIR $fpath)
 autoload -Uz $ZFNCDIR/[^_.]*(.:t)
 
 # Aliases
-try_source $ZINCDIR/aliases.zsh $this_file
+source $ZINCDIR/aliases.zsh
 
 # App configurations
 source_zsh_dir "$ZAPPDIR"
 
 # Directory hashes
-try_source "$ZINCDIR/hashdirs.zsh" $this_file
+source "$ZINCDIR/hashdirs.zsh"
 
 # shell files tracking - keep at the end
 zfile_track_end "$ZDOTDIR/.zshrc"

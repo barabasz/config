@@ -22,38 +22,35 @@ zfile_track_start ${0:A}
 # Load zshenv bootstrap functions
 source "$ZINCDIR/bootstrap.zsh"
 
-source abcdefghijk
-require_source abcdefghijk
-
 # Load XDG directories
-try_source "$ZINCDIR/xdg.zsh" $this_file
+source "$ZINCDIR/xdg.zsh"
 
 # Load user folders
-try_source "$ZINCDIR/folders.zsh" $this_file
+source "$ZINCDIR/folders.zsh"
 
 # Load environment variables
-try_source "$ZINCDIR/variables.zsh" $this_file
+source "$ZINCDIR/variables.zsh"
 
 # Interactive session only
 if [[ -o interactive ]]; then
     # Load colors
-    try_source "$ZINCDIR/colors.zsh" $this_file
+    source "$ZINCDIR/colors.zsh"
 
     # Load icons
-    try_source "$ZINCDIR/icons.zsh" $this_file
+    source "$ZINCDIR/icons.zsh"
 
     # Load PROMPT fallback
-    try_source "$ZINCDIR/prompt.zsh" $this_file
+    source "$ZINCDIR/prompt.zsh"
 fi
 
 # Load helper library
 source_zsh_dir "$ZLIBDIR"
 
 # Load PATH
-try_source "$ZINCDIR/path.zsh" $this_file
+source "$ZINCDIR/path.zsh"
 
 # Set locale
-try_source "$ZINCDIR/locales.zsh" $this_file
+source "$ZINCDIR/locales.zsh"
 
 # Shell files tracking - keep at the end
 zfile_track_end ${0:A}
