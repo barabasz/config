@@ -29,7 +29,7 @@ done
 if (( show_bar )); then
     printt "$title " $w $y
 else
-    print "$title:"
+    printf "$by%6s %s %21s %7s$x\n" "err" "file" "time" "dir"
 fi
 
 for filepath in $ZFILES_ORDER; do
@@ -64,7 +64,7 @@ for filepath in $ZFILES_ORDER; do
         name_color=$y
         indent=""
         folder="zsh"
-        folder_color=$y
+        folder_color=$w
         total=$(( total + time_ms ))
     else
         name_color=$c
@@ -97,7 +97,7 @@ done
 if (( show_bar )); then
     printl $y "" 44
 fi
-printf "${bw}Total loading time:        %6.2f ms${x}\n" "$total"
+printf "${by}%27s%6.2f ms  %s$x\n" "" "$total" "total"
 
 # Error reporting using printe
 if (( errors > 0 )); then

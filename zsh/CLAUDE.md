@@ -25,7 +25,7 @@ This is a modular, performance-optimized zsh configuration focused on maintainab
 - Autoloaded user functions
 - Comprehensive aliasing system
 
-**Version:** Tracked via `$ZSH_CONFIG_VERSION` in `.zshenv`
+**Version:** Tracked via `$ZSH_CONFIG_VERSION` in `inc/zsh.zsh`
 
 ---
 
@@ -62,10 +62,18 @@ This is a modular, performance-optimized zsh configuration focused on maintainab
 ### Design Decisions
 
 - **No compatibility layers** - zsh only, no sh/bash/ksh support
+- **Separation of concerns** - Each file has a single, clear responsibility
+  - Core configuration in `inc/zsh.zsh`
+  - Colors separated to `inc/colors.zsh`
+  - History configuration in `inc/history.zsh`
+  - Editor settings in `inc/editors.zsh`
+  - User folders in `inc/folders.zsh`
+  - Icons in `inc/icons.zsh`
 - **Helper library** - Small, fast functions loaded first in `.zshenv`
 - **Application configs** - Loaded last, can depend on helpers
 - **Tracking everywhere** - Every file reports loading time
 - **Dynamic loading** - All files in `lib/` and `apps/` are sourced dynamically at shell startup
+- **Explicit module loading** - All zsh modules loaded upfront in `inc/zsh.zsh`
 
 ---
 
@@ -81,9 +89,16 @@ This is a modular, performance-optimized zsh configuration focused on maintainab
 ├── .zsh_history      # Command history
 ├── inc/              # Core includes
 │   ├── zfiles.zsh       # Shell files tracking infrastructure
+│   ├── zsh.zsh          # Core zsh configuration and modules
+│   ├── bootstrap.zsh    # Bootstrap functions
 │   ├── xdg.zsh          # XDG Base Directories
+│   ├── folders.zsh      # User folder paths
 │   ├── variables.zsh    # Environment variables
-│   ├── bootstrap.zsh    # Bootstrap functions & colors
+│   ├── colors.zsh       # ANSI color codes
+│   ├── icons.zsh        # Icon/glyph exports
+│   ├── editors.zsh      # Editor and pager configuration
+│   ├── history.zsh      # History configuration and options
+│   ├── prompt.zsh       # Fallback prompt
 │   ├── path.zsh         # PATH configuration
 │   ├── hashdirs.zsh     # Named directory hashes
 │   ├── aliases.zsh      # Aliases
@@ -102,7 +117,7 @@ This is a modular, performance-optimized zsh configuration focused on maintainab
 ├── functions/        # Autoloaded user functions
 │   ├── sysinfo          # System information display
 │   ├── logininfo        # Login details
-│   ├── zfiles           # Show tracked files
+│   ├── zfiles           # Show tracked files (with -b flag for bar viz)
 │   └── ...              # Other functions
 └── cache/            # Runtime cache
     └── sessions/     # Zsh sessions
@@ -117,18 +132,26 @@ This is a modular, performance-optimized zsh configuration focused on maintainab
 **Purpose:** Always sourced first, sets up tracking and loads critical components.
 
 **Responsibilities:**
-- Set `$ZDOTDIR` and core zsh directory variables
 - Load file tracking system (`zfiles.zsh`)
-- Load XDG directories, environment variables, bootstrap functions
+- Load core zsh configuration (`zsh.zsh`)
+- Load bootstrap functions
+- Load XDG directories, folders, and environment variables
 - Source entire `lib/` directory (helper functions)
 - Configure PATH and locale
 
-**Key Variables:**
+**Key Variables** (defined in `inc/zsh.zsh`):
 ```zsh
-ZDOTDIR=$HOME/.config/zsh
-ZSH_CONFIG_VERSION="20260106v1"
-ZSH_DEBUG=0              # Set to 1 for verbose output
-ZSH_LOGIN_INFO=1         # Show login info
+CONFDIR=$HOME/.config
+ZDOTDIR=$CONFDIR/zsh
+ZCACHEDIR=$ZDOTDIR/cache
+ZINCDIR=$ZDOTDIR/inc
+ZLIBDIR=$ZDOTDIR/lib
+ZAPPDIR=$ZDOTDIR/apps
+ZFNCDIR=$ZDOTDIR/functions
+ZSH_CONFIG_VERSION="20260111v3"
+ZSH_DEBUG=1              # Set to 1 for verbose output
+ZSH_ZFILE_DEBUG=0        # Set to 1 for file tracking debug
+ZSH_LOGIN_INFO=0         # Show login info
 ZSH_SYS_INFO=0           # Show system info
 ```
 
@@ -136,9 +159,11 @@ ZSH_SYS_INFO=0           # Show system info
 ```
 .zshenv
   → inc/zfiles.zsh (file tracking setup)
+  → inc/zsh.zsh (core config, variables, zmodload)
+  → inc/bootstrap.zsh (helper functions)
   → inc/xdg.zsh (XDG directories)
+  → inc/folders.zsh (user folder paths)
   → inc/variables.zsh (environment exports)
-  → inc/bootstrap.zsh (colors, helpers)
   → lib/*.zsh (all helper functions)
   → inc/path.zsh (PATH configuration)
   → inc/locales.zsh (locale settings)
@@ -156,7 +181,56 @@ ZSH_SYS_INFO=0           # Show system info
 - `zfile_track_start()` - Start tracking a file
 - `zfile_track_end()` - End tracking and calculate time
 
-### 3. `inc/xdg.zsh` - XDG Base Directories
+### 3. `inc/zsh.zsh` - Core Zsh Configuration
+
+**Purpose:** Set core zsh configuration variables and load zsh modules.
+
+**Exports:**
+```zsh
+# Directory structure
+CONFDIR, ZDOTDIR, ZCACHEDIR, SHELL_SESSION_DIR
+ZINCDIR, ZLIBDIR, ZAPPDIR, ZFNCDIR
+
+# Debug/info flags
+ZSH_DEBUG, ZSH_ZFILE_DEBUG, ZSH_LOGIN_INFO, ZSH_SYS_INFO
+
+# Version
+ZSH_CONFIG_VERSION
+```
+
+**Zsh Modules Loaded:**
+- `zsh/complete` - Completion system
+- `zsh/datetime` - Date/time functions (EPOCHREALTIME)
+- `zsh/main` - Main module
+- `zsh/mathfunc` - Math functions
+- `zsh/net/tcp` - TCP socket support
+- `zsh/parameter` - Parameter manipulation
+- `zsh/regex` - Regex support
+- `zsh/stat` - File stat builtin
+- `zsh/system` - System interface
+- `zsh/terminfo` - Terminal info
+- `zsh/zle` - Zsh Line Editor
+- `zsh/zleparameter` - ZLE parameter access
+- `zsh/zselect` - Select system call
+- `zsh/zutil` - Utility builtins
+
+### 4. `inc/bootstrap.zsh` - Bootstrap Functions
+
+**Purpose:** Provide essential functions needed during initialization.
+
+**Exports:**
+- `is_debug()` - Check if debug mode enabled (ZSH_DEBUG=1 or DEBUG=1)
+- `source_zsh_dir()` - Source all .zsh files in directory
+
+**Usage:**
+```zsh
+source_zsh_dir "$ZAPPDIR"  # Load all app configs
+if is_debug; then
+    print "Debug mode active"
+fi
+```
+
+### 5. `inc/xdg.zsh` - XDG Base Directories
 
 **Purpose:** Set XDG Base Directory Specification variables.
 
@@ -172,45 +246,120 @@ XDG_RUNTIME_DIR=$HOME/.xdg
 XDG_DESKTOP_DIR, XDG_DOCUMENTS_DIR, XDG_DOWNLOAD_DIR, etc.
 ```
 
-### 4. `inc/variables.zsh` - Environment Variables
+### 6. `inc/folders.zsh` - User Folder Paths
+
+**Purpose:** Set user folder path variables.
+
+**Exports:**
+```zsh
+TMP, TEMP, TEMPDIR, TMPDIR  # Temporary directories
+BINDIR                      # ~/bin
+LIBDIR                      # ~/lib
+DLDIR                       # ~/Downloads
+DOCDIR                      # ~/Documents
+CACHEDIR                    # ~/.cache
+VENVDIR                     # ~/.venv
+```
+
+### 7. `inc/variables.zsh` - Environment Variables
 
 **Purpose:** Set general environment variables.
 
-**Key Exports:**
+**Exports:**
 ```zsh
-# History
-HISTFILE, HISTSIZE, SAVEHIST
-
-# Folders
-TMP, BINDIR, LIBDIR, DLDIR, DOCDIR, CACHEDIR, VENVDIR
-
 # Editors
 EDITOR='nvim', VISUAL='code', PAGER='less'
 
-# Prompt fallback
-PS1="[%F{cyan}%n%f@%F{green}%m%f:%F{yellow}%~%f]$ "
+# Logging (for custom scripts)
+LOG_SHOW_ICONS=1   # Show icons in log output
+LOG_COLOR_TEXTS=1  # Colorize log text
+LOG_EMOJI_ICONS=0  # Use emoji (0) or text (1) icons
 ```
 
-### 5. `inc/bootstrap.zsh` - Core Functions
+### 8. `inc/colors.zsh` - ANSI Color Codes
 
-**Purpose:** Provide essential functions needed during initialization.
+**Purpose:** Define ANSI color code variables for terminal output.
 
 **Exports:**
-- ANSI color codes (interactive only): `$r`, `$g`, `$y`, `$b`, `$p`, `$c`, `$w`, `$x` (reset)
-- Bright variants: `$br`, `$bg`, `$by`, `$bb`, `$bp`, `$bc`, `$bw`
-- `is_debug()` - Check if debug mode enabled
-- `source_zsh_dir()` - Source all .zsh files in directory
-- `source_time()` - Print source time for file
+```zsh
+# Basic colors
+r, g, y, b, p, c, w  # red, green, yellow, blue, purple, cyan, white
+
+# Bright colors
+br, bg, by, bb, bp, bc, bw
+
+# Reset
+x  # Reset to default
+```
 
 **Usage:**
 ```zsh
-source_zsh_dir "$ZAPPDIR"  # Load all app configs
-if is_debug; then
-    print "Debug mode active"
-fi
+print "${g}Success${x}"  # Green text
+print "${r}Error${x}"    # Red text
 ```
 
-### 6. `inc/path.zsh` - PATH Configuration
+### 9. `inc/icons.zsh` - Icon/Glyph Exports
+
+**Purpose:** Define icon/glyph variables for consistent visual output.
+
+**Exports:**
+```zsh
+ICO_BELL   # 🔔
+ICO_DEBUG  # 👉
+ICO_ERROR  # ⛔
+ICO_INFO   # 👍
+ICO_MSG    # 💬
+ICO_OK     # ✅
+ICO_UL     # •
+ICO_WARN   # ⚠️
+```
+
+### 10. `inc/editors.zsh` - Editor Configuration
+
+**Purpose:** Set editor and pager variables.
+
+**Exports:**
+```zsh
+EDITOR='nvim'
+VISUAL='code'
+PAGER='less'
+```
+
+**Note:** Variables are exported unconditionally for performance. If the tool is missing, commands using it will error, which is expected behavior.
+
+### 11. `inc/history.zsh` - History Configuration
+
+**Purpose:** Configure command history settings and options.
+
+**Exports:**
+```zsh
+HISTFILE=$ZDOTDIR/.zsh_history
+HISTSIZE=1000
+SAVEHIST=1000
+```
+
+**Options Set:**
+- `append_history` - Append to history file
+- `extended_history` - Save timestamps
+- `hist_expire_dups_first` - Delete duplicates first when HISTSIZE exceeded
+- `hist_ignore_dups` - Ignore consecutive duplicates
+- `hist_ignore_all_dups` - Delete old entry if new is duplicate
+- `hist_find_no_dups` - Don't display previously found lines
+- `hist_ignore_space` - Don't record lines starting with space
+- `hist_save_no_dups` - Don't write duplicates to history file
+- `hist_verify` - Show command before running history expansion
+- `share_history` - Share history between all sessions
+
+### 12. `inc/prompt.zsh` - Fallback Prompt
+
+**Purpose:** Set fallback prompt (will be overridden by Oh My Posh if configured).
+
+**Exports:**
+```zsh
+PS1="[%F{cyan}%n%f@%F{green}%m%f:%F{yellow}%~%f]$ "
+```
+
+### 13. `inc/path.zsh` - PATH Configuration
 
 **Purpose:** Build PATH with platform-specific directories.
 
@@ -220,7 +369,7 @@ fi
 - Linux-specific: linuxbrew paths, `/snap/bin`
 - Removes duplicates and non-existent directories
 
-### 7. `inc/hashdirs.zsh` - Named Directories
+### 14. `inc/hashdirs.zsh` - Named Directories
 
 **Purpose:** Create directory shortcuts using zsh hash feature.
 
@@ -233,7 +382,7 @@ hash -d zsh=$ZDOTDIR
 # Usage: cd ~zsh, ls ~gh
 ```
 
-### 8. `inc/aliases.zsh` - Aliases
+### 15. `inc/aliases.zsh` - Aliases
 
 **Purpose:** Define command aliases with dependency checks.
 
@@ -242,7 +391,7 @@ hash -d zsh=$ZDOTDIR
 - Common aliases: `cls`, `reload`, `myip`, `ds`
 - Application-specific (only if installed): bat, brew, eza, git, nvim, zoxide, etc.
 
-### 9. `inc/locales.zsh` - Locale Settings
+### 16. `inc/locales.zsh` - Locale Settings
 
 **Purpose:** Configure language and locale settings.
 
@@ -251,7 +400,7 @@ hash -d zsh=$ZDOTDIR
 - Polish locale for formatting (`LC_*=pl_PL.UTF-8`)
 - Auto-generation of locales on Debian-based systems
 
-### 10. `lib/` - Helper Library
+### 17. `lib/` - Helper Library
 
 **Purpose:** Fast, frequently-used utility functions loaded in `.zshenv`.
 
@@ -302,11 +451,11 @@ is_installed CMD... # True if all commands exist
 try_source FILE [CALLER] # Source file with error handling
 ```
 
-### 11. `apps/` - Application Integrations
+### 18. `apps/` - Application Integrations
 
 **Purpose:** Configure external tools and applications. Loaded last in `.zshrc`.
 
-**Naming Convention:** 
+**Naming Convention:**
 - `apps/{tool}.zsh` - regular app config
 - `apps/_{tool}.zsh` - prefixed with `_` to load first (alphabetical order)
 
@@ -343,7 +492,7 @@ fi
 zfile_track_end ${0:A}
 ```
 
-### 12. `functions/` - Autoloaded Functions
+### 19. `functions/` - Autoloaded Functions
 
 **Purpose:** Complex user functions that are autoloaded on demand.
 
@@ -356,15 +505,20 @@ zfile_track_end ${0:A}
 | `logininfo` | Display login information |
 | `sysinfo` | Display system information |
 | `uptimeh` | Get uptime in human format |
-| `zfiles` | Show loaded files report |
+| `zfiles` | Show loaded files report (supports -b flag for bar visualization) |
 
-### 13. `.zshrc` - Interactive Shell
+### 20. `.zshrc` - Interactive Shell
 
 **Purpose:** Set up interactive shell features.
 
 **Flow:**
 ```
 .zshrc
+  → inc/history.zsh (history configuration)
+  → inc/colors.zsh (color codes)
+  → inc/icons.zsh (icons/glyphs)
+  → inc/prompt.zsh (fallback prompt)
+  → inc/editors.zsh (editor variables)
   → autoload zmv, colors
   → autoload functions/*
   → inc/aliases.zsh
@@ -372,7 +526,7 @@ zfile_track_end ${0:A}
   → inc/hashdirs.zsh
 ```
 
-### 14. `.zlogin` - Post-Login
+### 21. `.zlogin` - Post-Login
 
 **Purpose:** Actions after login shell initialization.
 
@@ -412,7 +566,7 @@ zfile_track_end ${0:A}
 **Environment Variables:**
 - Uppercase
 - Descriptive
-- Examples: `ZDOTDIR`, `HOMEBREW_PREFIX`, `OMP_THEME`
+- Examples: `ZDOTDIR`, `ZINCDIR`, `HOMEBREW_PREFIX`, `OMP_THEME`
 
 **Local Variables:**
 - Lowercase
@@ -420,9 +574,14 @@ zfile_track_end ${0:A}
 - Examples: `filepath`, `file_name`, `start_time`
 
 **Color Variables:**
-- Single letter for basic colors: `r`, `g`, `y`, `b`, `p`, `c`, `w`, `x`
-- Prefix `b` for bright: `br`, `bg`, `by`, etc.
+- Single letter for basic colors: `r`, `g`, `y`, `b`, `p`, `c`, `w`
+- Prefix `b` for bright: `br`, `bg`, `by`, `bb`, `bp`, `bc`, `bw`
 - Reset: `x`
+
+**Icon Variables:**
+- Prefix: `ICO_`
+- Uppercase
+- Examples: `ICO_OK`, `ICO_ERROR`, `ICO_WARN`
 
 ### File Names
 
@@ -433,7 +592,7 @@ zfile_track_end ${0:A}
 - Examples: `brew.zsh`, `fzf.zsh`, `_omz.zsh`
 
 **Include Files:** `{purpose}.zsh`
-- Examples: `bootstrap.zsh`, `path.zsh`, `aliases.zsh`
+- Examples: `zsh.zsh`, `bootstrap.zsh`, `colors.zsh`, `folders.zsh`, `history.zsh`, `path.zsh`, `aliases.zsh`
 
 **Functions:** No extension, lowercase
 - Examples: `sysinfo`, `logininfo`, `zfiles`
@@ -499,26 +658,42 @@ zfile_track_end "$ZDOTDIR/.zshrc"
 Use `zfiles` function to see full report:
 ```zsh
 ❯ zfiles
+   err file                     time     dir
+ 1. ✓ .zshenv               12.45 ms  zsh
+ 2. ✓   zfiles.zsh           0.23 ms  inc
+ 3. ✓   zsh.zsh              1.12 ms  inc
+ 4. ✓   bootstrap.zsh        0.34 ms  inc
+ 5. ✓   xdg.zsh              0.45 ms  inc
+ 6. ✓   folders.zsh          0.21 ms  inc
+ 7. ✓   variables.zsh        0.32 ms  inc
+ 8. ✓   files.zsh            0.67 ms  lib
+ 9. ✓   system.zsh           1.23 ms  lib
+10. ✓   strings.zsh          0.45 ms  lib
+11. ✓   shell.zsh            0.34 ms  lib
+12. ✓   varia.zsh            0.78 ms  lib
+13. ✓   path.zsh             0.56 ms  inc
+14. ✓   locales.zsh          0.89 ms  inc
+15. ✓ .zshrc                 8.91 ms  zsh
+16. ✓   history.zsh          0.43 ms  inc
+17. ✓   colors.zsh           0.19 ms  inc
+18. ✓   icons.zsh            0.15 ms  inc
+19. ✓   prompt.zsh           0.11 ms  inc
+20. ✓   editors.zsh          0.13 ms  inc
+21. ✓   aliases.zsh          2.45 ms  inc
+22. ✓   brew.zsh             3.21 ms  apps
+23. ✓   omp.zsh             45.67 ms  apps
+24. ✓   hashdirs.zsh         0.12 ms  inc
+                            80.39 ms  total
+```
+
+**With bar visualization (`zfiles -b`):**
+```zsh
+❯ zfiles -b
 Zsh Shell Configuration Load Time Report
-=========================================
- 1. ✓ .zshenv              12.45 ms
- 2. ✓   xdg.zsh             0.45 ms  inc
- 3. ✓   variables.zsh       0.32 ms  inc
- 4. ✓   bootstrap.zsh       1.89 ms  inc
- 5. ✓   files.zsh           0.67 ms  lib
- 6. ✓   system.zsh          1.23 ms  lib
- 7. ✓   strings.zsh         0.45 ms  lib
- 8. ✓   shell.zsh           0.34 ms  lib
- 9. ✓   varia.zsh           0.78 ms  lib
-10. ✓   path.zsh            0.56 ms  inc
-11. ✓   locales.zsh         0.89 ms  inc
-12. ✓ .zshrc                8.91 ms
-13. ✓   aliases.zsh         2.45 ms  inc
-14. ✓   brew.zsh            3.21 ms  apps
-15. ✓   omp.zsh            45.67 ms  apps
-16. ✓   hashdirs.zsh        0.12 ms  inc
-------------------------------------------
-Total loading time:        80.39 ms
+ 1. ✓ .zshenv               12.45 ms  zsh   ┝━━
+ 2. ✓   zfiles.zsh           0.23 ms  inc   │
+ 3. ✓   zsh.zsh              1.12 ms  inc   ┝━
+...
 ```
 
 **Color coding:**
@@ -665,21 +840,37 @@ Total loading time:        80.39 ms
 
 ### Adding New Include File
 
-1. **Create file:** `inc/{purpose}.zsh`
+1. **Choose appropriate category:**
+   - Core config → `inc/zsh.zsh`
+   - Colors → `inc/colors.zsh`
+   - Icons → `inc/icons.zsh`
+   - User folders → `inc/folders.zsh`
+   - History → `inc/history.zsh`
+   - Editors → `inc/editors.zsh`
+   - General env vars → `inc/variables.zsh`
+   - New category → create new `inc/{purpose}.zsh`
 
-2. **Add tracking:**
+2. **Create file:** `inc/{purpose}.zsh`
+
+3. **Add tracking:**
    ```zsh
    #!/bin/zsh
    # Shell files tracking - keep at the top
    zfile_track_start ${0:A}
-   
+
    # Content here
-   
+
    # shell files tracking - keep at the end
    zfile_track_end ${0:A}
    ```
 
-3. **Source it** in appropriate location (`.zshenv` or `.zshrc`)
+4. **Source it** in appropriate location (`.zshenv` or `.zshrc`)
+
+**Note:** The configuration follows a separation of concerns principle:
+- Each file handles a single responsibility
+- Related variables are grouped together
+- Files are kept small and focused
+- This makes it easier to find, modify, and maintain configuration
 
 ### Performance Optimization
 
@@ -714,7 +905,8 @@ Total loading time:        80.39 ms
 
 1. **Enable debug mode:**
    ```zsh
-   export ZSH_DEBUG=1
+   export ZSH_DEBUG=1         # Enable general debug output
+   export ZSH_ZFILE_DEBUG=1   # Enable file tracking debug messages
    source ~/.zshenv
    ```
 
@@ -957,6 +1149,9 @@ print $ZSH_CONFIG_VERSION
 # Show all loaded files
 zfiles
 
+# Show all loaded files with bar visualization
+zfiles -b
+
 # Show system info
 sysinfo
 
@@ -966,11 +1161,14 @@ logininfo
 # Debug mode
 ZSH_DEBUG=1 zsh -lic "exit"
 
+# File tracking debug mode
+ZSH_ZFILE_DEBUG=1 zsh -lic "exit"
+
 # Measure startup
 time zsh -lic "exit"
 ```
 
 ---
 
-*Last updated: 2026-01-06*
-*Configuration version: 20260106v1*
+*Last updated: 2026-01-12*
+*Configuration version: 20260111v3*
