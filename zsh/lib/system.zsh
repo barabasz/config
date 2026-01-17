@@ -190,32 +190,18 @@ os_icon() {
 # Usage: get_uptime
 # Returns: "2 days 4h 15m" using format_duration
 get_uptime() {
-    if is_macos; then
-        uptime | sed 's/.*up \([^,]*\), .*/up \1/'
-    elif is_linux; then
-        uptime -p 2>/dev/null || uptime | sed 's/.*up \([^,]*\), .*/up \1/'
-    fi
-}
-
-get_uptime() {
     local uptime_sec boot_time
-
     if is_macos; then
-        # Extract boot time from sysctl output: "kern.boottime: { sec = 1704556800, usec = 0 }"
-        # (w)4 extracts the 4th word (timestamp), //, removes the comma
         boot_time=${$(sysctl -n kern.boottime)[(w)4]//,}
         uptime_sec=$(( EPOCHSECONDS - boot_time ))
     elif [[ -r /proc/uptime ]]; then
-        # Linux /proc/uptime: "34234.34 234234.34"
         read uptime_sec _ < /proc/uptime
-        # Remove decimals to get integer seconds
         uptime_sec=${uptime_sec%.*}
     else
-        # Fallback to standard uptime command parsing if methods above fail
+        # Fallback to standard uptime command
         uptime | sed 's/.*up \([^,]*\), .*/up \1/'
         return 0
     fi
-
     # Use helper from date.zsh if available
     if (( ${+functions[format_duration]} )); then
         format_duration "$uptime_sec"
