@@ -1,0 +1,75 @@
+# Execute command with animated spinner
+# Usage: execs MESSAGE COMMAND [ARGS...]
+#   MESSAGE: Text to display during execution
+#   COMMAND: Command to execute with optional arguments
+#
+# Example:
+#   execs "Downloading..." curl -O https://example.com/file.zip
+#   if [[ $? -eq 0 ]]; then prints "Done."; else printe "Failed."; fi
+#
+# Return codes:
+#   Returns the exit code of the executed command
+
+execs() {
+    # Suppress job control messages
+    setopt LOCAL_OPTIONS NO_MONITOR NO_NOTIFY
+
+    # Spinner frames (Braille pattern animation)
+    local frames=('⠋' '⠙' '⠹' '⠸' '⠼' '⠴' '⠦' '⠧' '⠇' '⠏')
+    local delay=0.08
+
+    # Validate arguments
+    if [[ $# -lt 2 ]]; then
+        if (( ${+functions[printe]} )); then
+            printe "Usage: execs MESSAGE COMMAND [ARGS...]"
+        else
+            print -u2 "Usage: execs MESSAGE COMMAND [ARGS...]"
+        fi
+        return 1
+    fi
+
+    # Parse arguments
+    local message="$1"
+    shift
+
+    # Create temporary file for capturing stdout
+    local tmpfile=${TMPDIR:-/tmp}/execs.$$.$RANDOM
+
+    # Execute command in background, capturing stdout
+    "$@" > "$tmpfile" &
+    local pid=$!
+    
+    # Hide cursor for clean animation
+    tput civis 2>/dev/null
+    
+    # Animate spinner while process is running
+    while kill -0 $pid 2>/dev/null; do
+        for frame in "${frames[@]}"; do
+            printf "\r\033[K${y}${frame}${x} ${message}"
+            sleep $delay
+            # Break early if process finished during frame animation
+            kill -0 $pid 2>/dev/null || break
+        done
+    done
+    
+    # Wait for process completion and capture exit code
+    wait $pid
+    local exit_code=$?
+    
+    # Clear the spinner line
+    printf "\r\033[K"
+
+    # Restore cursor visibility
+    tput cnorm 2>/dev/null
+
+    # Display captured output
+    [[ -s "$tmpfile" ]] && cat "$tmpfile"
+
+    # Cleanup
+    rm -f "$tmpfile"
+
+    return $exit_code
+}
+
+# Execute function
+execs "$@"

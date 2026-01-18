@@ -29,6 +29,25 @@ This is a modular, performance-optimized zsh configuration focused on maintainab
 
 ---
 
+## Instructions for Claude
+
+When working on changes to this zsh configuration:
+
+1. **Before adding or modifying functions**, always read:
+   - `lib/*.zsh` - to see existing helper functions
+   - `functions/*` - to see existing autoloaded functions
+
+   This prevents duplicating existing functionality and ensures consistency with established patterns.
+
+2. **Before modifying app integrations**, read:
+   - `apps/*.zsh` - to understand existing configurations
+
+3. **For any changes**, familiarize yourself with:
+   - The naming conventions (see [Naming Conventions](#naming-conventions))
+   - The file tracking pattern (see [File Tracking System](#file-tracking-system))
+
+---
+
 ## Philosophy & Principles
 
 ### Core Values

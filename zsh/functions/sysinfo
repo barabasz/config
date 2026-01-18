@@ -5,15 +5,10 @@
 local os=$(os_name)
 local icon=$(os_icon)
 local shell_v=$(shell_ver)
-local arch=$(get_arch)        # Zastępuje: uname -m
-local uptime=$(get_uptime)    # Zastępuje: uptimeh (to naprawia Twój błąd)
+local arch=$(get_arch)
+local uptime=$(get_uptime)
 local version=$(os_version)
 local codename=$(os_codename)
 
-# Zmienna 'kernel' była w oryginale nieużywana w printf, więc ją usunąłem.
-# Jeśli jej potrzebujesz, odkomentuj:
-# local kernel=$(get_kernel_version)
-
-# Wyświetlanie (zachowuje format jednej długiej linii z oryginału)
 print -n -- "This is ${icon} ${y}${os}${x} ${version} (${codename}) "
 print -- "with ${y}zsh${x} ${shell_v} running on ${y}${arch}${x} for ${c}${uptime}${x}"
