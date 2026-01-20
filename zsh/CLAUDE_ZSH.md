@@ -20,13 +20,30 @@ ARGC                   # number of arguments (not $#)
 argv                   # array of arguments (not $@ or $*)
 argv[1]                # first argument (not $1)
 argv[-1]               # last argument
+status                 # exit code of last command (not $?)
 
 # ❌ Bad - POSIX/bash style
 $#                     # use ARGC instead
 $@, $*                 # use argv instead
+$?                     # use status instead
 ```
 
 **Note:** `$1`, `$2` etc. are acceptable when clearer (e.g., in simple 2-3 arg functions), but `ARGC` is always preferred over `$#`.
+
+**Elegant arithmetic with `status`:** Inside `(( ))`, variables don't need `$` prefix, making exit code checks particularly clean:
+
+```zsh
+# ✅ Elegant - no $ needed in (( ))
+command
+if (( status != 0 )); then
+    print -u2 "Command failed with exit code $status"
+fi
+
+# Also valid but less elegant
+if (( $? != 0 )); then
+    print -u2 "Failed"
+fi
+```
 
 ---
 
@@ -78,7 +95,7 @@ Use `[[ ]]` **only** for string and file tests:
 # ❌ WRONG - bashisms, never use these
 [[ $# -lt 2 ]]         # use: (( ARGC < 2 ))
 [[ $count -gt 0 ]]     # use: (( count > 0 ))
-[[ $? -eq 0 ]]         # use: (( $? == 0 ))
+[[ $? -eq 0 ]]         # use: (( status == 0 ))
 [[ $x -ne $y ]]        # use: (( x != y ))
 [[ $a -le $b ]]        # use: (( a <= b ))
 [[ $a -ge $b ]]        # use: (( a >= b ))
@@ -364,6 +381,7 @@ is_file() {
 ### Don'ts ❌
 
 - **Never** use `$#` for argument count (use `ARGC`)
+- **Never** use `$?` for exit status (use `status`)
 - **Never** use `-lt`, `-gt`, `-eq`, `-ne`, `-le`, `-ge`
 - **Never** use `[ ]` (use `[[ ]]`)
 - **Never** use `echo` (use `print`)
