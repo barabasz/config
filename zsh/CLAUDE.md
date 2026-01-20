@@ -46,6 +46,8 @@ When working on changes to this zsh configuration:
    - The naming conventions (see [Naming Conventions](#naming-conventions))
    - The file tracking pattern (see [File Tracking System](#file-tracking-system))
 
+4. **For coding style**, follow the zsh idioms in **[CLAUDE_ZSH.md](CLAUDE_ZSH.md)** - this is critical for writing proper zsh code (not bash)
+
 ---
 
 ## Philosophy & Principles
@@ -739,39 +741,9 @@ Zsh Shell Configuration Load Time Report
    - Info: `*_name`, `*_version` → print string
    - Actions: `get_*`, `try_*`
 
-3. **Write zsh-native code:**
-   ```zsh
-   # Good - zsh native
-   is_file() {
-       [[ $# -eq 1 && -f "$1" ]]
-   }
-   
-   # Bad - bash-compatible
-   is_file() {
-       if [ $# -eq 1 ] && [ -f "$1" ]; then
-           return 0
-       else
-           return 1
-       fi
-   }
-   ```
+3. **Follow zsh coding style** - see [CLAUDE_ZSH.md](CLAUDE_ZSH.md)
 
-4. **Use zsh features:**
-   - `[[ ]]` instead of `[ ]`
-   - `print` instead of `echo`
-   - `(( ))` for arithmetic
-   - Parameter expansion
-   - Pattern matching
-
-5. **Keep functions small and focused:**
-   ```zsh
-   # Good - single responsibility
-   is_macos() {
-       [[ $OSTYPE == darwin* ]]
-   }
-   ```
-
-6. **Add tracking:**
+4. **Add tracking:**
    ```zsh
    #!/bin/zsh
    # Shell files tracking - keep at the top
@@ -783,7 +755,7 @@ Zsh Shell Configuration Load Time Report
    zfile_track_end ${0:A}
    ```
 
-7. **Test thoroughly:**
+5. **Test thoroughly:**
    ```zsh
    is_file /etc/hosts     # should return 0
    is_file /etc           # should return 1
@@ -1033,22 +1005,17 @@ fi
 
 - **Always** use tracking in sourced files
 - **Always** check installation before configuring
-- **Always** use zsh-native syntax
+- **Always** follow zsh coding style (see [CLAUDE_ZSH.md](CLAUDE_ZSH.md))
 - **Always** test functions before committing
 - Use `is_installed` before configuring tools
 - Use `is_debug` for conditional logging
 - Use named directories (`~zsh`, `~gh`, etc.)
 - Keep functions small and focused
-- Document complex logic
-- Use meaningful variable names
 - Prefer builtins over external commands
 - Use lazy loading for slow tools
 
 ### Don'ts ❌
 
-- **Never** write bash-compatible code
-- **Never** use `echo` (use `print`)
-- **Never** use `[ ]` (use `[[ ]]`)
 - **Never** skip tracking in sourced files
 - **Never** assume tools are installed
 - Don't use global variables in functions unnecessarily
@@ -1056,34 +1023,7 @@ fi
 - Don't put heavy operations in `.zshenv`
 - Don't use subshells when not needed
 
-### Code Style Checklist
-
-```zsh
-#!/bin/zsh
-# ✅ Shebang present
-# ✅ Tracking calls at top and bottom
-zfile_track_start ${0:A}
-
-# ✅ Check tool availability
-if is_installed tool; then
-    
-    # ✅ Use zsh constructs
-    [[ -f $file ]] && source "$file"
-    
-    # ✅ Use print for output
-    print "Message"
-    
-    # ✅ Use (( )) for arithmetic
-    (( count++ ))
-    
-    # ✅ Local variables in functions
-    local var="value"
-    
-fi
-
-# ✅ Tracking at end
-zfile_track_end ${0:A}
-```
+*For zsh coding do's and don'ts, see [CLAUDE_ZSH.md](CLAUDE_ZSH.md)*
 
 ---
 
@@ -1189,5 +1129,5 @@ time zsh -lic "exit"
 
 ---
 
-*Last updated: 2026-01-12*
+*Last updated: 2026-01-20*
 *Configuration version: 20260111v3*

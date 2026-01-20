@@ -1,7 +1,7 @@
 # Execute command with animated spinner
-# Usage: execs MESSAGE COMMAND [ARGS...]
-#   MESSAGE: Text to display during execution
-#   COMMAND: Command to execute with optional arguments
+# Usage: execs "Message text" <command> [args...]
+#   "Message text": Text to display during execution
+#   <command>: Command to execute with optional arguments
 #
 # Example:
 #   execs "Downloading..." curl -O https://example.com/file.zip
@@ -14,17 +14,19 @@ execs() {
     # Suppress job control messages
     setopt LOCAL_OPTIONS NO_MONITOR NO_NOTIFY
 
-    # Spinner frames (Braille pattern animation)
-    local frames=('⠋' '⠙' '⠹' '⠸' '⠼' '⠴' '⠦' '⠧' '⠇' '⠏')
+    # Spinner frames
+    # local frames=('🌑' '🌒' '🌓' '🌔' '🌕' '🌖' '🌗' '🌘')
+    # local frames=('⠋' '⠙' '⠹' '⠸' '⠼' '⠴' '⠦' '⠧' '⠇' '⠏')
+	# local frames=('✶' '✸' '✹' '✺' '✹' '✷')
+    # local frames=('⣷' '⣯' '⣟' '⡿' '⢿' '⣻' '⣽' '⣾')
+    # local frames=('⠁' '⠂' '⠄' '⡀' '⢀' '⠠' '⠐' '⠈')
+    # local frames=('▰▰▰▱▱▱' '▱▰▰▱▱▱' '▱▱▰▰▱▱' '▱▱▱▰▰▱' '▱▱▱▱▰▰' '▰▱▱▱▰▰' '▰▰▱▱▱▰')
+    local frames=('▰▰▰▰▱▱▱' '▱▰▰▰▰▱▱' '▱▱▰▰▰▰▱' '▱▱▱▰▰▰▰' '▰▱▱▱▰▰▰' '▰▰▱▱▱▰▰' '▰▰▰▱▱▱▰')
     local delay=0.08
 
     # Validate arguments
-    if [[ $# -lt 2 ]]; then
-        if (( ${+functions[printe]} )); then
-            printe "Usage: execs MESSAGE COMMAND [ARGS...]"
-        else
-            print -u2 "Usage: execs MESSAGE COMMAND [ARGS...]"
-        fi
+    if (( ARGC < 2 )); then
+        printe 'execs "Message text" <command> [args...]'
         return 1
     fi
 
@@ -45,7 +47,7 @@ execs() {
     # Animate spinner while process is running
     while kill -0 $pid 2>/dev/null; do
         for frame in "${frames[@]}"; do
-            printf "\r\033[K${y}${frame}${x} ${message}"
+            printf "\r\033[K${by}${frame}${x} ${message}"
             sleep $delay
             # Break early if process finished during frame animation
             kill -0 $pid 2>/dev/null || break
