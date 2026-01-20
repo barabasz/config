@@ -14,25 +14,14 @@ execs() {
     # Suppress job control messages
     setopt LOCAL_OPTIONS NO_MONITOR NO_NOTIFY
 
-    # Spinner frames
-    # local frames=('🌑' '🌒' '🌓' '🌔' '🌕' '🌖' '🌗' '🌘')
-    # local frames=('⠋' '⠙' '⠹' '⠸' '⠼' '⠴' '⠦' '⠧' '⠇' '⠏')
-	# local frames=('✶' '✸' '✹' '✺' '✹' '✷')
-    # local frames=('⣷' '⣯' '⣟' '⡿' '⢿' '⣻' '⣽' '⣾')
-    # local frames=('⠁' '⠂' '⠄' '⡀' '⢀' '⠠' '⠐' '⠈')
-    # local frames=('▰▰▰▱▱▱' '▱▰▰▱▱▱' '▱▱▰▰▱▱' '▱▱▱▰▰▱' '▱▱▱▱▰▰' '▰▱▱▱▰▰' '▰▰▱▱▱▰')
-    local frames=('▰▰▰▰▱▱▱' '▱▰▰▰▰▱▱' '▱▱▰▰▰▰▱' '▱▱▱▰▰▰▰' '▰▱▱▱▰▰▰' '▰▰▱▱▱▰▰' '▰▰▰▱▱▱▰')
-    local delay=0.08
-
-    # Validate arguments
-    if (( ARGC < 2 )); then
-        printe 'execs "Message text" <command> [args...]'
-        return 1
-    fi
+    local -a frames=( "${(@)EXECS_SPINNER_FRAMES:-${(@s: :):-| / - \\}}" )
+    local delay=${EXECS_SPINNER_DELAY:-0.16}
+    local usage="${0:t} \"Message text\" <command> [args...]"
 
     # Parse arguments
-    local message="$1"
-    shift
+    (( ARGC < 2 )) && printe "$usage" && return 1
+    local message="$1" && shift
+    [[ -z "$message" ]] && message="Processing..."
 
     # Create temporary file for capturing stdout
     local tmpfile=${TMPDIR:-/tmp}/execs.$$.$RANDOM
