@@ -1,0 +1,125 @@
+# mdig - Multi-DNS query tool
+# Query multiple DNS servers and display results in a table
+#
+# Usage: mdig <domain>
+#
+# Example:
+#   mdig example.com
+#   mdig google.com
+#
+# Environment:
+#   MDIG_SERVERS - associative array to override default DNS servers
+#
+# Return codes:
+#   0 - success
+#   1 - invalid arguments or dig not found
+
+# DNS servers configuration (name=ip)
+local -A dns_servers
+if (( ${+MDIG_SERVERS} )); then
+    dns_servers=( "${(@kv)MDIG_SERVERS}" )
+else
+    dns_servers=(
+        CloudFlare  1.1.1.1
+        Comodo      8.26.56.26
+        # DNS0EU      193.110.81.0
+        DNS4EU      86.54.11.100
+        Google      8.8.8.8
+        NextDNS     45.90.28.141
+        OpenDNS     208.67.222.222
+        Orange      194.204.152.34
+        Pi-hole     192.168.1.101
+        Play        193.47.158.254
+        Quad9       9.9.9.9
+        Unbound     192.168.1.100
+    )
+fi
+
+# Time thresholds for color coding (ms)
+local -ri time_green=30
+local -ri time_yellow=60
+
+# Validate arguments
+if (( ARGC != 1 )); then
+    print -u2 "Usage: mdig <domain>"
+    return 1
+fi
+
+local domain=$1
+
+# Check if dig is available
+if ! whence dig >/dev/null 2>&1; then
+    printe "dig not found in PATH"
+    return 1
+fi
+
+# Hide cursor for cleaner output
+tput civis 2>/dev/null
+
+# Collect results with progress feedback
+local name ip output time_ms answer
+local -a results
+local -i total=${#dns_servers}
+local -i current=0
+
+for name ip in ${(kv)dns_servers}; do
+    (( current++ ))
+    printf "\r\033[K${by}⏳${x} Querying ${b}%s${x} (%d/%d)..." "$name" "$current" "$total"
+
+    output=$(dig @$ip $domain +noall +answer +stats +time=2 +tries=1 2>/dev/null)
+
+    # Extract query time using zsh pattern matching
+    if [[ $output =~ 'Query time: ([0-9]+)' ]]; then
+        time_ms=$match[1]
+    else
+        time_ms=9999
+    fi
+
+    # Extract first A record
+    answer=${${(M)${(f)output}:#*[[:space:]]A[[:space:]]*}##*[[:space:]]}
+    [[ -z $answer ]] && answer="(no A record)"
+
+    # Store: "time_ms:name:ip:answer"
+    results+=("${time_ms}:${name}:${ip}:${answer}")
+done
+
+# Clear progress line
+printf "\r\033[K"
+
+# Restore cursor
+tput cnorm 2>/dev/null
+
+# Header
+printf "${b}%-28s %-14s %s${x}\n" "DNS" "Time (ms)" "Answer"
+# Sort numerically by time and print
+local line tc sort_time
+for line in ${(n)results}; do
+    sort_time=${line%%:*}
+    line=${line#*:}
+    name=${line%%:*}
+    line=${line#*:}
+    ip=${line%%:*}
+    answer=${line#*:}
+
+    # Color based on response time
+    if (( sort_time < time_green )); then
+        tc=$g
+    elif (( sort_time < time_yellow )); then
+        tc=$y
+    elif (( sort_time < 9999 )); then
+        tc=$r
+    else
+        tc=$x
+    fi
+
+    # Display timeout as "--"
+    [[ $sort_time == 9999 ]] && sort_time="--"
+
+    # Build first column with manual padding (ANSI codes break printf width)
+    local col1="$name (${c}$ip${x})"
+    local -i visible_len=${#:-$name ($ip)}
+    local -i pad_len=$((28 - visible_len))
+    (( pad_len > 0 )) && col1+="${(l:pad_len:: :)}"
+
+    printf "%s ${tc}%-14s${x} %s\n" "$col1" "$sort_time" "$answer"
+done

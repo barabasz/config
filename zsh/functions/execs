@@ -23,11 +23,17 @@ execs() {
     local message="$1" && shift
     [[ -z "$message" ]] && message="Processing..."
 
+    # Check if command exists (commands, functions, aliases, builtins)
+    if ! whence "$1" >/dev/null 2>&1; then
+        printe "Command not found: $1"
+        return 127
+    fi
+
     # Create temporary file for capturing stdout
     local tmpfile=${TMPDIR:-/tmp}/execs.$$.$RANDOM
 
     # Execute command in background, capturing stdout
-    "$@" > "$tmpfile" &
+    "$@" > "$tmpfile" 2>&1 &
     local pid=$!
     
     # Hide cursor for clean animation

@@ -384,6 +384,25 @@ get_day_of_year() {
     print -- $(( val ))
 }
 
+# Format seconds (with sub-second precision) into human readable time
+# Usage: format_time 0.0005    → "500 μs"
+#        format_time 0.125     → "125.0 ms"
+#        format_time 2.5       → "2.50 s"
+# Input: seconds as float (e.g., from curl timing or EPOCHREALTIME diff)
+# Returns: formatted string with appropriate unit (μs, ms, s)
+format_time() {
+    (( ARGC == 1 )) || return 1
+    local -F val=$1
+
+    if (( val < 0.001 )); then
+        printf "%.0f μs" $(( val * 1000000 ))
+    elif (( val < 1 )); then
+        printf "%.1f ms" $(( val * 1000 ))
+    else
+        printf "%.2f s" $val
+    fi
+}
+
 # Format seconds into human readable duration
 # Usage: format_duration 3665
 # Returns: "1.0 h" or "1 day 2h 30m"

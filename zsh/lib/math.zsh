@@ -312,5 +312,29 @@ fibonacci() {
     print -- $b
 }
 
+# Format bytes into human readable size
+# Usage: format_bytes 1536      → "1.50 KiB"
+#        format_bytes 1048576   → "1.00 MiB"
+#        format_bytes 500       → "500 B"
+# Input: bytes (integer or float)
+# Returns: formatted string with appropriate unit (B, KiB, MiB, GiB, TiB)
+format_bytes() {
+    (( ARGC == 1 )) || return 1
+    local -F bytes=$1
+    local -a units=(B KiB MiB GiB TiB)
+    local -i i=1
+
+    while (( bytes >= 1024 && i < ${#units} )); do
+        (( bytes /= 1024.0 ))
+        (( i++ ))
+    done
+
+    if (( i == 1 )); then
+        printf "%.0f %s" $bytes $units[i]
+    else
+        printf "%.2f %s" $bytes $units[i]
+    fi
+}
+
 # shell files tracking - keep at the end
 zfile_track_end ${0:A}

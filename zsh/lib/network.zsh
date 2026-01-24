@@ -246,6 +246,66 @@ is_valid_ip() {
     return 1
 }
 
+# Check if URL is valid
+# Usage: is_url_valid "https://example.com/path?query=1"
+# Returns: 0 (true) or 1 (false)
+# Validates: scheme, host (domain or IP), optional port, path, query, fragment
+is_url_valid() {
+    (( ARGC == 1 )) || return 1
+    local url=$1
+
+    # URL regex pattern:
+    # ^(https?|ftp)://                     - scheme (http, https, ftp)
+    # ([a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}  - domain
+    # |((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}...        - or IPv4
+    # (:[0-9]{1,5})?                       - optional port
+    # (/[^\s]*)?$                          - optional path/query/fragment
+
+    local domain_pattern='([a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}'
+    local ipv4_pattern='((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)'
+    local port_pattern='(:[0-9]{1,5})?'
+    local path_pattern='(/[^[:space:]]*)?'
+
+    local full_pattern="^(https?|ftp)://(${domain_pattern}|${ipv4_pattern}|localhost)${port_pattern}${path_pattern}$"
+
+    [[ $url =~ $full_pattern ]]
+}
+
+# Check if email address is valid
+# Usage: is_email_valid "user@example.com"
+# Returns: 0 (true) or 1 (false)
+# Validates: local part, @ symbol, domain with TLD
+is_email_valid() {
+    (( ARGC == 1 )) || return 1
+    local email=$1
+
+    # Email regex pattern (RFC 5321 simplified):
+    # ^[a-zA-Z0-9._%+-]+     - local part (letters, digits, special chars)
+    # @                       - at symbol
+    # [a-zA-Z0-9.-]+         - domain (letters, digits, dots, hyphens)
+    # \.[a-zA-Z]{2,}$        - TLD (dot + 2+ letters)
+
+    local pattern='^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+
+    [[ $email =~ $pattern ]]
+}
+
+# Check if domain name is valid
+# Usage: is_domain_valid "example.com"
+# Returns: 0 (true) or 1 (false)
+is_domain_valid() {
+    (( ARGC == 1 )) || return 1
+    local domain=$1
+
+    # Domain pattern:
+    # - Labels separated by dots
+    # - Each label: starts/ends with alphanumeric, can contain hyphens
+    # - TLD: 2+ letters
+    local pattern='^([a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$'
+
+    [[ $domain =~ $pattern ]]
+}
+
 # Check if port is open
 # Usage: is_port_open "localhost" 80
 # Returns: 0 (true) if open, 1 (false) otherwise

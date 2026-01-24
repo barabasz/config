@@ -1,0 +1,490 @@
+# urlinfo - URL information tool (zsh port of PHP version)
+# Query URL and display detailed connection, SSL, and timing information
+#
+# Usage: urlinfo [options] URL
+#
+# Options:
+#   -b  show response body (only for unencoded text/plain content)
+#   -c  print verbose cURL info
+#   -f  ignore SSL certificate errors
+#   -H  print help and exit
+#   -h  print verbose response headers (without cookies and CSP)
+#   -i  print verbose ipinfo response
+#   -m  mute standard output (only show errors)
+#   -p  force plain text content response
+#   -t  show script execution time
+#   -v  print version and exit
+#
+# Environment:
+#   IPINFO_TOKEN - API token for ipinfo.io (optional)
+#
+# Example:
+#   urlinfo example.com
+#   urlinfo -t -b https://api.example.com/status
+#
+# Return codes:
+#   0 - success
+#   1 - invalid arguments, curl error, or invalid URL
+
+# --- Constants ---
+local -r VERSION="1.0.6-zsh"
+local -r USER_AGENT="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
+local -r DEFAULT_SCHEME="https"
+local -r DATE_FMT="%Y-%m-%d %H:%M %Z"
+
+# --- Helper Functions ---
+
+# Extract value from JSON (simple key-value)
+_urlinfo_json_val() {
+    local json=$1 key=$2
+    local val
+
+    if [[ $json =~ \"$key\"[[:space:]]*:[[:space:]]*\"([^\"]*)\" ]]; then
+        val=$match[1]
+    elif [[ $json =~ \"$key\"[[:space:]]*:[[:space:]]*([^,\}[:space:]]+) ]]; then
+        val=$match[1]
+    fi
+
+    print -r -- $val
+}
+
+# Get HTTP status text
+_urlinfo_status_text() {
+    local -i code=$1
+    case $code in
+        200) print "OK" ;;
+        201) print "Created" ;;
+        204) print "No Content" ;;
+        301) print "Moved Permanently" ;;
+        302) print "Moved Temporarily" ;;
+        303) print "See Other" ;;
+        304) print "Not Modified" ;;
+        307) print "Temporary Redirect" ;;
+        308) print "Permanent Redirect" ;;
+        400) print "Bad Request" ;;
+        401) print "Unauthorized" ;;
+        403) print "Forbidden" ;;
+        404) print "Not Found" ;;
+        405) print "Method Not Allowed" ;;
+        408) print "Request Timeout" ;;
+        429) print "Too Many Requests" ;;
+        500) print "Server Error" ;;
+        502) print "Bad Gateway" ;;
+        503) print "Service Unavailable" ;;
+        504) print "Gateway Timeout" ;;
+        *) print "Unknown" ;;
+    esac
+}
+
+# Format date string to standard format
+_urlinfo_fmt_date() {
+    local input=$1
+    # Try to parse with date command
+    local formatted
+    formatted=$(date -j -f "%b %d %H:%M:%S %Y %Z" "$input" "+$DATE_FMT" 2>/dev/null) ||
+    formatted=$(date -j -f "%a, %d %b %Y %H:%M:%S %Z" "$input" "+$DATE_FMT" 2>/dev/null) ||
+    formatted=$input
+    print -r -- $formatted
+}
+
+# --- Main Logic ---
+
+# Parse options
+local -A opts
+zparseopts -D -E -A opts b c f H h i m p t v
+
+# Version
+if (( ${+opts[-v]} )); then
+    print "URLInfo version $VERSION"
+    return 0
+fi
+
+# Help
+if (( ${+opts[-H]} )); then
+    print "Usage: urlinfo [options] URL"
+    print ""
+    print "Options:"
+    print "  -b  show response body (only for unencoded content)"
+    print "  -c  print verbose cURL info"
+    print "  -f  ignore SSL certificate errors"
+    print "  -H  print this help and exit"
+    print "  -h  print verbose response headers"
+    print "  -i  print verbose ipinfo response"
+    print "  -m  mute standard output"
+    print "  -p  force plain text content response"
+    print "  -t  show script execution time"
+    print "  -v  print version and exit"
+    return 0
+fi
+
+# Check arguments
+if (( ARGC == 0 )); then
+    printe "No URL specified. Use -H for help."
+    return 1
+fi
+
+if (( ARGC > 1 )); then
+    printe "Too many arguments. Use -H for help."
+    return 1
+fi
+
+# Check if curl is available
+if ! is_installed curl; then
+    printe "curl not found"
+    return 1
+fi
+
+local url=$1
+local -F start_time=$EPOCHREALTIME
+
+# URL normalization (add https:// if no scheme provided)
+[[ $url != *://* ]] && url="${DEFAULT_SCHEME}://${url}"
+
+# URL validation (using is_url_valid from lib/network.zsh)
+if ! is_url_valid "$url"; then
+    printe "Invalid URL format."
+    return 1
+fi
+
+# Check scheme (urlinfo only supports http/https, not ftp)
+local scheme=${url%%://*}
+if [[ $scheme != http && $scheme != https ]]; then
+    printe "Only http:// and https:// schemes are supported."
+    return 1
+fi
+
+# Prepare temp files
+local tmp_dir=$(mktemp -d)
+local hdr_file="$tmp_dir/headers"
+local body_file="$tmp_dir/body"
+local ssl_file="$tmp_dir/ssl"
+
+trap "rm -rf $tmp_dir" EXIT
+
+# Hide cursor and show progress
+tput civis 2>/dev/null
+printf "${by}⏳${x} Fetching ${b}%s${x}..." "$url"
+
+# Setup curl arguments (no -v, cleaner output)
+local -a curl_args=(
+    -s -L
+    -A "$USER_AGENT"
+    -D "$hdr_file"
+    -o "$body_file"
+    --connect-timeout 5
+    --max-time 30
+)
+
+(( ${+opts[-f]} )) && curl_args+=(-k)
+
+if (( ${+opts[-p]} )); then
+    curl_args+=(-H "Accept-Encoding: identity")
+else
+    curl_args+=(-H "Accept-Encoding: br, gzip, deflate")
+fi
+
+# Write-out format
+local fmt="%{http_code}|%{remote_ip}|%{remote_port}|%{local_ip}|%{local_port}|"
+fmt+="%{size_download}|%{speed_download}|%{content_type}|%{url_effective}|"
+fmt+="%{time_namelookup}|%{time_connect}|%{time_appconnect}|%{time_pretransfer}|"
+fmt+="%{time_starttransfer}|%{time_total}|%{num_redirects}|%{scheme}|%{http_version}"
+
+# Execute main request
+local output
+output=$(curl "${curl_args[@]}" -w "$fmt" "$url" 2>/dev/null)
+local -i curl_status=$?
+
+# Clear progress line
+printf "\r\033[K"
+
+if (( curl_status != 0 )); then
+    tput cnorm 2>/dev/null
+    # Human-readable curl error messages
+    local curl_error
+    case $curl_status in
+        6)  curl_error="Could not resolve host - domain does not exist or DNS failure" ;;
+        7)  curl_error="Failed to connect to host - server may be down or unreachable" ;;
+        28) curl_error="Connection timed out" ;;
+        35) curl_error="SSL/TLS handshake failed" ;;
+        51) curl_error="SSL certificate verification failed" ;;
+        52) curl_error="Server returned empty response" ;;
+        56) curl_error="Network error while receiving data" ;;
+        60) curl_error="SSL certificate problem (untrusted or expired)" ;;
+        *)  curl_error="Connection failed (curl error $curl_status)" ;;
+    esac
+    printe "$curl_error"
+    return 1
+fi
+
+# Parse curl output
+local -a data=( "${(@s:|:)output}" )
+
+local http_code=$data[1]
+local remote_ip=$data[2]
+local remote_port=$data[3]
+local local_ip=$data[4]
+local local_port=$data[5]
+local size_download=$data[6]
+local speed_download=$data[7]
+local content_type=$data[8]
+local url_effective=$data[9]
+local -F t_dns=$data[10]
+local -F t_con=$data[11]
+local -F t_app=$data[12]
+local -F t_pre=$data[13]
+local -F t_start=$data[14]
+local -F t_total=$data[15]
+local -i num_redirects=$data[16]
+local scheme=$data[17]
+local http_version=$data[18]
+
+# Fetch SSL certificate info separately (only for HTTPS)
+local ssl_subject="" ssl_issuer="" ssl_start="" ssl_expire=""
+
+if [[ $scheme == HTTPS ]]; then
+    printf "${by}⏳${x} Fetching SSL info..."
+
+    # Get SSL info with separate curl call using -v
+    local ssl_output
+    ssl_output=$(curl -s -v --head --connect-timeout 3 ${${+opts[-f]}:+-k} "$url_effective" 2>&1)
+
+    printf "\r\033[K"
+
+    # Parse SSL info line by line
+    local ssl_line
+    for ssl_line in "${(@f)ssl_output}"; do
+        if [[ $ssl_line == *"subject:"* ]]; then
+            ssl_subject=${ssl_line#*subject: }
+            [[ $ssl_subject =~ 'CN=([^,;]+)' ]] && ssl_subject=$match[1]
+        elif [[ $ssl_line == *"issuer:"* ]]; then
+            ssl_issuer=${ssl_line#*issuer: }
+            [[ $ssl_issuer =~ 'CN=([^,;]+)' ]] && ssl_issuer=$match[1]
+        elif [[ $ssl_line == *"start date:"* ]]; then
+            ssl_start=${ssl_line#*start date: }
+            ssl_start=$(_urlinfo_fmt_date "$ssl_start")
+        elif [[ $ssl_line == *"expire date:"* ]]; then
+            ssl_expire=${ssl_line#*expire date: }
+            ssl_expire=$(_urlinfo_fmt_date "$ssl_expire")
+        fi
+    done
+fi
+
+# Restore cursor
+tput cnorm 2>/dev/null
+
+# Mute mode - exit early
+if (( ${+opts[-m]} )); then
+    return $(( http_code >= 400 ))
+fi
+
+# Parse headers
+local -A headers
+local hdr_line key val
+for hdr_line in "${(@f)$(< $hdr_file)}"; do
+    hdr_line=${hdr_line//$'\r'/}
+    if [[ $hdr_line == *:* ]]; then
+        key=${hdr_line%%:*}
+        val=${hdr_line#*: }
+        headers[${key:l}]=$val
+    fi
+done
+
+# Verbose curl info
+if (( ${+opts[-c]} )); then
+    printh "cURL info"
+    print "HTTP code:       $http_code"
+    print "Effective URL:   $url_effective"
+    print "Scheme:          $scheme"
+    print "HTTP version:    $http_version"
+    print "Remote:          $remote_ip:$remote_port"
+    print "Local:           $local_ip:$local_port"
+    print "Redirects:       $num_redirects"
+    print "Size download:   $size_download"
+    print "Speed download:  $speed_download"
+    print "Content type:    $content_type"
+    print "DNS lookup:      $t_dns"
+    print "Connect time:    $t_con"
+    print "App connect:     $t_app"
+    print "Pre-transfer:    $t_pre"
+    print "Start transfer:  $t_start"
+    print "Total time:      $t_total"
+    print ""
+fi
+
+# Verbose headers
+if (( ${+opts[-h]} )); then
+    printh "Response headers"
+    local hdr
+    for hdr in ${(ko)headers}; do
+        [[ $hdr == set-cookie || $hdr == content-security-policy ]] && continue
+        print "$hdr: $headers[$hdr]"
+    done
+    print ""
+fi
+
+# Fetch IP info
+local ip_org="" ip_city="" ip_region="" ip_country="" ip_hostname="" ip_bogon="" ip_error=""
+local ip_json=""
+
+if [[ -n $remote_ip ]]; then
+    printf "${by}⏳${x} Fetching IP info..."
+
+    local ip_url="https://ipinfo.io/${remote_ip}"
+    [[ -n $IPINFO_TOKEN ]] && ip_url+="?token=$IPINFO_TOKEN"
+
+    ip_json=$(curl -s --connect-timeout 2 --max-time 5 "$ip_url" 2>/dev/null)
+
+    printf "\r\033[K"
+
+    if [[ -n $ip_json ]]; then
+        ip_error=$(_urlinfo_json_val "$ip_json" "error")
+        ip_bogon=$(_urlinfo_json_val "$ip_json" "bogon")
+        ip_hostname=$(_urlinfo_json_val "$ip_json" "hostname")
+        ip_org=$(_urlinfo_json_val "$ip_json" "org")
+        ip_city=$(_urlinfo_json_val "$ip_json" "city")
+        ip_region=$(_urlinfo_json_val "$ip_json" "region")
+        ip_country=$(_urlinfo_json_val "$ip_json" "country")
+    fi
+fi
+
+# Verbose ipinfo
+if (( ${+opts[-i]} )) && [[ -n $ip_json ]]; then
+    printh "IP info response"
+    print -r -- "$ip_json"
+    print ""
+fi
+
+# --- Display Output ---
+
+# Request
+local display_url=$url_effective
+(( ${#display_url} > 80 )) && display_url="${display_url:0:77}..."
+print "Request:\t${c}GET${x}: ${c}${display_url}${x}"
+
+# Connection
+local scheme_display
+if [[ $scheme == HTTPS ]]; then
+    scheme_display="${g}HTTPS${x}/$http_version"
+else
+    scheme_display="${y}HTTP${x}/$http_version"
+fi
+print "Connection:\t${y}${local_ip}${x}:${y}${local_port}${x} → ${scheme_display} → ${y}${remote_ip}${x}:${y}${remote_port}${x}"
+
+# Response
+local code_color=$r
+(( http_code >= 200 && http_code < 300 )) && code_color=$g
+(( http_code >= 300 && http_code < 400 )) && code_color=$y
+
+local status_text=$(_urlinfo_status_text $http_code)
+local response_detail=""
+[[ -n $headers[status] ]] && response_detail=" ($headers[status])"
+print "Response:\t${code_color}${http_code}${x} ${status_text}${response_detail}"
+
+# Redirect count
+(( num_redirects > 0 )) && print "Redirects:\t${y}${num_redirects}${x} redirect(s) followed"
+
+# IP Info
+if [[ -n $ip_error ]]; then
+    print "IP info:\t${r}API error${x}"
+elif [[ $ip_bogon == true ]]; then
+    print "IP info:\tprivate/bogon IP address"
+elif [[ -n $ip_org ]]; then
+    print "IP info:\tcompany ${y}${ip_org}${x} from ${y}${ip_city}${x} (${ip_region}, ${ip_country})"
+fi
+
+[[ -n $ip_hostname ]] && print "IP hostname:\t${y}${ip_hostname}${x}"
+
+# Server Info
+if [[ -n $headers[server] || -n $headers[date] ]]; then
+    print -n "Server info:\t"
+    [[ -n $headers[server] ]] && print -n "name ${y}$headers[server]${x} "
+    if [[ -n $headers[date] ]]; then
+        local formatted_date=$(_urlinfo_fmt_date "$headers[date]")
+        print -n "date ${y}${formatted_date}${x}"
+    fi
+    print ""
+fi
+
+# Proxy Info
+[[ -n $headers[via] ]] && print "Proxy info:\tvia ${y}$headers[via]${x}"
+
+# Cache Info
+if [[ -n $headers[cache-control] || -n $headers[pragma] ]]; then
+    print -n "Cache info:\t"
+    [[ -n $headers[cache-control] ]] && print -n "cache-control ${y}$headers[cache-control]${x} "
+    [[ -n $headers[pragma] ]] && print -n "pragma ${y}$headers[pragma]${x}"
+    print ""
+fi
+
+# SSL Info
+if [[ $scheme == HTTPS ]]; then
+    print "SSL subject:\tfor ${y}${ssl_subject:-unknown}${x} by ${y}${ssl_issuer:-unknown}${x}"
+    print "SSL validity:\tfrom ${y}${ssl_start:-unknown}${x} until ${y}${ssl_expire:-unknown}${x}"
+fi
+
+# Other Flags
+local flags=""
+[[ -n $headers[strict-transport-security] ]] && flags+="HSTS ${y}$headers[strict-transport-security]${x} "
+[[ -n $headers[x-frame-options] ]] && flags+="X-Frame-Options ${y}${headers[x-frame-options]:l}${x} "
+[[ -n $flags ]] && print "Other flags:\t$flags"
+
+# Content Info
+local ctype_main=${content_type%%;*}
+local ctype_charset=""
+[[ $content_type == *charset=* ]] && ctype_charset=" charset ${y}${${content_type#*charset=}%%[;[:space:]]*}${x}"
+
+print -n "Content type:\t${y}${ctype_main}${x}${ctype_charset}"
+
+if [[ -n $headers[content-encoding] ]]; then
+    local enc_desc=""
+    case $headers[content-encoding] in
+        gzip) enc_desc="(LZ77 with CRC)" ;;
+        compress) enc_desc="(LZW)" ;;
+        deflate) enc_desc="(zlib with deflate)" ;;
+        br) enc_desc="(Brotli)" ;;
+    esac
+    print " encoded with ${y}$headers[content-encoding]${x} $enc_desc"
+else
+    print -n " as ${y}plain text${x}"
+    (( ${+opts[-p]} )) && print -n " (${r}forced${x})"
+    print ""
+fi
+
+print "Content size:\t${y}$(format_bytes $size_download)${x} downloaded at ${y}$(format_bytes $speed_download)/s${x}"
+
+# Timing Info
+local -F t_tcp=$(( t_con - t_dns ))
+local -F t_ssl=$(( t_app - t_con ))
+local -F t_ttfb=$(( t_start - t_pre ))
+local -F t_trans=$(( t_total - t_start ))
+
+print -n "Pretransfer:\tDNS lookup ${y}$(format_time $t_dns)${x}"
+print -n " TCP handshake ${y}$(format_time $t_tcp)${x}"
+if (( t_app > 0 )); then
+    print " SSL handshake ${y}$(format_time $t_ssl)${x}"
+else
+    print " ${y}no SSL (HTTP)${x}"
+fi
+
+print "Transfer:\ttime to first byte ${y}$(format_time $t_ttfb)${x} transfer time ${y}$(format_time $t_trans)${x} total time ${y}$(format_time $t_total)${x}"
+
+# Body content
+if (( ${+opts[-b]} )); then
+    print ""
+    printh "Body content"
+    if [[ -n $headers[content-encoding] ]]; then
+        print "  (encoded with $headers[content-encoding], cannot display)"
+    elif [[ -s $body_file ]]; then
+        cat "$body_file"
+    else
+        print "  (empty)"
+    fi
+    print ""
+fi
+
+# Script execution time
+if (( ${+opts[-t]} )); then
+    local -F elapsed=$(( EPOCHREALTIME - start_time ))
+    print ""
+    print "Script time:\t${c}$(format_time $elapsed)${x}"
+fi
