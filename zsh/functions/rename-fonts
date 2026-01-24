@@ -1,0 +1,28 @@
+# Rename font files in the current directory based on their internal font names.
+# Requires exiftool to be installed.
+
+setopt nullglob
+
+local i=0
+local fonts=(*.otf *.ttf .*.otf .*.ttf)
+for file in $fonts; do
+    if [[ -f "$file" ]]; then
+        local name=$(exiftool -fontname -S $file | sed 's/^[^:]*: //')
+        if [[ $name = "" ]]; then
+            name=$(exiftool $file | grep "Font Name" | head -1 | sed 's/^[^:]*: //')
+        fi
+        [[ $name = "" ]] && echo "No font name found for $file." && continue
+        local filename="${file:t:r}"
+        local extension="${file##*.}"
+        echo "$b$file$r ${y}→$r $g$name.$extension"$r
+        mv $file $name.$extension
+        ((i++))
+    else
+        print "No font files found in the current directory."
+        break
+    fi
+done
+
+print "\n$i files renamed."
+
+unsetopt nullglob
