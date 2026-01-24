@@ -1,0 +1,103 @@
+# Unified function to get random numbers with optional formatting
+# Usage:
+#   get_random [flags]          -> Raw number
+#   get_random [flags] max      -> Range [0, max] (inclusive)
+#   get_random [flags] min max  -> Range [min, max] (inclusive)
+
+
+# Parse options using zparseopts
+local -a opts_bin opts_hex opts_oct opts_ver opts_help
+
+# We map both short (-b) and long (--binary) flags to the same variable.
+zparseopts -D -E \
+    b=opts_bin -binary=opts_bin \
+    x=opts_hex -hex=opts_hex \
+    o=opts_oct -octal=opts_oct \
+    v=opts_ver -version=opts_ver \
+    h=opts_help -help=opts_help
+
+# Handle Help Flag
+if (( ${#opts_help} > 0 )); then
+    print -- "${y}Collatz-Weyl Generator v$_CWG_VERSION$x"
+    print "Usage: ${y}get_random$x [options] [max | min max]"
+    print ""
+    print "Arguments:"
+    print "  No args        Return raw 64-bit integer"
+    print "  max            Return integer in range [0, max] (inclusive)"
+    print "  min max        Return integer in range [min, max] (inclusive)"
+    print ""
+    print "Options:"
+    print "  -b, --binary   Output in binary (base 2)"
+    print "  -x, --hex      Output in hexadecimal (base 16)"
+    print "  -o, --octal    Output in octal (base 8)"
+    print "  -v, --version  Show version"
+    print "  -h, --help     Show this help message"
+    return 0
+fi
+
+# Handle Version Flag
+if (( ${#opts_ver} > 0 )); then
+    print -- "Collatz-Weyl Generator v$_CWG_VERSION"
+    return 0
+fi
+
+# Validate remaining arguments
+local arg
+for arg in "$@"; do
+    if [[ "$arg" == -* ]]; then
+        print -u2 "get_random: unknown option: $arg"
+        print -u2 "Try 'get_random --help' for usage."
+        return 1
+    fi
+    if [[ "$arg" != <-> ]]; then
+        print -u2 "get_random: invalid argument '$arg' (expected positive integer)"
+        return 1
+    fi
+done
+
+# Calculate logic
+local result_val
+
+if (( $# == 0 )); then
+    # Raw number
+    cwg_next
+    result_val=$REPLY
+    
+elif (( $# == 1 )); then
+    # Range [0, max] (inclusive)
+    local max=$1
+    # Note: We allow 0 here if someone really wants a random number from 0 to 0.
+    
+    cwg_next
+    # Logic: To include max, we need modulo (max + 1)
+    (( result_val = REPLY % (max + 1) ))
+    
+elif (( $# == 2 )); then
+    # Range [min, max] (inclusive)
+    local min=$1
+    local max=$2
+    if (( min > max )); then
+        print -u2 "get_random: Max must be greater than or equal to min"
+        return 1
+    fi
+    local range
+    (( range = max - min + 1 ))
+    cwg_next
+    (( result_val = (REPLY % range) + min ))
+    
+else
+    print -u2 "get_random: Too many arguments."
+    return 1
+fi
+
+# Format Output
+if (( ${#opts_bin} > 0 )); then
+    print -- $(( [#2] result_val ))
+elif (( ${#opts_oct} > 0 )); then
+    print -- $(( [#8] result_val ))
+elif (( ${#opts_hex} > 0 )); then
+    print -- $(( [#16] result_val ))
+else
+    # Default: Decimal
+    print -- $(( [#10] result_val ))
+fi

@@ -10,63 +10,59 @@
 # Return codes:
 #   Returns the exit code of the executed command
 
-execs() {
-    # Suppress job control messages
-    setopt LOCAL_OPTIONS NO_MONITOR NO_NOTIFY
 
-    local -a frames=( "${(@)EXECS_SPINNER_FRAMES:-${(@s: :):-| / - \\}}" )
-    local delay=${EXECS_SPINNER_DELAY:-0.16}
-    local usage="${0:t} \"Message text\" <command> [args...]"
+# Suppress job control messages
+setopt LOCAL_OPTIONS NO_MONITOR NO_NOTIFY
 
-    # Parse arguments
-    (( ARGC < 2 )) && printe "$usage" && return 1
-    local message="$1" && shift
-    [[ -z "$message" ]] && message="Processing..."
+local -a frames=( "${(@)EXECS_SPINNER_FRAMES:-${(@s: :):-| / - \\}}" )
+local delay=${EXECS_SPINNER_DELAY:-0.16}
+local usage="${0:t} \"Message text\" <command> [args...]"
 
-    # Check if command exists (commands, functions, aliases, builtins)
-    if ! whence "$1" >/dev/null 2>&1; then
-        printe "Command not found: $1"
-        return 127
-    fi
+# Parse arguments
+(( ARGC < 2 )) && printe "$usage" && return 1
+local message="$1" && shift
+[[ -z "$message" ]] && message="Processing..."
 
-    # Create temporary file for capturing stdout
-    local tmpfile=${TMPDIR:-/tmp}/execs.$$.$RANDOM
+# Check if command exists (commands, functions, aliases, builtins)
+if ! whence "$1" >/dev/null 2>&1; then
+    printe "Command not found: $1"
+    return 127
+fi
 
-    # Execute command in background, capturing stdout
-    "$@" > "$tmpfile" 2>&1 &
-    local pid=$!
-    
-    # Hide cursor for clean animation
-    tput civis 2>/dev/null
-    
-    # Animate spinner while process is running
-    while kill -0 $pid 2>/dev/null; do
-        for frame in "${frames[@]}"; do
-            printf "\r\033[K${by}${frame}${x} ${message}"
-            sleep $delay
-            # Break early if process finished during frame animation
-            kill -0 $pid 2>/dev/null || break
-        done
+# Create temporary file for capturing stdout
+local tmpfile=${TMPDIR:-/tmp}/execs.$$.$RANDOM
+
+# Execute command in background, capturing stdout
+"$@" > "$tmpfile" 2>&1 &
+local pid=$!
+
+# Hide cursor for clean animation
+tput civis 2>/dev/null
+
+# Animate spinner while process is running
+while kill -0 $pid 2>/dev/null; do
+    for frame in "${frames[@]}"; do
+        printf "\r\033[K${by}${frame}${x} ${message}"
+        sleep $delay
+        # Break early if process finished during frame animation
+        kill -0 $pid 2>/dev/null || break
     done
-    
-    # Wait for process completion and capture exit code
-    wait $pid
-    local exit_code=$?
-    
-    # Clear the spinner line
-    printf "\r\033[K"
+done
 
-    # Restore cursor visibility
-    tput cnorm 2>/dev/null
+# Wait for process completion and capture exit code
+wait $pid
+local exit_code=$?
 
-    # Display captured output
-    [[ -s "$tmpfile" ]] && cat "$tmpfile"
+# Clear the spinner line
+printf "\r\033[K"
 
-    # Cleanup
-    rm -f "$tmpfile"
+# Restore cursor visibility
+tput cnorm 2>/dev/null
 
-    return $exit_code
-}
+# Display captured output
+[[ -s "$tmpfile" ]] && cat "$tmpfile"
 
-# Execute function
-execs "$@"
+# Cleanup
+rm -f "$tmpfile"
+
+return $exit_code

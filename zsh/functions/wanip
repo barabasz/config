@@ -3,139 +3,135 @@
 #   -6: Get IPv6 address instead of IPv4
 #   -v: Verbose mode (show which service was used)
 #   -t: Set timeout in seconds (default: 1)
-wanip() {
-    local ipv6=0
-    local verbose=0
-    local timeout=1
-    local ip=""
-    local service_name=""
-    local service_cmd=""
-    
-    # Parse options
-    while [[ "$1" == -* ]]; do
-        case "$1" in
-            -6) ipv6=1 ;;
-            -v) verbose=1 ;;
-            -t) timeout="$2"; shift ;;
-            *) 
-                if (( ${+functions[printe]} )); then
-                    printe "Unknown option: $1"
-                else
-                    print -u2 "Unknown option: $1"
-                fi
-                return 1 
-                ;;
-        esac
-        shift
-    done
 
-    # Check for required tools (prefer dig, fallback to curl)
-    local has_dig=0
-    local has_curl=0
-    (( ${+commands[dig]} )) && has_dig=1
-    (( ${+commands[curl]} )) && has_curl=1
+local ipv6=0
+local verbose=0
+local timeout=1
+local ip=""
+local service_name=""
+local service_cmd=""
 
-    if [[ $has_dig -eq 0 && $has_curl -eq 0 ]]; then
-        if (( ${+functions[printe]} )); then
-            printe "Missing dependencies: 'curl' or 'dig' required."
-        else
-            print -u2 "Error: 'curl' or 'dig' required."
-        fi
-        return 1
-    fi
-
-    # Define services
-    # Format: "ServiceName:Command"
-    local -a services=()
-
-    if [[ $ipv6 -eq 1 ]]; then
-        # IPv6 Services
-        if [[ $has_curl -eq 1 ]]; then
-            services+=(
-                "icanhazip.com:curl -6 -fsS -m $timeout https://icanhazip.com"
-                "ifconfig.me:curl -6 -fsS -m $timeout https://ifconfig.me/ip"
-                "ipify.org:curl -6 -fsS -m $timeout https://api6.ipify.org"
-            )
-        fi
-        # Dig usually defaults to A record (IPv4), getting AAAA (IPv6) requires explicitly asking DNS that supports it
-        # or checking specific TXT records. For simplicity, curl is more reliable for "what is my IPv6" via HTTP.
-    else
-        # IPv4 Services (Mix of DNS/dig and HTTP/curl)
-        
-        # DNS (dig) is much faster than HTTP
-        if [[ $has_dig -eq 1 ]]; then
-            services+=(
-                "OpenDNS (DNS):dig +short -4 myip.opendns.com @resolver1.opendns.com"
-                "Akamai (DNS):dig +short -4 whoami.akamai.net @ns1-1.akamaitech.net"
-                "Google (DNS):dig -4 TXT +short o-o.myaddr.l.google.com @ns1.google.com"
-            )
-        fi
-        
-        # HTTP (curl)
-        if [[ $has_curl -eq 1 ]]; then
-            services+=(
-                "icanhazip.com:curl -4 -fsS -m $timeout https://icanhazip.com"
-                "ifconfig.me:curl -4 -fsS -m $timeout https://ifconfig.me/ip"
-                "ipify.org:curl -4 -fsS -m $timeout https://api.ipify.org"
-                "ipecho.net:curl -4 -fsS -m $timeout https://ipecho.net/plain"
-            )
-        fi
-    fi
-
-    if (( ${#services} == 0 )); then
-        # Should not happen if deps checks passed, but safety first
-        print -u2 "No services available."
-        return 1
-    fi
-
-    # Try each service
-    for service_info in "${services[@]}"; do
-        service_name=${service_info%%:*}
-        service_cmd=${service_info#*:}
-        
-        # Execute command and capture output (stderr discarded)
-        ip=$(eval "$service_cmd" 2>/dev/null)
-        
-        # Trim whitespace
-        ip="${ip##[[:space:]]#}"
-        ip="${ip%%[[:space:]]#}"
-        
-        # Remove quotes if dig returned them (e.g. "1.2.3.4")
-        ip=${ip//\"/}
-
-        # Validation
-        local valid=0
-        if [[ $ipv6 -eq 1 ]]; then
-            # Basic IPv6 check: contains at least two colons
-            [[ "$ip" == *:* ]] && valid=1
-        else
-            # IPv4 check: 4 octets
-            [[ "$ip" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]] && valid=1
-        fi
-
-        if [[ $valid -eq 1 ]]; then
-            if [[ $verbose -eq 1 ]]; then
-                 if (( ${+functions[printi]} )); then
-                    printi "IP found using $service_name"
-                 else
-                    print -u2 "IP found using $service_name"
-                 fi
+# Parse options
+while [[ "$1" == -* ]]; do
+    case "$1" in
+        -6) ipv6=1 ;;
+        -v) verbose=1 ;;
+        -t) timeout="$2"; shift ;;
+        *) 
+            if (( ${+functions[printe]} )); then
+                printe "Unknown option: $1"
+            else
+                print -u2 "Unknown option: $1"
             fi
-            
-            # Print result to stdout
-            print -- "$ip"
-            return 0
-        fi
-    done
+            return 1 
+            ;;
+    esac
+    shift
+done
 
-    # If we reached here, all services failed
+# Check for required tools (prefer dig, fallback to curl)
+local has_dig=0
+local has_curl=0
+(( ${+commands[dig]} )) && has_dig=1
+(( ${+commands[curl]} )) && has_curl=1
+
+if [[ $has_dig -eq 0 && $has_curl -eq 0 ]]; then
     if (( ${+functions[printe]} )); then
-        printe "Failed to retrieve public IP address"
+        printe "Missing dependencies: 'curl' or 'dig' required."
     else
-        print -u2 "Failed to retrieve public IP address"
+        print -u2 "Error: 'curl' or 'dig' required."
     fi
     return 1
-}
+fi
 
-# Execute function
-wanip "$@"
+# Define services
+# Format: "ServiceName:Command"
+local -a services=()
+
+if [[ $ipv6 -eq 1 ]]; then
+    # IPv6 Services
+    if [[ $has_curl -eq 1 ]]; then
+        services+=(
+            "icanhazip.com:curl -6 -fsS -m $timeout https://icanhazip.com"
+            "ifconfig.me:curl -6 -fsS -m $timeout https://ifconfig.me/ip"
+            "ipify.org:curl -6 -fsS -m $timeout https://api6.ipify.org"
+        )
+    fi
+    # Dig usually defaults to A record (IPv4), getting AAAA (IPv6) requires explicitly asking DNS that supports it
+    # or checking specific TXT records. For simplicity, curl is more reliable for "what is my IPv6" via HTTP.
+else
+    # IPv4 Services (Mix of DNS/dig and HTTP/curl)
+    
+    # DNS (dig) is much faster than HTTP
+    if [[ $has_dig -eq 1 ]]; then
+        services+=(
+            "OpenDNS (DNS):dig +short -4 myip.opendns.com @resolver1.opendns.com"
+            "Akamai (DNS):dig +short -4 whoami.akamai.net @ns1-1.akamaitech.net"
+            "Google (DNS):dig -4 TXT +short o-o.myaddr.l.google.com @ns1.google.com"
+        )
+    fi
+    
+    # HTTP (curl)
+    if [[ $has_curl -eq 1 ]]; then
+        services+=(
+            "icanhazip.com:curl -4 -fsS -m $timeout https://icanhazip.com"
+            "ifconfig.me:curl -4 -fsS -m $timeout https://ifconfig.me/ip"
+            "ipify.org:curl -4 -fsS -m $timeout https://api.ipify.org"
+            "ipecho.net:curl -4 -fsS -m $timeout https://ipecho.net/plain"
+        )
+    fi
+fi
+
+if (( ${#services} == 0 )); then
+    # Should not happen if deps checks passed, but safety first
+    print -u2 "No services available."
+    return 1
+fi
+
+# Try each service
+for service_info in "${services[@]}"; do
+    service_name=${service_info%%:*}
+    service_cmd=${service_info#*:}
+    
+    # Execute command and capture output (stderr discarded)
+    ip=$(eval "$service_cmd" 2>/dev/null)
+    
+    # Trim whitespace
+    ip="${ip##[[:space:]]#}"
+    ip="${ip%%[[:space:]]#}"
+    
+    # Remove quotes if dig returned them (e.g. "1.2.3.4")
+    ip=${ip//\"/}
+
+    # Validation
+    local valid=0
+    if [[ $ipv6 -eq 1 ]]; then
+        # Basic IPv6 check: contains at least two colons
+        [[ "$ip" == *:* ]] && valid=1
+    else
+        # IPv4 check: 4 octets
+        [[ "$ip" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]] && valid=1
+    fi
+
+    if [[ $valid -eq 1 ]]; then
+        if [[ $verbose -eq 1 ]]; then
+                if (( ${+functions[printi]} )); then
+                printi "IP found using $service_name"
+                else
+                print -u2 "IP found using $service_name"
+                fi
+        fi
+        
+        # Print result to stdout
+        print -- "$ip"
+        return 0
+    fi
+done
+
+# If we reached here, all services failed
+if (( ${+functions[printe]} )); then
+    printe "Failed to retrieve public IP address"
+else
+    print -u2 "Failed to retrieve public IP address"
+fi
+return 1
