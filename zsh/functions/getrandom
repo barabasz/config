@@ -1,9 +1,11 @@
 # Unified function to get random numbers with optional formatting
+# using the Collatz-Weyl Generator (CWG).
+# Requires cwg_next to be defined and _CWG_VERSION to be set.
+#
 # Usage:
 #   get_random [flags]          -> Raw number
 #   get_random [flags] max      -> Range [0, max] (inclusive)
 #   get_random [flags] min max  -> Range [min, max] (inclusive)
-
 
 # Parse options using zparseopts
 local -a opts_bin opts_hex opts_oct opts_ver opts_help
@@ -62,31 +64,25 @@ if (( $# == 0 )); then
     # Raw number
     cwg_next
     result_val=$REPLY
-    
 elif (( $# == 1 )); then
     # Range [0, max] (inclusive)
     local max=$1
-    # Note: We allow 0 here if someone really wants a random number from 0 to 0.
-    
     cwg_next
-    # Logic: To include max, we need modulo (max + 1)
     (( result_val = REPLY % (max + 1) ))
-    
 elif (( $# == 2 )); then
     # Range [min, max] (inclusive)
     local min=$1
     local max=$2
     if (( min > max )); then
-        print -u2 "get_random: Max must be greater than or equal to min"
+        printe "get_random: Max must be greater than or equal to min"
         return 1
     fi
     local range
     (( range = max - min + 1 ))
     cwg_next
     (( result_val = (REPLY % range) + min ))
-    
 else
-    print -u2 "get_random: Too many arguments."
+    printe "get_random: Too many arguments."
     return 1
 fi
 

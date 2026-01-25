@@ -5,82 +5,66 @@
 #   <number>: Show full trajectory for a single number
 #   <start> <end>: Show statistics table for a range of numbers
 
-
 # Validate argument count
 if (( $# < 1 || $# > 2 )); then
-    if (( ${+functions[printe]} )); then
-        printe "Usage: collatz <number> OR collatz <start> <end>"
-    else
-        print -u2 "Usage: collatz <number> OR collatz <start> <end>"
-    fi
+    printe "Usage: collatz <number> OR collatz <start> <end>"
     return 1
 fi
 
-integer start_num=$1
-integer end_num=0
-local mode="single" 
-
-# Validate first argument (must be positive integer)
-if [[ "$start_num" != <-> || "$start_num" -lt 1 ]]; then
-    if (( ${+functions[printe]} )); then
-        printe "Error: First argument must be a positive integer."
-    else
-        print -u2 "Error: First argument must be a positive integer."
-    fi
+# Parse and validate first argument
+local arg1="$1"
+if [[ "$arg1" != <-> ]] || (( arg1 < 1 )); then
+    printe "Error: First argument must be a positive integer."
     return 1
 fi
 
-# Determine mode and validate second argument if present
+integer start_num=$arg1
+integer end_num=$start_num # Default to single mode (start == end)
+local mode="single"
+
+# Parse and validate second argument (Range Mode)
 if (( $# == 2 )); then
-    end_num=$2
-    mode="range"
-
-    if [[ "$end_num" != <-> ]]; then
-        if (( ${+functions[printe]} )); then
-            printe "Error: Second argument must be a positive integer."
-        else
-            print -u2 "Error: Second argument must be a positive integer."
-        fi
+    local arg2="$2"
+    if [[ "$arg2" != <-> ]]; then
+        printe "Error: Second argument must be a positive integer."
         return 1
     fi
     
+    end_num=$arg2
+    mode="range"
+    
     if (( start_num >= end_num )); then
-        if (( ${+functions[printe]} )); then
-            printe "Error: Range start ($start_num) must be smaller than end ($end_num)."
-        else
-            print -u2 "Error: Range start ($start_num) must be smaller than end ($end_num)."
-        fi
+        printe "Error: Range start ($start_num) must be smaller than end ($end_num)."
         return 1
     fi
-else
-    # Single mode: iterate once
-    end_num=$start_num
 fi
 
 # Print header for range mode
 if [[ "$mode" == "range" ]]; then
-    local fmt="%-10s | %-15s | %-10s\n"
+    # %B starts bold, %b ends bold (Zsh prompt expansion)
     print -P "%BCollatz Range Analysis ($start_num - $end_num)%b"
-    printf "$fmt" "Number" "Max Value" "Steps"
-    print "-------------------------------------------"
+    printf "%-10s | %-15s | %-10s\n" "Number" "Max Value" "Steps"
+    print -- "-------------------------------------------"
 fi
 
 # Main Processing Loop
-integer i
+integer i current steps max_val
+
 for (( i = start_num; i <= end_num; i++ )); do
-    integer current=$i
-    integer steps=0
-    integer max_val=$current
+    current=$i
+    steps=0
+    max_val=$current
     
     # Single mode output: start number
     if [[ "$mode" == "single" ]]; then
-        print -n "$current"
+        print -n -- "$current"
     fi
 
     # Calculate Sequence
     while (( current > 1 )); do
         (( steps++ ))
         
+        # If even: divide by 2, If odd: 3n + 1
         if (( current % 2 == 0 )); then
             (( current /= 2 ))
         else
@@ -89,21 +73,22 @@ for (( i = start_num; i <= end_num; i++ )); do
 
         # Track peak
         if (( current > max_val )); then
-            (( max_val = current ))
+            max_val=$current
         fi
 
         # Single mode output: trajectory
         if [[ "$mode" == "single" ]]; then
-            print -n " -> $current"
+            print -n -- " -> $current"
         fi
     done
 
     # Final Output
     if [[ "$mode" == "single" ]]; then
-        print "\n-------------------------"
-        print "Steps taken: $steps"
-        print "Max value:   $max_val"
+        print -- "\n-------------------------"
+        print -- "Steps taken: $steps"
+        print -- "Max value:   $max_val"
     else
+        # Range mode: Table row
         printf "%-10d | %-15d | %-10d\n" $i $max_val $steps
     fi
 done
