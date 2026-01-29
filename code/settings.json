@@ -58,5 +58,11 @@
     "python.defaultInterpreterPath": "/Users/barabasz/.venv/python",
     "git.openRepositoryInParentFolders": "always",
     "explorer.confirmDelete": false,
-    "editor.unicodeHighlight.invisibleCharacters": false
+    "editor.unicodeHighlight.invisibleCharacters": false,
+    "github.copilot.enable": {
+        "*": true,
+        "plaintext": false,
+        "markdown": true,
+        "scminput": false
+    }
 }
