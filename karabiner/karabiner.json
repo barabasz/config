@@ -212,6 +212,7 @@
                     },
                     {
                         "description": "right_command → right_option / 2️⃣ right_command → caps_lock",
+                        "enabled": false,
                         "manipulators": [
                             {
                                 "conditions": [
