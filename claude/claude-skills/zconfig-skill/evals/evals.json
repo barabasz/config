@@ -1,0 +1,107 @@
+{
+  "evals": [
+    {
+      "id": "fix-bash-function",
+      "prompt": "Popraw tę funkcję żeby była zgodna z wytycznymi zconfig. Funkcja ma sprawdzać czy podany argument jest prawidłowym adresem email.\n\n```zsh\ncheck_email() {\n    if [ $# -ne 1 ]; then\n        echo \"Error: requires exactly 1 argument\"\n        return 1\n    fi\n    \n    email=\"$1\"\n    if echo \"$email\" | grep -qE '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$'; then\n        return 0\n    else\n        return 1\n    fi\n}\n```",
+      "expectations": [
+        "Funkcja używa (( ARGC == 1 )) zamiast [ $# -ne 1 ]",
+        "Funkcja używa print zamiast echo",
+        "Funkcja używa [[ =~ ]] zamiast grep",
+        "Funkcja nie używa zewnętrznych komend (grep, echo)",
+        "Kod jest zgodny z wytycznymi ZSH.md"
+      ]
+    },
+    {
+      "id": "optimize-zsh-code",
+      "prompt": "Zoptymalizuj podany kod by w pełni wykorzystywał możliwości zsh. Funkcja pobiera nazwę pliku bez rozszerzenia.\n\n```zsh\nget_basename() {\n    local filepath=\"$1\"\n    local filename=$(basename \"$filepath\")\n    local name=\"${filename%.*}\"\n    echo \"$name\"\n}\n```",
+      "expectations": [
+        "Kod używa path modifiers (np. :t, :r) zamiast basename",
+        "Kod używa REPLY zamiast echo/subshell",
+        "Kod nie używa zewnętrznych komend",
+        "Kod używa print zamiast echo",
+        "Walidacja argumentów używa (( ARGC == 1 ))"
+      ]
+    },
+    {
+      "id": "write-lib-helper",
+      "prompt": "Napisz szybki helper do biblioteki w lib/strings.zsh. Funkcja ma odwracać kolejność znaków w stringu (reverse string).\n\nNazwa funkcji: str_reverse\nArgument: string do odwrócenia\nZwraca: odwrócony string przez REPLY (NIE używaj subshell)",
+      "expectations": [
+        "Plik zawiera shebang #!/bin/zsh",
+        "Plik zawiera file tracking (zfile_track_start/end)",
+        "Funkcja używa (( )) do walidacji argumentów",
+        "Funkcja używa REPLY do zwracania wartości (nie subshell!)",
+        "Kod jest w 100% zsh-native",
+        "Funkcja NIE używa fn.zsh (to helper, nie user function)",
+        "Nazwa funkcji zgodna z NAMING.md (prefix str_)",
+        "Brak użycia echo lub print do zwracania wartości"
+      ]
+    },
+    {
+      "id": "write-user-function-speedconv",
+      "prompt": "Napisz funkcję do konwersji prędkości do functions/ z wykorzystaniem biblioteki fn.zsh.\n\nWymagania:\n- Nazwa: speedconv\n- Konwersja między: km/h, mph, m/s, knots\n- Argumenty: wartość, jednostka źródłowa, jednostka docelowa\n- Opcja: -p/--precision (liczba miejsc po przecinku, domyślnie 2)\n- Przykłady użycia w pomocy\n- Walidacja typów (wartość musi być liczbą > 0)\n\nUWAGA: Funkcje w functions/ są autoloadowane - NIE dodawaj shebang ani file tracking!",
+      "files": [],
+      "expectations": [
+        "Funkcja używa fn.zsh library (_fn, _fn_args, _fn_opts, _fn_examples)",
+        "Wywołanie _fn_init \"$@\" || return $REPLY",
+        "Argumenty są walidowane (wartość jako float(0;], jednostki jako string)",
+        "Opcja precision walidowana jako integer[0;10]",
+        "Zawiera przykłady użycia w _fn_examples",
+        "Obliczenia używają (( )) arithmetic",
+        "Kod jest w 100% zsh-native",
+        "BRAK shebangu #!/bin/zsh (autoloaded function)",
+        "BRAK file tracking (zfile_track_start/end)",
+        "Funkcja zaczyna się bezpośrednio od kodu"
+      ]
+    },
+    {
+      "id": "app-integration",
+      "prompt": "Stwórz integrację dla narzędzia 'rg' (ripgrep) w apps/rg.zsh.\n\nWymagania:\n- Sprawdź czy rg jest zainstalowane\n- Ustaw alias rga='rg --hidden --glob !.git'\n- Eksportuj RG_COLORS dla kolorowego outputu\n- Dodaj file tracking",
+      "files": [],
+      "expectations": [
+        "Plik zawiera shebang #!/bin/zsh",
+        "Zawiera zfile_track_start i zfile_track_end",
+        "Używa is_installed do sprawdzenia dostępności rg",
+        "Konfiguracja tylko gdy rg jest dostępne",
+        "Prawidłowa struktura zgodna z STRUCTURE.md"
+      ]
+    },
+    {
+      "id": "fix-numeric-comparisons",
+      "prompt": "Popraw wszystkie problemy w tym kodzie:\n\n```zsh\nprocess_files() {\n    if [ $# -lt 2 ] || [ $# -gt 5 ]; then\n        echo \"Error: requires 2-5 arguments\" >&2\n        return 1\n    fi\n    \n    local count=0\n    for file in \"$@\"; do\n        if [ -f \"$file\" ]; then\n            count=$((count + 1))\n            echo \"Processing: $file\"\n        fi\n    done\n    \n    if [ $count -eq 0 ]; then\n        echo \"No files found\"\n        return 1\n    fi\n    \n    echo \"Processed $count files\"\n}\n```",
+      "expectations": [
+        "Używa (( )) dla wszystkich porównań numerycznych",
+        "Nie używa [ ] do testów numerycznych",
+        "Używa ARGC zamiast $#",
+        "Używa print zamiast echo",
+        "Używa print -u2 dla błędów zamiast >&2",
+        "Używa (( count++ )) zamiast count=$((count + 1))"
+      ]
+    },
+    {
+      "id": "optimize-reply-usage",
+      "prompt": "Zoptymalizuj tę funkcję używając REPLY zamiast subshells:\n\n```zsh\nget_file_info() {\n    local filepath=\"$1\"\n    \n    if [[ ! -f \"$filepath\" ]]; then\n        echo \"\"\n        return 1\n    fi\n    \n    local basename=$(basename \"$filepath\")\n    local extension=\"${basename##*.}\"\n    local name=\"${basename%.*}\"\n    \n    echo \"${name}|${extension}\"\n}\n\n# Usage\nresult=$(get_file_info \"/path/to/file.txt\")\n```\n\nZoptymalizuj używając REPLY, path modifiers i bez subshells.",
+      "expectations": [
+        "Funkcja używa REPLY do zwracania wartości",
+        "Używa path modifiers (:t, :e, :r) zamiast basename",
+        "Brak użycia subshells $()",
+        "Brak użycia echo do zwracania wartości",
+        "Walidacja argumentów używa (( ARGC == 1 ))",
+        "Kod używa [[ ]] do testów plików",
+        "Exit code 2 dla invalid usage, 1 dla błędu",
+        "Pokazuje przykład użycia bez $() w komentarzu"
+      ]
+    },
+    {
+      "id": "fix-reserved-variable-name",
+      "prompt": "Ta funkcja ma bug - nie działa poprawnie. Znajdź i napraw problem:\n\n```zsh\nprocess_directory() {\n    (( ARGC == 1 )) || {\n        print -u2 \"Usage: process_directory <path>\"\n        return 2\n    }\n    \n    local path=\"$1\"\n    \n    [[ -d \"$path\" ]] || {\n        print -u2 \"Error: $path is not a directory\"\n        return 1\n    }\n    \n    # Check if required tools are available\n    if ! whence -p grep >/dev/null; then\n        print -u2 \"Error: grep not found\"\n        return 127\n    fi\n    \n    # Process files\n    print \"Processing directory: $path\"\n}\n```\n\nHint: Problem jest związany z nazwą zmiennej lokalnej.",
+      "expectations": [
+        "Zmienia nazwę zmiennej 'path' na inną (np. dir_path, target_path)",
+        "Wyjaśnia że 'path' jest tied do PATH i nie może być używane jako local variable",
+        "Kod używa (( )) do sprawdzania ARGC",
+        "Kod używa print zamiast echo",
+        "Kod używa prawidłowych exit codes (2 dla invalid usage, 127 dla not found)",
+        "Wyjaśnia że shadowing 'path' powoduje że PATH staje się pusty w funkcji"
+      ]
+    }
+  ]
+}

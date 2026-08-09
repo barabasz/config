@@ -1,6 +1,6 @@
 {
     "[sql]": {
-        "editor.defaultFormatter": "adpyke.vscode-sql-formatter"
+        "editor.defaultFormatter": "ms-mssql.mssql"
     },
     "diffEditor.ignoreTrimWhitespace": false,
     "editor.accessibilitySupport": "off",
@@ -52,10 +52,10 @@
     "mssql.connectionGroups": [
         {
             "name": "ROOT",
-            "id": "2E3A0716-4B3B-4968-9119-D77F6DA75B4F"
+            "id": "ROOT"
         }
     ],
-    "python.defaultInterpreterPath": "/Users/barabasz/.venv/python",
+    "python.defaultInterpreterPath": "/Users/barabasz/.local/venv",
     "git.openRepositoryInParentFolders": "always",
     "explorer.confirmDelete": false,
     "editor.unicodeHighlight.invisibleCharacters": false,
@@ -64,5 +64,61 @@
         "plaintext": false,
         "markdown": true,
         "scminput": false
-    }
+    },
+    "git.ignoreRebaseWarning": true,
+    "yaml.disableSchemaDetection": [
+        "**/.github/workflows/*.yml",
+        "**/.github/workflows/*.yaml",
+        "**/.gitea/workflows/*.yml",
+        "**/.gitea/workflows/*.yaml",
+        "**/.forgejo/workflows/*.yml",
+        "**/.forgejo/workflows/*.yaml"
+    ],
+    "pgsql.serverGroups": [
+        {
+            "name": "Servers",
+            "id": "F090DB69-FC12-4A75-9A84-E1B608603353",
+            "isDefault": true
+        }
+    ],
+    "pgsql.connections": [
+        {
+            "id": "E27637F7-7079-423D-AF56-51428BBF03EC",
+            "groupId": "F090DB69-FC12-4A75-9A84-E1B608603353",
+            "authenticationType": "SqlLogin",
+            "connectTimeout": 15,
+            "applicationName": "vscode-pgsql",
+            "clientEncoding": "utf8",
+            "sslmode": "require",
+            "sshSavePassword": true,
+            "savePassword": true,
+            "sslRootCertMode": "none",
+            "server": "db.barabasz.in",
+            "user": "postgres",
+            "password": "",
+            "profileName": "db.barabasz.in",
+            "expiresOn": 0,
+            "sshPassword": ""
+        }
+    ],
+    "mssql.connections": [
+        {
+            "authenticationType": "SqlLogin",
+            "connectTimeout": 30,
+            "applicationName": "vscode-mssql",
+            "applicationIntent": "ReadWrite",
+            "server": "mssql.barabasz.in",
+            "database": "shop_demo",
+            "user": "barabasz",
+            "password": "",
+            "commandTimeout": 30,
+            "encrypt": "Optional",
+            "groupId": "ROOT",
+            "profileName": "shop_demo",
+            "savePassword": true,
+            "trustServerCertificate": true,
+            "id": "0562a2ca-6474-4c37-b035-519252faed6d",
+            "profileSource": 0
+        }
+    ]
 }

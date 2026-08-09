@@ -1,0 +1,1 @@
+/Users/barabasz/.config/zsh/docs/EXAMPLES.md
