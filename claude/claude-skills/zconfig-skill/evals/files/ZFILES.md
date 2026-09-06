@@ -1,1 +1,0 @@
-/Users/barabasz/.config/zsh/docs/ZFILES.md
