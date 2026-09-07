@@ -22,6 +22,16 @@ Status:children_add(function()
 	}
 end, 500, Status.RIGHT)
 
+-- Link target in status bar
+Status:children_add(function(self)
+	local h = self._current.hovered
+	if h and h.link_to then
+		return ui.Span(" -> " .. tostring(h.link_to)):fg("magenta")
+	else
+		return ""
+	end
+end, 3300, Status.LEFT)
+
 -- Extra tab on startup
 ya.emit("tab_create", { Url(os.getenv("HOME")) })
 ya.emit("tab_swap", { -1 })
