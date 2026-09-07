@@ -1,10 +1,13 @@
+-- full-border plugin: https://github.com/yazi-rs/plugins/tree/main/full-border.yazi
 require("full-border"):setup()
 
+-- git.yazi plugin: https://github.com/yazi-rs/plugins/tree/main/git.yazi
 require("git"):setup {
 	-- Order of status signs showing in the linemode
 	order = 1500,
 }
 
+-- Owner and group info in status bar
 Status:children_add(function()
 	local h = cx.active.current.hovered
 	if h == nil or ya.target_family() ~= "unix" then
@@ -18,3 +21,8 @@ Status:children_add(function()
 		" ",
 	}
 end, 500, Status.RIGHT)
+
+-- Extra tab on startup
+ya.emit("tab_create", { Url(os.getenv("HOME")) })
+ya.emit("tab_swap", { -1 })
+ya.emit("tab_switch", { 1 })

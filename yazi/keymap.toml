@@ -1,44 +1,36 @@
-[[mgr.prepend_keymap]]
-on  = "i"
-run = "arrow -1"
-desc = "Move cursor up"
+#:schema https://yazi-rs.github.io/schemas/keymap.json
 
-[[mgr.prepend_keymap]]
-on  = "k"
-run = "arrow 1"
-desc = "Move cursor down"
+[mgr]
+  append_keymap = [
+    # Copy menu
+    { on = [ "c", "s" ], run = "plugin copy-extra -- size",  desc = "Copy file size" },
+    { on = [ "c", "t" ], run = "plugin copy-extra -- mtime", desc = "Copy mod time" },
+  ]
 
-[[mgr.prepend_keymap]]
-on  = "j"
-run = "leave"
-desc = "Go back to the parent directory"
-
-[[mgr.prepend_keymap]]
-on   = "l"
-run  = "plugin smart-enter"
-desc = "Enter the child directory, or open the file"
-
-[[mgr.prepend_keymap]]
-on   = "p"
-run  = "plugin smart-paste"
-desc = "Paste into the hovered directory or CWD"
-
-[[mgr.prepend_keymap]]
-on   = "<Right>"
-run  = "plugin smart-enter"
-desc = "Enter the child directory, or open the file"
-
-[[mgr.prepend_keymap]]
-on  = "F"
-run = "plugin smart-filter"
-desc = "Smart filter"
-
-[[mgr.prepend_keymap]]
-on  = "M"
-run = "plugin mount"
-desc = "Mount manager"
-
-[[mgr.prepend_keymap]]
-on   = "!"
-run  = 'shell "$SHELL" --block'
-desc = "Open shell here"
+  prepend_keymap = [
+    { on = "i",       run = "arrow -1",               desc = "Move cursor up" },
+    { on = "k",       run = "arrow 1",                desc = "Move cursor down" },
+    { on = "j",       run = "leave",                  desc = "Go back to the parent directory" },
+    { on = "l",       run = "plugin smart-enter",     desc = "Enter the child directory, or open the file" },
+    { on = "p",       run = "plugin smart-paste",     desc = "Paste into the hovered directory or CWD" },
+    { on = "<Right>", run = "plugin smart-enter",     desc = "Enter the child directory, or open the file" },
+    { on = "F",       run = "plugin smart-filter",    desc = "Smart filter" },
+    { on = "M",       run = "plugin mount",           desc = "Mount manager" },
+    { on = "!",       run = 'shell "$SHELL" --block', desc = "Open shell here" },
+    # Go-to menu
+    { on = [ "g", "<Space>" ], run = "noop"},
+    { on = [ "g", "b" ], run = "noop" },
+    { on = [ "g", "/" ], run = "cd /",                       desc = "Go to root",           for = "unix" },
+    { on = [ "g", "c" ], run = "cd ~/.config",               desc = "Go to config",         for = "unix" },
+    { on = [ "g", "d" ], run = "cd ~/Downloads",             desc = "Go to downloads",      for = "unix" },
+    { on = [ "g", "f" ], run = "follow",                     desc = "Follow symlink" },
+    { on = [ "g", "g" ], run = "cd ~/GitHub",                desc = "Go to github" },
+    { on = [ "g", "h" ], run = "cd ~",                       desc = "Go to home",           for = "unix" },
+    { on = [ "g", "j" ], run = "cd --interactive",           desc = "Jump to folder" },
+    { on = [ "g", "r" ], run = 'cd C:\\$Recycle.Bin',        desc = 'Go to recycle bin',    for = "windows" },
+    { on = [ "g", "r" ], run = "cd ~/.Trash",                desc = "Go to recycle bin",    for = "unix" },
+    { on = [ "g", "t" ], run = 'cd C:\\Temp',                desc = 'Go to temp',           for = "windows" },
+    { on = [ "g", "t" ], run = "cd ~tmp",                    desc = "Go to temp",           for = "unix" },
+    { on = [ "g", "y" ], run = "cd ~/.config/yazi",          desc = "Go to Yazi",           for = "unix" },
+    { on = [ "g", "z" ], run = "cd ~/.config/zsh",           desc = "Go to zsh",            for = "unix" },
+  ]
