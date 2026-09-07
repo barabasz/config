@@ -6,3 +6,39 @@ sort_dir_first = true
 
 [input]
 cursor_blink = true
+
+[plugin]
+  prepend_fetchers = [
+    # git.yazi plugin: https://github.com/yazi-rs/plugins/tree/main/git.yazi
+    { url = "*",          run = "git",             group = "git" },
+    { url = "*/",         run = "git",             group = "git" },
+
+    # mime-ext plugin: https://github.com/yazi-rs/plugins/tree/main/mime-ext.yazi
+    { url = "local://*",  run = "mime-ext.local",  prio = "high", group = "mime" },
+    { url = "remote://*", run = "mime-ext.remote", prio = "high", group = "mime" },
+  ]
+
+  prepend_preloaders = [
+    # mediainfo plugin: https://github.com/boydaihungst/mediainfo.yazi
+    { mime = "{audio,video,image}/*", run = "mediainfo" },
+    { mime = "application/{subrip,postscript,illustrator,dvb.ait,vnd.adobe.illustrator,eps}", run = "mediainfo" },
+    { url = "*.{ai,eps,ait}", run = "mediainfo" },
+    { mime = "{image}/*", run = "mediainfo --no-metadata" },
+    { mime = "{video}/*", run = "mediainfo --no-preview" },
+  ]
+
+  prepend_previewers = [
+    # piper plugin: https://github.com/yazi-rs/plugins/tree/main/piper.yazi
+    { url = "*.md", run = 'piper -- CLICOLOR_FORCE=1 glow -w=$w -s=dark "$1"' },
+    { url = "*.csv", run = 'piper -- bat -p --color=always "$1"' },
+
+    # mediainfo plugin: https://github.com/boydaihungst/mediainfo.yazi
+    { mime = "{audio,video,image}/*", run = "mediainfo"},
+    { mime = "application/{subrip,postscript,illustrator,dvb.ait,vnd.adobe.illustrator,eps}", run = "mediainfo" },
+    { url = "*.{ai,eps,ait}", run = "mediainfo" },
+    { mime = "{image}/*", run = "mediainfo --no-metadata" },
+    { mime = "{video}/*", run = "mediainfo --no-preview" },
+  ]
+
+[tasks]
+  image_alloc = 1073741824  # 1024*1024*1024 = 1024MB
