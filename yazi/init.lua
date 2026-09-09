@@ -1,3 +1,22 @@
+-- ~/.config/yazi/init.lua
+
+-- proper date/time display format
+function Linemode:mtime()
+	local time = math.floor(self._file.cha.mtime or 0)
+	if time == 0 then
+		return ""
+	end
+	return os.date("%Y-%m-%d %H:%M", time)
+end
+
+function Linemode:btime()
+	local time = math.floor(self._file.cha.btime or 0)
+	if time == 0 then
+		return ""
+	end
+	return os.date("%Y-%m-%d %H:%M", time)
+end
+
 -- full-border plugin: https://github.com/yazi-rs/plugins/tree/main/full-border.yazi
 require("full-border"):setup()
 

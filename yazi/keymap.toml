@@ -18,8 +18,7 @@
     { on = "M",       run = "plugin mount",           desc = "Mount manager" },
     { on = "!",       run = 'shell "$SHELL" --block', desc = "Open shell here" },
     # Go-to menu
-    { on = [ "g", "<Space>" ], run = "noop"},
-    { on = [ "g", "b" ], run = "noop" },
+    { on = [ "g", "<Space>" ], run = "noop" },
     { on = [ "g", "/" ], run = "cd /",                       desc = "Go to root",           for = "unix" },
     { on = [ "g", "c" ], run = "cd ~/.config",               desc = "Go to config",         for = "unix" },
     { on = [ "g", "d" ], run = "cd ~/Downloads",             desc = "Go to downloads",      for = "unix" },
@@ -30,7 +29,10 @@
     { on = [ "g", "r" ], run = 'cd C:\\$Recycle.Bin',        desc = 'Go to recycle bin',    for = "windows" },
     { on = [ "g", "r" ], run = "cd ~/.Trash",                desc = "Go to recycle bin",    for = "unix" },
     { on = [ "g", "t" ], run = 'cd C:\\Temp',                desc = 'Go to temp',           for = "windows" },
-    { on = [ "g", "t" ], run = "cd ~tmp",                    desc = "Go to temp",           for = "unix" },
+    { on = [ "g", "t" ], run = "cd ~/Temp",                  desc = "Go to temp",           for = "unix" },
     { on = [ "g", "y" ], run = "cd ~/.config/yazi",          desc = "Go to Yazi",           for = "unix" },
     { on = [ "g", "z" ], run = "cd ~/.config/zsh",           desc = "Go to zsh",            for = "unix" },
+    # User-defined functions
+    { on = [ "u", "c" ], run = "shell --orphan -- code %h",  desc = "Open in Code",         for = "unix" },
+    { on = [ "u", "l" ], run = "plugin lint",                desc = "Lint file",            for = "unix" },
   ]

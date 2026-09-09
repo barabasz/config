@@ -34,6 +34,13 @@ cursor_blink = true
     # piper plugin: https://github.com/yazi-rs/plugins/tree/main/piper.yazi
     { url = "*.md", run = 'piper -- CLICOLOR_FORCE=1 glow -w=$w -s=dark "$1"' },
     { url = "*.csv", run = 'piper -- bat -p --color=always "$1"' },
+    { url = "*.iml", run = 'piper -- bat -p --color=always "$1"' },
+    { url = "*.ini", run = 'piper -- bat -p --color=always "$1"' },
+    { url = "*.vba", run = 'piper -- bat -p --color=always "$1"' },
+    { url = "*.xml", run = 'piper -- bat -p --color=always "$1"' },
+    { url = "*.zlogin", run = 'piper -- bat -p --color=always "$1"' },
+    { url = "*.zlogout", run = 'piper -- bat -p --color=always "$1"' },
+    { url = "*.zprofile", run = 'piper -- bat -p --color=always "$1"' },
 
     # mediainfo plugin: https://github.com/boydaihungst/mediainfo.yazi
     { mime = "{audio,video,image}/*", run = "mediainfo"},
