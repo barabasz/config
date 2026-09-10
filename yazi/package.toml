@@ -43,6 +43,11 @@ use = "yazi-rs/plugins:piper"
 rev = "4dc7f1b"
 hash = "45a533508a9840cc5a10cf6129f63e6a"
 
+[[plugin.deps]]
+use = "barabasz/yazi-plugins:lint"
+rev = "6bef2f3"
+hash = "64039820b43662bdde5f18b5df5cb75d"
+
 [[flavor.deps]]
 use = "kalidyasin/yazi-flavors:tokyonight-night"
 rev = "bfd1b37"
