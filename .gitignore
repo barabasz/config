@@ -19,7 +19,6 @@ iterm2/sockets
 # `ya pkg install` from yazi/package.toml — only hand-written,
 # unpublished plugins stay tracked here.
 yazi/plugins/*
-!yazi/plugins/copy-extra.yazi
 yazi/flavors/*
 
 # Neovim
